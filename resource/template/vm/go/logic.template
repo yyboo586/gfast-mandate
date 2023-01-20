@@ -1,0 +1,309 @@
+// ==========================================================================
+// GFast自动生成logic操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/logic/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+{{$structName := .table.BusinessName | CaseCamelLower}}
+
+package logic
+////
+{{$gjson:=false}}
+{{$usedSystemModule:=false}}
+{{range $index, $column := .table.Columns}}
+{{if eq $column.HtmlType "images" "file" "files"}}
+{{$gjson = true}}
+{{end}}
+{{if eq $column.HtmlField "createdBy" "updatedBy" "deletedBy"}}
+{{$usedSystemModule = true}}
+{{end}}
+{{end}}
+
+import (
+    "context"
+    "github.com/gogf/gf/v2/frame/g"
+    {{if or .table.HasConversion (eq .table.TplCategory "tree")}}
+    "github.com/gogf/gf/v2/util/gconv"
+    {{end}}
+    "{{.goModName}}/api/v1/{{.table.ModuleName}}"
+    "{{.goModName}}/{{.table.PackageName}}/dao"
+    "{{.goModName}}/{{.table.PackageName}}/model"
+    "{{.goModName}}/{{.table.PackageName}}/model/do"
+    "{{.goModName}}/{{.table.PackageName}}/service"
+    {{if ne .table.TplCategory "tree"}}
+    "{{.goModName}}/internal/app/system/consts"
+    {{end}}
+    {{if $usedSystemModule}}
+    systemService "{{.goModName}}/internal/app/system/service"
+    {{end}}
+    {{if or (eq .table.TplCategory "tree") $gjson}}
+    "{{.goModName}}/library/libUtils"
+    {{end}}
+    "{{.goModName}}/library/liberr"
+)
+
+
+{{$pk:=""}}
+{{$pkGoField:=""}}
+
+{{$createdAt:=""}}
+{{$createdAtGoField:=""}}
+
+{{range $index, $column := .table.Columns}}
+{{if $column.IsPk}}
+    {{$pk = $column.ColumnName}}
+    {{$pkGoField = $column.GoField}}
+{{end}}
+{{if eq $column.ColumnName "created_at"}}
+    {{$createdAt = $column.ColumnName}}
+    {{$createdAtGoField = $column.GoField}}
+{{end}}
+{{end}}
+////
+func init() {
+	service.Register{{.table.ClassName}}(New())
+}
+////
+func New() *s{{.table.ClassName}} {
+	return &s{{.table.ClassName}}{}
+}
+////
+type s{{.table.ClassName}} struct{}
+////
+func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (listRes *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error){
+    listRes = new({{.table.ModuleName}}.{{.table.ClassName}}SearchRes)
+    err = g.Try(ctx, func(ctx context.Context) {
+        m := dao.{{.table.ClassName}}.Ctx(ctx).WithAll()
+        {{range $index, $column := .table.QueryColumns}}
+        {{if eq $column.QueryType "LIKE"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" like ?", "%"+req.{{$column.GoField}}+"%")
+        }
+        {{else if eq $column.QueryType "EQ"}}
+          {{if eq $column.GoType "string"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{else if eq $column.GoType "Time"}}
+            {{if eq $column.ColumnName "created_at"}}
+        if req.BeginTime != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >=", req.BeginTime)
+        }
+        if req.EndTime != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" <", req.EndTime)
+        }
+            {{else}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+            {{end}}
+          {{else if or (eq $column.GoType "int") (eq $column.GoType "int64") (eq $column.GoType "uint") (eq $column.GoType "uint64") (eq $column.GoType "bool")}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{end}}
+        {{else if eq $column.QueryType "BETWEEN" }}
+        if req.{{$column.GoField}} != nil && len(req.{{$column.GoField}}) > 0 {
+          if req.{{$column.GoField}}[0] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >= ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[0]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+          if len(req.{{$column.GoField}}) > 1 && req.{{$column.GoField}}[1] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" < ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[1]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+        }
+        {{end}}
+        {{end}}
+        {{if ne .table.TplCategory "tree"}}
+        listRes.Total, err = m.Count()
+        liberr.ErrIsNil(ctx, err, "获取总行数失败")
+        if req.PageNum == 0 {
+            req.PageNum = 1
+        }
+        listRes.CurrentPage = req.PageNum
+        if req.PageSize == 0 {
+            req.PageSize = consts.PageSize
+        }
+        order:= "{{.table.SortColumn}} {{.table.SortType}}"
+        if req.OrderBy!=""{
+            order = req.OrderBy
+        }
+        var res []*model.{{.table.ClassName}}InfoRes
+        err = m.Fields({{.table.ModuleName}}.{{.table.ClassName}}SearchRes{}).Page(req.PageNum, req.PageSize).Order(order).Scan(&res)
+        {{else}}
+        order:= "{{.table.SortColumn}} {{.table.SortType}}"
+        if req.OrderBy!=""{
+            order = req.OrderBy
+        }
+        var res []*model.{{.table.ClassName}}InfoRes
+        err = m.Fields({{.table.ModuleName}}.{{.table.ClassName}}SearchRes{}).Order(order).Scan(&res)
+        {{end}}
+        liberr.ErrIsNil(ctx, err, "获取数据失败")
+        listRes.List = make([]*model.{{.table.ClassName}}ListRes,len(res))
+        for k,v:=range res{
+            {{range $index, $column := .table.Columns}}
+            {{if and $column.IsList (eq $column.HtmlType "images" "file" "files")}}
+            {{$column.HtmlField}}:= ([]*comModel.UpFile)(nil)
+            err = gjson.DecodeTo(v.{{$column.GoField}},&{{$column.HtmlField}})
+            liberr.ErrIsNil(ctx,err)
+            {{end}}
+            {{end}}
+            listRes.List[k] = &model.{{.table.ClassName}}ListRes{
+                {{if eq .table.TplCategory "tree"}}
+                  {{range $index, $column := .table.Columns}}
+                    {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                    {{end}}
+                  {{end}}
+                  {{range $index, $column := .table.Columns}}
+                    {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
+                      {{if eq $column.HtmlType "images" "file" "files"}}
+                {{$column.GoField}} : {{$column.HtmlField}},
+                      {{else}}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                        {{range $ti, $linkedTable := $.table.LinkedTables}}
+                            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+                Linked{{$column.GoField}}:v.Linked{{$column.GoField}},
+                            {{end}}
+                        {{end}}
+                      {{end}}
+                    {{end}}
+                  {{end}}
+                {{else}}
+                  {{if not .table.IsPkListable}}
+                {{.table.PkColumn.GoField}} : v.{{.table.PkColumn.GoField}},
+                  {{end}}
+                  {{range $index, $column := .table.ListColumns}}
+                    {{if eq $column.HtmlType "images" "file" "files"}}
+                {{$column.GoField}} : {{$column.HtmlField}},
+                    {{else}}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                    {{range $ti, $linkedTable := $.table.LinkedTables}}
+                        {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+                Linked{{$column.GoField}}:v.Linked{{$column.GoField}},
+                        {{end}}
+                    {{end}}
+                    {{end}}
+                  {{end}}
+                {{end}}
+            }
+        }
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.table.PkColumn.HtmlField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error){
+    err =g.Try(ctx, func(ctx context.Context){
+        err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
+        liberr.ErrIsNil(ctx,err,"获取信息失败")
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        {{range $index, $column := .table.EditColumns}}
+        {{if eq $column.HtmlType "checkbox"}}
+        {{$column.HtmlField}} := ""
+        req.{{$column.GoField}}.FilterEmpty()
+        if !req.{{$column.GoField}}.IsEmpty(){
+            {{$column.HtmlField}}=req.{{$column.GoField}}.Join(",")
+        }
+        {{else if eq $column.HtmlType "images" "file" "files"}}
+        for _,obj:=range req.{{$column.GoField}}{
+            obj.Url,err = libUtils.GetFilesPath(ctx,obj.Url)
+            liberr.ErrIsNil(ctx, err)
+        }
+        {{end}}
+        {{end}}
+        _, err = dao.{{.table.ClassName}}.Ctx(ctx).Insert(do.{{.table.ClassName}}{
+            {{if .table.IsPkInsertable}}
+            {{.table.PkColumn.GoField}}:req.{{.table.PkColumn.GoField}},
+            {{end}}
+            {{range $index, $column := .table.EditColumns}}
+            {{if eq $column.HtmlType "checkbox"}}
+            {{$column.GoField}}:{{$column.HtmlField}},
+            {{else}}
+            {{$column.GoField}}:req.{{$column.GoField}},
+            {{end}}
+            {{end}}
+            {{if .table.HasCreatedBy}}
+            CreatedBy:systemService.Context().GetUserId(ctx),
+            {{end}}
+        })
+        liberr.ErrIsNil(ctx, err, "添加失败")
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        {{range $index, $column := .table.EditColumns}}
+        {{if eq $column.HtmlType "checkbox"}}
+        {{$column.HtmlField}} := ""
+        req.{{$column.GoField}}.FilterEmpty()
+        if !req.{{$column.GoField}}.IsEmpty(){
+            {{$column.HtmlField}}=req.{{$column.GoField}}.Join(",")
+        }
+        {{else if eq $column.HtmlType "images" "file" "files"}}
+        for _,obj:=range req.{{$column.GoField}}{
+            obj.Url,err = libUtils.GetFilesPath(ctx,obj.Url)
+            liberr.ErrIsNil(ctx, err)
+        }
+        {{end}}
+        {{end}}
+        _, err = dao.{{.table.ClassName}}.Ctx(ctx).WherePri(req.{{.table.PkColumn.GoField}}).Update(do.{{.table.ClassName}}{
+            {{range $index, $column := .table.EditColumns}}
+            {{if eq $column.HtmlType "checkbox"}}
+            {{$column.GoField}}:{{$column.HtmlField}},
+            {{else}}
+            {{$column.GoField}}:req.{{$column.GoField}},
+            {{end}}
+            {{end}}
+            {{if .table.HasUpdatedBy}}
+            UpdatedBy:systemService.Context().GetUserId(ctx),
+            {{end}}
+        })
+        liberr.ErrIsNil(ctx, err, "修改失败")
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})Delete(ctx context.Context, {{$.table.PkColumn.HtmlField}}s []{{$.table.PkColumn.GoType}}) (err error){
+    err = g.Try(ctx,func(ctx context.Context){
+        {{if eq .table.TplCategory "tree"}}
+        ids, err = s.GetChildrenIds(ctx,ids)
+        liberr.ErrIsNil(ctx,err)
+        {{end}}
+        _, err = dao.{{.table.ClassName}}.Ctx(ctx).Delete(dao.{{.table.ClassName}}.Columns().{{$pkGoField}}+" in (?)", {{$.table.PkColumn.HtmlField}}s)
+        liberr.ErrIsNil(ctx,err,"删除失败")
+    })
+    return
+}
+
+////
+{{if eq .table.TplCategory "tree"}}
+// GetChildrenIds 通过ID获取子级ID
+func (s *s{{.table.ClassName}})GetChildrenIds(ctx context.Context,ids []{{$.table.PkColumn.GoType}}) (returnIds []{{$.table.PkColumn.GoType}},err error) {
+    err = g.Try(ctx,func(ctx context.Context){
+        //获取所有
+        var all *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes
+        all, err = s.List(ctx, &{{.table.ModuleName}}.{{.table.ClassName}}SearchReq{})
+        liberr.ErrIsNil(ctx,err)
+        list := make(g.List, len(all.List))
+        for k, info := range all.List {
+            list[k] = gconv.Map(info)
+        }
+        for _, id := range ids {
+            children := libUtils.FindSonByParentId(list, id, "{{.table.TreeParentCode}}", "{{.table.TreeCode}}")
+            for _, cid := range children {
+                returnIds = append(ids, cid["{{.table.TreeCode}}"].({{$.table.PkColumn.GoType}}))
+            }
+        }
+    })
+	return
+}
+{{end}}

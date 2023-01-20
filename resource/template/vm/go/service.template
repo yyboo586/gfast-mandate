@@ -1,0 +1,54 @@
+// ==========================================================================
+// GFast自动生成service操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/service/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+{{$structName := .table.BusinessName | CaseCamelLower}}
+
+package service
+////
+
+{{$gjson:=false}}
+{{range $index, $column := .table.Columns}}
+{{if eq $column.HtmlType "images" "file" "files"}}
+{{$gjson = true}}
+{{end}}
+{{end}}
+
+import (
+	"context"
+	"{{.goModName}}/api/v1/{{.table.ModuleName}}"
+	"{{.goModName}}/{{.table.PackageName}}/model"
+	{{if or .table.HasConversion (eq .table.TplCategory "tree")}}
+	{{end}}
+)
+
+////
+type I{{.table.ClassName}} interface {
+	List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error)
+	GetBy{{.table.PkColumn.GoField}}(ctx context.Context, {{.table.PkColumn.GoField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error)
+	Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (err error)
+	Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (err error)
+	Delete(ctx context.Context, {{$.table.PkColumn.GoField}} []{{$.table.PkColumn.GoType}}) (err error)
+}
+
+////
+var local{{.table.ClassName}} I{{.table.ClassName}}
+
+////
+func {{.table.ClassName}}() I{{.table.ClassName}} {
+	if local{{.table.ClassName}} == nil {
+		panic("implement not found for interface I{{.table.ClassName}}, forgot register?")
+	}
+	return local{{.table.ClassName}}
+}
+
+////
+func Register{{.table.ClassName}}(i I{{.table.ClassName}}) {
+	local{{.table.ClassName}} = i
+}

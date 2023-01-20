@@ -1,0 +1,108 @@
+import request from '/@/utils/request'
+
+{{$businessName := .table.BusinessName | CaseCamelLower}}
+
+
+{{$plugin:=""}}
+{{if ContainsI $.table.PackageName "plugins"}}
+{{$plugin = "plugins/"}}
+{{end}}
+
+
+// 查询{{.table.FunctionName}}列表
+export function list{{.table.ClassName}}(query:object) {
+  return request({
+    url: '/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询{{.table.FunctionName}}详细
+export function get{{.table.ClassName}}({{.table.PkColumn.HtmlField}}:{{.table.PkColumn.TsType}}) {
+  return request({
+    url: '/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/get',
+    method: 'get',
+    params: {
+      {{.table.PkColumn.HtmlField}}: {{.table.PkColumn.HtmlField}}.toString()
+    }
+  })
+}
+
+// 新增{{.table.FunctionName}}
+export function add{{.table.ClassName}}(data:object) {
+  return request({
+    url: '/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/add',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改{{.table.FunctionName}}
+export function update{{.table.ClassName}}(data:object) {
+  return request({
+    url: '/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/edit',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除{{.table.FunctionName}}
+export function del{{.table.ClassName}}({{.table.PkColumn.HtmlField}}s:{{.table.PkColumn.TsType}}[]) {
+  return request({
+    url: '/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/delete',
+    method: 'delete',
+    data:{
+      {{.table.PkColumn.HtmlField}}s:{{.table.PkColumn.HtmlField}}s
+    }
+  })
+}
+
+
+{{$getUserList:=false}}
+
+{{/*去重处理*/}}
+{{$hasMethods:=newArray}}
+{{range $index,$column:= .table.Columns}}
+{{if and $column.IsStatus $column.IsList}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改
+export function change{{$.table.ClassName}}{{$column.GoField}}({{$.table.PkColumn.HtmlField}}:{{$.table.PkColumn.TsType}},{{$column.HtmlField}}:{{$column.TsType}}) {
+  const data = {
+    {{$.table.PkColumn.HtmlField}},
+    {{$column.HtmlField}}
+  }
+  return request({
+    url: '/{{$plugin}}{{$.apiVersion}}/{{$.table.ModuleName}}/{{$businessName}}/change{{$column.GoField}}',
+    method: 'put',
+    data:data
+  })
+}
+{{end}}
+{{if ne $column.LinkTableName ""}}
+{{if not (inArray $hasMethods (concat "list" $column.LinkTableClass))}}
+{{$hasMethods = append $hasMethods (concat "list" $column.LinkTableClass)}}
+// 关联{{$column.LinkTableName}}表选项
+export function list{{$column.LinkTableClass}}(query:object){
+   return request({
+     url: '/{{$plugin}}{{$.apiVersion}}/{{$column.LinkTableModuleName}}/{{$column.LinkTableBusinessName | CaseCamelLower}}/list',
+     method: 'get',
+     params: query
+   })
+}
+{{end}}
+{{end}}
+{{if eq $column.HtmlField "createdBy" "updatedBy"}}
+{{$getUserList = true}}
+{{end}}
+{{end}}
+
+{{if $getUserList}}
+//获取用户信息列表
+export function getUserList(uIds:number[]){
+    return request({
+     url: '/{{.apiVersion|}}/system/user/getUsers',
+     method: 'get',
+     params: {ids:uIds}
+   })
+}
+{{end}}

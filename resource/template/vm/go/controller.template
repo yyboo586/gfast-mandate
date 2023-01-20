@@ -1,0 +1,68 @@
+// ==========================================================================
+// GFast自动生成controller操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/controller/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+{{$structName := .table.BusinessName | CaseCamelLower}}
+
+package controller
+////
+
+import (
+    "context"
+    "{{.goModName}}/api/v1/{{.table.ModuleName}}"
+    "{{.goModName}}/{{.table.PackageName}}/service"
+    {{if ne $.table.ModuleName "system"}}
+    systemController "{{.goModName}}/internal/app/system/controller"
+    {{end}}
+)
+////
+type {{$structName}}Controller struct {
+    {{if ne $.table.ModuleName "system"}}
+    systemController.BaseController
+    {{else}}
+    BaseController
+    {{end}}
+}
+////
+var {{.table.ClassName}} = new({{$structName}}Controller)
+////
+// List 列表
+func (c *{{$structName}}Controller) List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error) {
+	res, err = service.{{.table.ClassName}}().List(ctx, req)
+	return
+}
+
+////
+// Get 获取{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Get(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}GetReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}GetRes, err error) {
+    res = new({{.table.ModuleName}}.{{.table.ClassName}}GetRes)
+	res.{{.table.ClassName}}InfoRes,err = service.{{.table.ClassName}}().GetBy{{.table.PkColumn.GoField}}(ctx, req.{{.table.PkColumn.GoField}})
+	return
+}
+
+////
+// Add 添加{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}AddRes, err error) {
+	err = service.{{.table.ClassName}}().Add(ctx, req)
+	return
+}
+
+////
+// Edit 修改{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}EditRes, err error) {
+	err = service.{{.table.ClassName}}().Edit(ctx, req)
+	return
+}
+
+////
+// Delete 删除{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Delete(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}DeleteReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}DeleteRes, err error) {
+	err = service.{{.table.ClassName}}().Delete(ctx, req.{{$.table.PkColumn.GoField}}s)
+	return
+}
