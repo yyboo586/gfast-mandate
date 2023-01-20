@@ -2,7 +2,7 @@
 <div align="center">
 	<img src="https://yxh-1301841944.cos.ap-chongqing.myqcloud.com/gfast/2022-04-19/gfastlogo.png">
     <p>
-        <h1>GFast V3.0</h1>
+        <h1>GFast V3.2</h1>
     </p>
     <p align="center">
         <a href="https://goframe.org/pages/viewpage.action?pageId=1114119" target="_blank">
@@ -29,7 +29,7 @@
 
 
 ## 平台简介
-* 基于全新Go Frame 2.0+Vue3+Element Plus开发的全栈前后端分离的管理系统
+* 基于全新Go Frame 2.3+Vue3+Element Plus开发的全栈前后端分离的管理系统
 * 前端采用vue-next-admin 、Vue、Element UI。
 * 本项目由<a href="http://www.qjit.cn/" target="_blank"><b>奇讯科技</b></a>团队开发。
 * 如您想购买云服务器请先领取阿里云优惠券：[点我进入](https://www.aliyun.com/minisite/goods?userCode=fcor2omk )，腾讯云优惠券：[点我领取](https://cloud.tencent.com/act/cps/redirect?redirect=1062&cps_key=20b1c3842f74986b2894e2c5fcde7ea2&from=console )
@@ -39,8 +39,8 @@
 * 模块化：单应用多系统的模式，将一个完整的应用拆分为多个系统，后续扩展更加便捷，增加代码复用性。
 * 插件化： 可通过插件的方式扩展系统功能
 * 认证机制：采用gtoken的用户状态认证及casbin的权限认证
-* 路由模式：得利于goframe2.0提供了规范化的路由注册方式,无需注解自动生成api文档 
-* 面向接口开发 
+* 路由模式：得利于goframe2.0提供了规范化的路由注册方式,无需注解自动生成api文档
+* 面向接口开发
 
 
 ## 内置功能
@@ -69,7 +69,7 @@
 [http://v3.g-fast.cn/sys](http://v3.g-fast.cn/sys)
 账号：demo  密码：123456
 ## 配置
-项目数据库文件 `resource/data/db.sql` 创建数据库导入后修改配置 `manifest/config/config.yaml.bak` 复制改为`manifest/config/config.yaml`  
+项目数据库文件 `resource/data/db.sql` 创建数据库导入后修改配置 `manifest/config/config.yaml.bak` 复制改为`manifest/config/config.yaml`
 
 其中gfToken配置
 ```yaml
@@ -91,7 +91,7 @@ github地址：[https://github.com/tiger1103/gfast-ui](https://github.com/tiger1
 gitee地址：[https://gitee.com/tiger1103/gfast-ui](https://gitee.com/tiger1103/gfast-ui)
 
 ## 文档地址
-> 文档正在书写中，请耐心等一等。
+> [http://doc.g-fast.cn/docs/gfast32](http://doc.g-fast.cn/docs/gfast32)
 
 ## 相关视频
 [https://space.bilibili.com/254192571/channel/seriesdetail?sid=223204](https://space.bilibili.com/254192571/channel/seriesdetail?sid=223204)
@@ -162,9 +162,5 @@ CCflow 国内最优秀的开源流程引擎  [https://gitee.com/opencc/ccflow](h
 ## 支持开源
 如果您喜爱gfast，请给常熬夜的作者来杯咖啡吧！<a href="https://ys0abw.yuque.com/ys0abw/ephcr9/zo38ua" target="_blank"> 点我送咖啡</a>
 
-## 生成service示例
-```shell
-gf2 gen service -s internal/app/system/logic -d internal/app/system/service
-```
 ## [感谢JetBrains提供的免费GoLand](https://jb.gg/OpenSource)
 [![avatar](https://camo.githubusercontent.com/323657c6e81419b8e151e9da4c71f409e3fcc65d630535170c59fe4807dbc905/68747470733a2f2f676f6672616d652e6f72672f646f776e6c6f61642f7468756d626e61696c732f313131343131392f6a6574627261696e732e706e67)](https://jb.gg/OpenSource)
