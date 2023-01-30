@@ -144,42 +144,33 @@ func (s *sToolsGenTable) SelectDbTableListByNames(ctx context.Context, tableName
 func (s *sToolsGenTable) ImportGenTable(ctx context.Context, tableList []*entity.ToolsGenTable) error {
 	if tableList != nil {
 		err := g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
-			for _, table := range tableList {
-				tableName := table.TableName
-				// 保存列信息
-				genTableColumns, err := service.ToolsGenTableColumn().SelectDbTableColumnsByName(ctx, tableName)
-				if err != nil || len(genTableColumns) <= 0 {
-					_ = tx.Rollback()
-					return gerror.New("获取列数据失败")
-				}
-				err = s.InitTable(ctx, table, genTableColumns)
-				if err != nil {
-					_ = tx.Rollback()
-					return err
-				}
-				result, err1 := tx.Model(dao.ToolsGenTable.Table()).Insert(table)
-				if err1 != nil {
-					_ = tx.Rollback()
-					return err1
-				}
-				tmpId, err2 := result.LastInsertId()
-
-				if err2 != nil || tmpId <= 0 {
-					_ = tx.Rollback()
-					return gerror.New("保存数据失败")
-				}
-
-				table.TableId = tmpId
-				for _, column := range genTableColumns {
-					service.ToolsGenTableColumn().InitColumnField(column, table)
-					_, err3 := tx.Model(dao.ToolsGenTableColumn.Table()).Insert(column)
-					if err3 != nil {
-						_ = tx.Rollback()
-						return gerror.New("保存列数据失败")
+			err := g.Try(ctx, func(ctx context.Context) {
+				for _, table := range tableList {
+					tableName := table.TableName
+					// 保存列信息
+					genTableColumns, err := service.ToolsGenTableColumn().SelectDbTableColumnsByName(ctx, tableName)
+					liberr.ErrIsNil(ctx, err, "获取列数据失败")
+					if len(genTableColumns) <= 0 {
+						liberr.ErrIsNil(ctx, gerror.New("获取列数据失败"))
+					}
+					err = s.InitTable(ctx, table, genTableColumns)
+					liberr.ErrIsNil(ctx, err)
+					result, err1 := tx.Model(dao.ToolsGenTable.Table()).Insert(table)
+					liberr.ErrIsNil(ctx, err1)
+					tmpId, err2 := result.LastInsertId()
+					liberr.ErrIsNil(ctx, err2, "保存数据失败")
+					if tmpId <= 0 {
+						liberr.ErrIsNil(ctx, gerror.New("保存数据失败"))
+					}
+					table.TableId = tmpId
+					for _, column := range genTableColumns {
+						service.ToolsGenTableColumn().InitColumnField(column, table)
+						_, err3 := tx.Model(dao.ToolsGenTableColumn.Table()).Insert(column)
+						liberr.ErrIsNil(ctx, err3, "保存列数据失败")
 					}
 				}
-			}
-			return nil
+			})
+			return err
 		})
 		return err
 	} else {
