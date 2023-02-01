@@ -298,9 +298,10 @@ func (s *s{{.table.ClassName}})GetChildrenIds(ctx context.Context,ids []{{$.tabl
             list[k] = gconv.Map(info)
         }
         for _, id := range ids {
+            returnIds = append(returnIds,id)
             children := libUtils.FindSonByParentId(list, id, "{{.table.TreeParentCode}}", "{{.table.TreeCode}}")
             for _, cid := range children {
-                returnIds = append(ids, cid["{{.table.TreeCode}}"].({{$.table.PkColumn.GoType}}))
+                returnIds = append(returnIds, cid["{{.table.TreeCode}}"].({{$.table.PkColumn.GoType}}))
             }
         }
     })
