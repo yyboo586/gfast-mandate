@@ -47,6 +47,7 @@ func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGro
 			controller.ToolsGenTable,
 			controller.Personal,
 			controller.UserOnline,
+			controller.Cache,     // 缓存处理
 			controller.Upload,    // 普通文件上传
 			controller.BigUpload, // 大文件上传
 			controller.UEditor,   //编辑器
