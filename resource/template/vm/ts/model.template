@@ -62,6 +62,7 @@ export interface {{.table.ClassName}}TableDataState {
             {{else}}
             {{$column.HtmlField}}: {{$column.TsType}}|undefined;
             {{end}}{{end}}
+            dateRange: string[];
         };
     };
 }

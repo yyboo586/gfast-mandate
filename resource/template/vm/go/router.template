@@ -23,7 +23,7 @@ var R = new(Router)
 type Router struct{}
 ////
 func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGroup) {
-	group.Group("/demo", func(group *ghttp.RouterGroup) {
+	group.Group("/{{.table.ModuleName}}", func(group *ghttp.RouterGroup) {
 		//登录验证拦截
 		service.GfToken().Middleware(group)
 		//context拦截器

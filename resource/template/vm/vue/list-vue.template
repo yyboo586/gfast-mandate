@@ -16,9 +16,9 @@
                 {{if eq $colIndex 2}}
                 <el-col :span="8" :class="!showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
-                    <el-button type="primary" size="small" @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
-                    <el-button size="small" @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
-                    <el-button type="primary" link size="small" @click="toggleSearch">
+                    <el-button type="primary"  @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
+                    <el-button type="primary" link  @click="toggleSearch">
                       {{"{{"}} word {{"}}"}}
                       <el-icon v-show="showAll"><ele-ArrowUp/></el-icon>
                       <el-icon v-show="!showAll"><ele-ArrowDown /></el-icon>
@@ -33,7 +33,6 @@
                         v-model="tableData.param.{{$column.HtmlField}}{{if eq $column.QueryType "BETWEEN"}}[0]{{end}}"
                         placeholder="请输入{{$column.ColumnComment}}"
                         clearable
-                        size="small"
                         {{if eq $column.QueryType "BETWEEN"}}style="width:100px"{{end}}
                         @keyup.enter.native="{{$businessName}}List"
                     />
@@ -42,7 +41,6 @@
                         v-model="tableData.param.{{$column.HtmlField}}[1]"
                         placeholder="请输入{{$column.ColumnComment}}"
                         clearable
-                        size="small"
                         style="width:100px"
                         @keyup.enter.native="{{$businessName}}List"
                     />
@@ -53,7 +51,7 @@
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox") (ne $column.DictType "") }}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable size="small">
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable >
                         <el-option
                             v-for="dict in {{$column.DictType}}"
                             :key="dict.value"
@@ -68,7 +66,7 @@
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
                     <el-date-picker
-                        clearable size="small" style="width: 200px"
+                        clearable  style="width: 200px"
                         v-model="tableData.param.{{$column.HtmlField}}"
                     {{if eq $column.QueryType "BETWEEN"}}
                         type="daterange"
@@ -87,7 +85,7 @@
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
                     <el-date-picker
-                        clearable size="small" style="width: 200px"
+                        clearable  style="width: 200px"
                         v-model="tableData.param.{{$column.HtmlField}}"
                     {{if eq $column.QueryType "BETWEEN"}}
                         type="datetimerange"
@@ -105,7 +103,7 @@
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox") (ne $column.LinkTableName "")}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable size="small" {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if not $column.IsCascade}}@click.native="get{{$column.LinkTableClass}}{{if $column.IsCascade}}Query{{end}}Items{{$column.GoField}}"{{end}}>
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if not $column.IsCascade}}@click.native="get{{$column.LinkTableClass}}{{if $column.IsCascade}}Query{{end}}Items{{$column.GoField}}"{{end}}>
                       <el-option
                       {{if $column.IsCascade}}
                           v-for="item in {{$column.HtmlField}}QueryOptions"
@@ -123,7 +121,7 @@
                 {{else}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable size="small">
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable >
                         <el-option label="请选择字典生成" value="" />
                     </el-select>
                   </el-form-item>
@@ -131,13 +129,28 @@
                   {{$colIndex = ($colIndex | plus 1)}}
                 {{end}}
               {{end}}
+              {{if eq $column.ColumnName "created_at"}}
+              <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="创建日期" prop="dateRange">
+                      <el-date-picker
+                          clearable style="width: 200px"
+                          v-model="tableData.param.dateRange"
+                          type="daterange"
+                          range-separator="-"
+                          value-format="YYYY-MM-DD"
+                          start-placeholder="开始日期"
+                          end-placeholder="结束日期"
+                      ></el-date-picker>
+                  </el-form-item>
+              </el-col>
+              {{end}}
             {{end}}
             {{if gt $colIndex 2}}
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
-                    <el-button type="primary" size="small" @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
-                    <el-button size="small" @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
-                    <el-button type="primary" link size="small" @click="toggleSearch">
+                    <el-button type="primary"  @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
+                    <el-button type="primary" link  @click="toggleSearch">
                         {{"{{"}} word {{"}}"}}
                         <el-icon v-show="showAll"><ele-ArrowUp/></el-icon>
                         <el-icon v-show="!showAll"><ele-ArrowDown /></el-icon>
@@ -147,8 +160,8 @@
             {{else}}
                 <el-col :span="8" class="colBlock">
                   <el-form-item>
-                    <el-button type="primary"  size="small" @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
-                    <el-button size="small" @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
+                    <el-button type="primary"   @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
                   </el-form-item>
                 </el-col>
             {{end}}
@@ -159,7 +172,6 @@
               <el-col :span="1.5">
                 <el-button
                   type="primary"
-                  size="small"
                   @click="handleAdd"
                   v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/add'"
                 ><el-icon><ele-Plus /></el-icon>新增</el-button>
@@ -167,7 +179,6 @@
               <el-col :span="1.5">
                 <el-button
                   type="success"
-                  size="small"
                   :disabled="single"
                   @click="handleUpdate(null)"
                   v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/edit'"
@@ -176,7 +187,6 @@
               <el-col :span="1.5">
                 <el-button
                   type="danger"
-                  size="small"
                   :disabled="multiple"
                   @click="handleDelete(null)"
                   v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/delete'"
@@ -268,7 +278,6 @@
             <template #default="scope">
             {{if eq .table.ShowDetail "true"}}
               <el-button
-                size="small"
                 type="primary"
                 link
                 @click="handleView(scope.row)"
@@ -276,14 +285,12 @@
               ><el-icon><ele-View /></el-icon>详情</el-button>
               {{end}}
               <el-button
-                size="small"
                 type="primary"
                 link
                 @click="handleUpdate(scope.row)"
                 v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/edit'"
               ><el-icon><ele-EditPen /></el-icon>修改</el-button>
               <el-button
-                size="small"
                 type="primary"
                 link
                 @click="handleDelete(scope.row)"
@@ -464,6 +471,7 @@ export default defineComponent({
                     {{else}}
                     {{$column.HtmlField}}: undefined,
                     {{end}}{{end}}
+                    dateRange: []
                 },
             },
         });
@@ -513,24 +521,28 @@ export default defineComponent({
             });
             {{end}}
             {{if or $hasCreatedBy $hasUpdatedBy}}
-            getUserList(listUid).then((response:any) =>{
-                let users = response.data.list||[]
-                list.map((item:any)=>{
-                    users.forEach((user:any)=>{
-                        {{if $hasCreatedBy}}
-                        if(item.createdBy==user.id){
-                            item.createdBy = user.userNickname
-                        }
-                        {{end}}
-                        {{if $hasUpdatedBy}}
-                        if(item.updatedBy==user.id){
-                            item.updatedBy = user.userNickname
-                        }
-                        {{end}}
+            if(listUid.length>0){
+                getUserList(listUid).then((response:any) =>{
+                    let users = response.data.list||[]
+                    list.map((item:any)=>{
+                        users.forEach((user:any)=>{
+                            {{if $hasCreatedBy}}
+                            if(item.createdBy==user.id){
+                                item.createdBy = user.userNickname
+                            }
+                            {{end}}
+                            {{if $hasUpdatedBy}}
+                            if(item.updatedBy==user.id){
+                                item.updatedBy = user.userNickname
+                            }
+                            {{end}}
+                        })
                     })
+                    state.tableData.data = list;
                 })
+            }else{
                 state.tableData.data = list;
-            })
+            }
             {{else}}
             state.tableData.data = list;
             {{end}}

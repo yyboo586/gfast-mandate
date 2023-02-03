@@ -90,11 +90,8 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleNam
         }
           {{else if eq $column.GoType "Time"}}
             {{if eq $column.ColumnName "created_at"}}
-        if req.BeginTime != "" {
-            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >=", req.BeginTime)
-        }
-        if req.EndTime != "" {
-            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" <", req.EndTime)
+        if len(req.DateRange) != 0 {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >=? AND "+dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" <=?", req.DateRange[0], req.DateRange[1])
         }
             {{else}}
         if req.{{$column.GoField}} != "" {
