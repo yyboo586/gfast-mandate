@@ -11,6 +11,7 @@ package {{.table.ModuleName }}
 ////
 {{$hasUpFile:=false}}
 {{$hasArr:=false}}
+{{$hasGtime:=false}}
 {{range $index,$column :=.table.Columns}}
 {{if eq $column.HtmlType "imagefile" "images" "file" "files" }}
     {{$hasUpFile = true}}
@@ -19,13 +20,17 @@ package {{.table.ModuleName }}
     {{$hasArr = true}}
 {{end}}
 {{end}}
-
+{{range $index,$column :=.table.EditColumns}}
+    {{if eq $column.GoType "Time"}}
+        {{$hasGtime = true}}
+    {{end}}
+{{end}}
 import (
     {{if $hasArr}}
     "github.com/gogf/gf/v2/container/garray"
     {{end}}
     "github.com/gogf/gf/v2/frame/g"
-    {{if .table.HasTimeColumn}}
+    {{if and .table.HasTimeColumn $hasGtime}}
     "github.com/gogf/gf/v2/os/gtime"
     {{end}}
     commonApi "{{.goModName}}/api/v1/common"
