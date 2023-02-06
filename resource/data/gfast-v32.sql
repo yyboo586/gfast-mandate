@@ -11,7 +11,7 @@
  Target Server Version : 50736
  File Encoding         : 65001
 
- Date: 16/01/2023 21:12:04
+ Date: 06/02/2023 09:14:48
 */
 
 SET NAMES utf8mb4;
@@ -179,8 +179,8 @@ CREATE TABLE `demo_gen_class`  (
 -- ----------------------------
 -- Records of demo_gen_class
 -- ----------------------------
-INSERT INTO `demo_gen_class` VALUES (4, '一班');
-INSERT INTO `demo_gen_class` VALUES (5, '二班');
+INSERT INTO `demo_gen_class` VALUES (4, '分类一');
+INSERT INTO `demo_gen_class` VALUES (5, '分类二');
 
 -- ----------------------------
 -- Table structure for demo_gen_other
@@ -265,7 +265,7 @@ CREATE TABLE `sys_auth_rule`  (
   UNIQUE INDEX `name`(`name`) USING BTREE,
   INDEX `pid`(`pid`) USING BTREE,
   INDEX `weigh`(`weigh`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 59 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '菜单节点表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 113 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '菜单节点表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_auth_rule
@@ -310,6 +310,18 @@ INSERT INTO `sys_auth_rule` VALUES (55, 53, 'api/v1/system/sysJob/add', '定时�
 INSERT INTO `sys_auth_rule` VALUES (56, 53, 'api/v1/system/sysJob/edit', '定时任务修改', '', '', '定时任务修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO `sys_auth_rule` VALUES (57, 53, 'api/v1/system/sysJob/delete', '定时任务删除', '', '', '定时任务删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO `sys_auth_rule` VALUES (58, 53, 'api/v1/system/sysJob/run', '执行一次', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2023-01-12 18:20:13', '2023-01-12 18:20:13');
+INSERT INTO `sys_auth_rule` VALUES (89, 0, 'api/v1/demo/demoGenClass', '分类信息管理', 'iconfont icon-fuwenbenkuang', '', '分类信息管理', 0, 0, 0, '/demo/demoGenClass', 'layout/routerView/parent', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (90, 89, 'api/v1/demo/demoGenClass/list', '分类信息列表', 'ele-Fold', '', '分类信息列表', 1, 0, 0, '/demo/demoGenClass/list', 'demo/demoGenClass/list/index', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (91, 90, 'api/v1/demo/demoGenClass/get', '分类信息查询', '', '', '分类信息查询', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (92, 90, 'api/v1/demo/demoGenClass/add', '分类信息添加', '', '', '分类信息添加', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (93, 90, 'api/v1/demo/demoGenClass/edit', '分类信息修改', '', '', '分类信息修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (94, 90, 'api/v1/demo/demoGenClass/delete', '分类信息删除', '', '', '分类信息删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (107, 0, 'api/v1/demo/demoGen', '代码生成测试管理', 'iconfont icon-fuwenbenkuang', '', '代码生成测试管理', 0, 0, 0, '/demo/demoGen', 'layout/routerView/parent', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (108, 107, 'api/v1/demo/demoGen/list', '代码生成测试列表', 'ele-Fold', '', '代码生成测试列表', 1, 0, 0, '/demo/demoGen/list', 'demo/demoGen/list/index', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (109, 108, 'api/v1/demo/demoGen/get', '代码生成测试查询', '', '', '代码生成测试查询', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (110, 108, 'api/v1/demo/demoGen/add', '代码生成测试添加', '', '', '代码生成测试添加', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (111, 108, 'api/v1/demo/demoGen/edit', '代码生成测试修改', '', '', '代码生成测试修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO `sys_auth_rule` VALUES (112, 108, 'api/v1/demo/demoGen/delete', '代码生成测试删除', '', '', '代码生成测试删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_config
@@ -562,108 +574,11 @@ CREATE TABLE `sys_job_log`  (
   `created_at` datetime NULL DEFAULT NULL COMMENT '执行日期',
   `result` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '执行结果',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 103 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务日志表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 551 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务日志表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_job_log
 -- ----------------------------
-INSERT INTO `sys_job_log` VALUES (1, 'test1', '2023-01-13 21:53:44', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (2, 'test1', '2023-01-13 21:53:45', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (3, 'test1', '2023-01-13 21:53:46', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (5, 'test1', '2023-01-13 21:53:47', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (7, 'test1', '2023-01-13 21:53:48', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (9, 'test1', '2023-01-13 21:53:49', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (11, 'test1', '2023-01-13 21:53:50', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (13, 'test1', '2023-01-13 21:53:51', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (14, 'test2', '2023-01-13 21:53:51', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (15, 'test1', '2023-01-13 21:53:52', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (16, 'test2', '2023-01-13 21:53:52', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (17, 'test1', '2023-01-13 21:53:53', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (18, 'test2', '2023-01-13 21:53:53', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (19, 'test1', '2023-01-13 21:53:54', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (20, 'test2', '2023-01-13 21:53:54', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (21, 'test1', '2023-01-13 21:53:55', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (22, 'test2', '2023-01-13 21:53:55', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (23, 'test1', '2023-01-13 21:53:56', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (24, 'test2', '2023-01-13 21:53:56', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (25, 'test1', '2023-01-13 21:53:57', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (26, 'test2', '2023-01-13 21:53:57', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (27, 'test1', '2023-01-13 21:53:58', '无参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (28, 'test2', '2023-01-13 21:53:58', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (29, 'test2', '2023-01-13 21:53:59', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (30, 'test2', '2023-01-13 21:54:00', '有参测试运行成功');
-INSERT INTO `sys_job_log` VALUES (31, 'checkUserOnline', '2023-01-13 22:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (32, 'checkUserOnline', '2023-01-13 22:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (33, 'checkUserOnline', '2023-01-13 22:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (34, 'checkUserOnline', '2023-01-13 22:30:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (35, 'checkUserOnline', '2023-01-13 22:40:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (36, 'checkUserOnline', '2023-01-13 22:50:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (37, 'checkUserOnline', '2023-01-13 23:00:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (38, 'checkUserOnline', '2023-01-13 23:10:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (39, 'checkUserOnline', '2023-01-13 23:20:07', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (40, 'checkUserOnline', '2023-01-13 23:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (41, 'checkUserOnline', '2023-01-16 11:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (42, 'checkUserOnline', '2023-01-16 11:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (43, 'checkUserOnline', '2023-01-16 11:20:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (44, 'checkUserOnline', '2023-01-16 11:30:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (45, 'checkUserOnline', '2023-01-16 11:40:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (46, 'checkUserOnline', '2023-01-16 11:50:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (47, 'checkUserOnline', '2023-01-16 12:00:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (48, 'checkUserOnline', '2023-01-16 12:10:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (49, 'checkUserOnline', '2023-01-16 12:20:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (50, 'checkUserOnline', '2023-01-16 12:30:07', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (51, 'checkUserOnline', '2023-01-16 12:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (52, 'checkUserOnline', '2023-01-16 12:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (53, 'checkUserOnline', '2023-01-16 13:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (54, 'checkUserOnline', '2023-01-16 13:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (55, 'checkUserOnline', '2023-01-16 13:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (56, 'checkUserOnline', '2023-01-16 13:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (57, 'checkUserOnline', '2023-01-16 13:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (58, 'checkUserOnline', '2023-01-16 13:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (59, 'checkUserOnline', '2023-01-16 14:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (60, 'checkUserOnline', '2023-01-16 14:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (61, 'checkUserOnline', '2023-01-16 14:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (62, 'checkUserOnline', '2023-01-16 14:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (63, 'checkUserOnline', '2023-01-16 14:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (64, 'checkUserOnline', '2023-01-16 14:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (65, 'checkUserOnline', '2023-01-16 15:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (66, 'checkUserOnline', '2023-01-16 15:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (67, 'checkUserOnline', '2023-01-16 15:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (68, 'checkUserOnline', '2023-01-16 15:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (69, 'checkUserOnline', '2023-01-16 15:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (70, 'checkUserOnline', '2023-01-16 15:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (71, 'checkUserOnline', '2023-01-16 16:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (72, 'checkUserOnline', '2023-01-16 16:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (73, 'checkUserOnline', '2023-01-16 16:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (74, 'checkUserOnline', '2023-01-16 16:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (75, 'checkUserOnline', '2023-01-16 16:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (76, 'checkUserOnline', '2023-01-16 16:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (77, 'checkUserOnline', '2023-01-16 17:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (78, 'checkUserOnline', '2023-01-16 17:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (79, 'checkUserOnline', '2023-01-16 17:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (80, 'checkUserOnline', '2023-01-16 17:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (81, 'checkUserOnline', '2023-01-16 17:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (82, 'checkUserOnline', '2023-01-16 17:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (83, 'checkUserOnline', '2023-01-16 18:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (84, 'checkUserOnline', '2023-01-16 18:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (85, 'checkUserOnline', '2023-01-16 18:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (86, 'checkUserOnline', '2023-01-16 18:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (87, 'checkUserOnline', '2023-01-16 18:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (88, 'checkUserOnline', '2023-01-16 18:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (89, 'checkUserOnline', '2023-01-16 19:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (90, 'checkUserOnline', '2023-01-16 19:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (91, 'checkUserOnline', '2023-01-16 19:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (92, 'checkUserOnline', '2023-01-16 19:30:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (93, 'checkUserOnline', '2023-01-16 19:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (94, 'checkUserOnline', '2023-01-16 19:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (95, 'checkUserOnline', '2023-01-16 20:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (96, 'checkUserOnline', '2023-01-16 20:10:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (97, 'checkUserOnline', '2023-01-16 20:20:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (98, 'checkUserOnline', '2023-01-16 20:30:06', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (99, 'checkUserOnline', '2023-01-16 20:40:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (100, 'checkUserOnline', '2023-01-16 20:50:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (101, 'checkUserOnline', '2023-01-16 21:00:05', '在线用户定时更新，执行成功');
-INSERT INTO `sys_job_log` VALUES (102, 'checkUserOnline', '2023-01-16 21:10:05', '在线用户定时更新，执行成功');
 
 -- ----------------------------
 -- Table structure for sys_login_log
@@ -681,13 +596,11 @@ CREATE TABLE `sys_login_log`  (
   `login_time` datetime NULL DEFAULT NULL COMMENT '登录时间',
   `module` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '登录模块',
   PRIMARY KEY (`info_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统访问记录' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统访问记录' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_login_log
 -- ----------------------------
-INSERT INTO `sys_login_log` VALUES (1, 'demo', '::1', '内网IP', 'Chrome', 'Windows 10', 1, '登录成功', '2023-01-16 11:00:42', '系统后台');
-INSERT INTO `sys_login_log` VALUES (2, 'demo', '::1', '内网IP', 'Chrome', 'Windows 10', 1, '登录成功', '2023-01-16 18:40:52', '系统后台');
 
 -- ----------------------------
 -- Table structure for sys_oper_log
@@ -709,87 +622,18 @@ CREATE TABLE `sys_oper_log`  (
   `error_msg` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '错误消息',
   `oper_time` datetime NULL DEFAULT NULL COMMENT '操作时间',
   PRIMARY KEY (`oper_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 77 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '操作日志记录' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '操作日志记录' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_oper_log
 -- ----------------------------
-INSERT INTO `sys_oper_log` VALUES (1, '定时任务', 0, '/api/v1/system/sysJob/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/sysJob/list?pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\"}', '', '2023-01-16 11:00:54');
-INSERT INTO `sys_oper_log` VALUES (2, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_job_policy&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"sys_job_policy\"}', '', '2023-01-16 11:00:54');
-INSERT INTO `sys_oper_log` VALUES (3, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_job_status&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"sys_job_status\"}', '', '2023-01-16 11:00:54');
-INSERT INTO `sys_oper_log` VALUES (4, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_job_group&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"sys_job_group\"}', '', '2023-01-16 11:00:54');
-INSERT INTO `sys_oper_log` VALUES (5, '定时任务查询', 0, '/api/v1/system/sysJob/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/sysJob/get?jobId=8', '::1', '内网IP', '{\"jobId\":\"8\"}', '', '2023-01-16 11:00:57');
-INSERT INTO `sys_oper_log` VALUES (6, '', 0, '/api/v1/system/sysJob/logs', 'GET', 1, 'demo', '财务部门', '/api/v1/system/sysJob/logs?pageNum=1&pageSize=10&targetName=checkUserOnline', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"targetName\":\"checkUserOnline\"}', '', '2023-01-16 11:00:57');
-INSERT INTO `sys_oper_log` VALUES (7, '', 0, '/api/v1/system/user/getUsers', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/getUsers?ids[]=2&ids[]=1', '::1', '内网IP', '{\"ids\":[\"2\",\"1\"]}', '', '2023-01-16 11:00:57');
-INSERT INTO `sys_oper_log` VALUES (8, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 11:01:12');
-INSERT INTO `sys_oper_log` VALUES (9, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 11:01:27');
-INSERT INTO `sys_oper_log` VALUES (10, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=3', '::1', '内网IP', '{\"id\":\"3\"}', '', '2023-01-16 11:01:30');
-INSERT INTO `sys_oper_log` VALUES (11, '', 0, '/api/v1/system/role/getParams', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/getParams', '::1', '内网IP', '{}', '', '2023-01-16 11:01:30');
-INSERT INTO `sys_oper_log` VALUES (12, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 11:16:33');
-INSERT INTO `sys_oper_log` VALUES (13, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 11:16:52');
-INSERT INTO `sys_oper_log` VALUES (14, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=3', '::1', '内网IP', '{\"id\":\"3\"}', '', '2023-01-16 11:16:55');
-INSERT INTO `sys_oper_log` VALUES (15, '', 0, '/api/v1/system/role/getParams', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/getParams', '::1', '内网IP', '{}', '', '2023-01-16 11:16:55');
-INSERT INTO `sys_oper_log` VALUES (16, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 11:18:50');
-INSERT INTO `sys_oper_log` VALUES (17, '', 0, '/api/v1/system/role/getParams', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/getParams', '::1', '内网IP', '{}', '', '2023-01-16 11:18:50');
-INSERT INTO `sys_oper_log` VALUES (18, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 11:19:57');
-INSERT INTO `sys_oper_log` VALUES (19, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:28:07');
-INSERT INTO `sys_oper_log` VALUES (20, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:28:09');
-INSERT INTO `sys_oper_log` VALUES (21, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:29:47');
-INSERT INTO `sys_oper_log` VALUES (22, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:33:42');
-INSERT INTO `sys_oper_log` VALUES (23, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:34:11');
-INSERT INTO `sys_oper_log` VALUES (24, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:34:38');
-INSERT INTO `sys_oper_log` VALUES (25, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:34:42');
-INSERT INTO `sys_oper_log` VALUES (26, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:35:10');
-INSERT INTO `sys_oper_log` VALUES (27, '在线用户', 0, '/api/v1/system/online/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/online/list?ipaddr=&userName=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"ipaddr\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"userName\":\"\"}', '', '2023-01-16 12:36:23');
-INSERT INTO `sys_oper_log` VALUES (28, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 12:36:32');
-INSERT INTO `sys_oper_log` VALUES (29, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 12:37:19');
-INSERT INTO `sys_oper_log` VALUES (30, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 18:40:59');
-INSERT INTO `sys_oper_log` VALUES (31, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 18:41:19');
-INSERT INTO `sys_oper_log` VALUES (32, '', 0, '/api/v1/system/role/getParams', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/getParams', '::1', '内网IP', '{}', '', '2023-01-16 18:41:19');
-INSERT INTO `sys_oper_log` VALUES (33, '登录日志', 0, '/api/v1/system/loginLog/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/loginLog/list?pageNum=1&pageSize=10&status=&ipaddr=&loginLocation=&userName=', '::1', '内网IP', '{\"ipaddr\":\"\",\"loginLocation\":\"\",\"pageNum\":\"1\",\"pageSize\":\"10\",\"status\":\"\",\"userName\":\"\"}', '', '2023-01-16 20:10:57');
-INSERT INTO `sys_oper_log` VALUES (34, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=admin_login_status&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"admin_login_status\"}', '', '2023-01-16 20:10:57');
-INSERT INTO `sys_oper_log` VALUES (35, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:35:34');
-INSERT INTO `sys_oper_log` VALUES (36, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:35:36');
-INSERT INTO `sys_oper_log` VALUES (37, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=2', '::1', '内网IP', '{\"id\":\"2\"}', '', '2023-01-16 20:36:10');
-INSERT INTO `sys_oper_log` VALUES (38, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:38:26');
-INSERT INTO `sys_oper_log` VALUES (39, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=2', '::1', '内网IP', '{\"roleId\":\"2\"}', '', '2023-01-16 20:38:31');
-INSERT INTO `sys_oper_log` VALUES (40, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=2', '::1', '内网IP', '{\"id\":\"2\"}', '', '2023-01-16 20:38:31');
-INSERT INTO `sys_oper_log` VALUES (41, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:38:44');
-INSERT INTO `sys_oper_log` VALUES (42, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:38:46');
-INSERT INTO `sys_oper_log` VALUES (43, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:38:46');
-INSERT INTO `sys_oper_log` VALUES (44, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=5', '::1', '内网IP', '{\"id\":\"5\"}', '', '2023-01-16 20:39:19');
-INSERT INTO `sys_oper_log` VALUES (45, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=5', '::1', '内网IP', '{\"roleId\":\"5\"}', '', '2023-01-16 20:39:19');
-INSERT INTO `sys_oper_log` VALUES (46, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:49:39');
-INSERT INTO `sys_oper_log` VALUES (47, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=2', '::1', '内网IP', '{\"roleId\":\"2\"}', '', '2023-01-16 20:49:42');
-INSERT INTO `sys_oper_log` VALUES (48, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=2', '::1', '内网IP', '{\"id\":\"2\"}', '', '2023-01-16 20:49:42');
-INSERT INTO `sys_oper_log` VALUES (49, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:52:42');
-INSERT INTO `sys_oper_log` VALUES (50, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=3', '::1', '内网IP', '{\"id\":\"3\"}', '', '2023-01-16 20:52:47');
-INSERT INTO `sys_oper_log` VALUES (51, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=3', '::1', '内网IP', '{\"roleId\":\"3\"}', '', '2023-01-16 20:52:47');
-INSERT INTO `sys_oper_log` VALUES (52, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:54:24');
-INSERT INTO `sys_oper_log` VALUES (53, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:54:24');
-INSERT INTO `sys_oper_log` VALUES (54, '', 0, '/api/v1/system/role/dataScope', 'PUT', 1, 'demo', '财务部门', '/api/v1/system/role/dataScope', '::1', '内网IP', '{\"dataScope\":\"2\",\"deptCheckStrictly\":true,\"deptIds\":[101,103,104,105,106,107],\"roleId\":1,\"roleName\":\"超级管理员\"}', '', '2023-01-16 20:55:52');
-INSERT INTO `sys_oper_log` VALUES (55, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:55:52');
-INSERT INTO `sys_oper_log` VALUES (56, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:55:55');
-INSERT INTO `sys_oper_log` VALUES (57, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:55:55');
-INSERT INTO `sys_oper_log` VALUES (58, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:56:08');
-INSERT INTO `sys_oper_log` VALUES (59, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:56:08');
-INSERT INTO `sys_oper_log` VALUES (60, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:57:40');
-INSERT INTO `sys_oper_log` VALUES (61, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:57:42');
-INSERT INTO `sys_oper_log` VALUES (62, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:57:42');
-INSERT INTO `sys_oper_log` VALUES (63, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:58:17');
-INSERT INTO `sys_oper_log` VALUES (64, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:58:17');
-INSERT INTO `sys_oper_log` VALUES (65, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=2', '::1', '内网IP', '{\"id\":\"2\"}', '', '2023-01-16 20:58:21');
-INSERT INTO `sys_oper_log` VALUES (66, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=2', '::1', '内网IP', '{\"roleId\":\"2\"}', '', '2023-01-16 20:58:21');
-INSERT INTO `sys_oper_log` VALUES (67, '', 0, '/api/v1/system/role/dataScope', 'PUT', 1, 'demo', '财务部门', '/api/v1/system/role/dataScope', '::1', '内网IP', '{\"dataScope\":\"5\",\"deptCheckStrictly\":false,\"deptIds\":[],\"roleId\":2,\"roleName\":\"普通管理员\"}', '', '2023-01-16 20:58:25');
-INSERT INTO `sys_oper_log` VALUES (68, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"roleName\":\"\",\"roleStatus\":\"\"}', '', '2023-01-16 20:58:25');
-INSERT INTO `sys_oper_log` VALUES (69, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=2', '::1', '内网IP', '{\"id\":\"2\"}', '', '2023-01-16 20:58:27');
-INSERT INTO `sys_oper_log` VALUES (70, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=2', '::1', '内网IP', '{\"roleId\":\"2\"}', '', '2023-01-16 20:58:27');
-INSERT INTO `sys_oper_log` VALUES (71, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=3', '::1', '内网IP', '{\"roleId\":\"3\"}', '', '2023-01-16 20:58:29');
-INSERT INTO `sys_oper_log` VALUES (72, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=3', '::1', '内网IP', '{\"id\":\"3\"}', '', '2023-01-16 20:58:29');
-INSERT INTO `sys_oper_log` VALUES (73, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=4', '::1', '内网IP', '{\"id\":\"4\"}', '', '2023-01-16 20:58:32');
-INSERT INTO `sys_oper_log` VALUES (74, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=4', '::1', '内网IP', '{\"roleId\":\"4\"}', '', '2023-01-16 20:58:32');
-INSERT INTO `sys_oper_log` VALUES (75, '', 0, '/api/v1/system/role/get', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/get?id=1', '::1', '内网IP', '{\"id\":\"1\"}', '', '2023-01-16 20:58:35');
-INSERT INTO `sys_oper_log` VALUES (76, '', 0, '/api/v1/system/role/deptTreeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/deptTreeSelect?roleId=1', '::1', '内网IP', '{\"roleId\":\"1\"}', '', '2023-01-16 20:58:35');
+INSERT INTO `sys_oper_log` VALUES (1, '', 0, '/api/v1/system/operLog/clear', 'DELETE', 1, 'demo', '财务部门', '/api/v1/system/operLog/clear', '::1', '内网IP', '{}', '', '2023-02-06 09:13:47');
+INSERT INTO `sys_oper_log` VALUES (2, '操作日志', 0, '/api/v1/system/operLog/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/operLog/list?pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\"}', '', '2023-02-06 09:13:47');
+INSERT INTO `sys_oper_log` VALUES (3, '代码生成', 0, '/api/v1/system/tools/gen/tableList', 'GET', 1, 'demo', '财务部门', '/api/v1/system/tools/gen/tableList?tableName=&tableComment=&pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\",\"tableComment\":\"\",\"tableName\":\"\"}', '', '2023-02-06 09:13:57');
+INSERT INTO `sys_oper_log` VALUES (4, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_job_status&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"sys_job_status\"}', '', '2023-02-06 09:13:58');
+INSERT INTO `sys_oper_log` VALUES (5, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_job_policy&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"sys_job_policy\"}', '', '2023-02-06 09:13:58');
+INSERT INTO `sys_oper_log` VALUES (6, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_job_group&defaultValue=', '::1', '内网IP', '{\"defaultValue\":\"\",\"dictType\":\"sys_job_group\"}', '', '2023-02-06 09:13:58');
+INSERT INTO `sys_oper_log` VALUES (7, '定时任务', 0, '/api/v1/system/sysJob/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/sysJob/list?pageNum=1&pageSize=10', '::1', '内网IP', '{\"pageNum\":\"1\",\"pageSize\":\"10\"}', '', '2023-02-06 09:13:58');
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -927,7 +771,7 @@ INSERT INTO `sys_user` VALUES (22, 'yxfmlbb', '15969423326', '大数据部门测
 INSERT INTO `sys_user` VALUES (23, 'wangming', '13699888855', '王明', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL);
 INSERT INTO `sys_user` VALUES (24, 'zhk', '13699885591', '综合科', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '192.168.0.146', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL);
 INSERT INTO `sys_user` VALUES (28, 'demo3', '18699888855', '测试账号1', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '123132@qq.com', 0, '', 109, '', 1, '', '', '192.168.0.229', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL);
-INSERT INTO `sys_user` VALUES (31, 'demo', '15334455789', '李四', 0, '6dd68eea81e0fca319add0bd58c3fdf6', '46PvWe1Sl7', 1, '123@qq.com', 2, 'upload_file/2022-11-11/co9copop81co0gysbz.jpg', 109, '3', 1, '云南省曲靖市22223', '生活变的再糟糕，也不妨碍我变得更好', '::1', '2023-01-16 18:40:52', '2021-06-22 17:58:00', '2022-11-11 17:25:27', NULL);
+INSERT INTO `sys_user` VALUES (31, 'demo', '15334455789', '李四', 0, '6dd68eea81e0fca319add0bd58c3fdf6', '46PvWe1Sl7', 1, '123@qq.com', 2, 'upload_file/2022-11-11/co9copop81co0gysbz.jpg', 109, '3', 1, '云南省曲靖市22223', '生活变的再糟糕，也不妨碍我变得更好', '::1', '2023-02-06 08:56:18', '2021-06-22 17:58:00', '2022-11-11 17:25:27', NULL);
 INSERT INTO `sys_user` VALUES (32, 'demo100', '18699888859', '测试账号1', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '[::1]', '2021-11-24 18:01:21', '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL);
 INSERT INTO `sys_user` VALUES (33, 'demo110', '18699888853', '测试账号1', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL);
 INSERT INTO `sys_user` VALUES (34, 'yxfmlbb2', '15969423327', '研发部门测试', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '1111@qqq.com', 1, '', 103, '', 0, '', '', '127.0.0.1', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL);
@@ -936,7 +780,7 @@ INSERT INTO `sys_user` VALUES (36, 'zxd', '13699885565', '张晓东', 0, '542a6e
 INSERT INTO `sys_user` VALUES (37, 'yxfmlbb3', '13513513511', '张三', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '111@qq.com', 0, '', 204, '', 1, '', '', '[::1]', '2021-07-26 14:49:25', '2021-06-22 17:58:00', '2021-07-26 14:49:18', NULL);
 INSERT INTO `sys_user` VALUES (38, 'test_user', '18888888880', 'test', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '11@qq.com', 1, '', 200, '111', 0, '', '', '', NULL, '2021-06-22 17:58:00', '2021-07-12 22:05:29', NULL);
 INSERT INTO `sys_user` VALUES (39, 'asan', '18687460555', '阿三', 0, '2354837137115700e2adf870ac113dcf', 'drdDvbtYZW', 1, '456654@qq.com', 1, '', 201, '666666', 1, '', '', '', NULL, '2021-07-12 17:21:43', '2021-07-12 21:13:31', '2021-07-12 22:00:44');
-INSERT INTO `sys_user` VALUES (40, 'asi', '13655888888', '啊四', 0, 'fbb755b35d48759dad47bb1540249fd1', '9dfUstcxrz', 1, '5464@qq.com', 1, '', 201, 'adsaasd', 1, '', '', '', '0000-00-00 00:00:00', '2021-07-12 17:46:27', '2021-07-12 21:29:41', '2021-07-12 22:00:44');
+INSERT INTO `sys_user` VALUES (40, 'asi', '13655888888', '啊四', 0, 'fbb755b35d48759dad47bb1540249fd1', '9dfUstcxrz', 1, '5464@qq.com', 1, '', 201, 'adsaasd', 1, '', '', '', NULL, '2021-07-12 17:46:27', '2021-07-12 21:29:41', '2021-07-12 22:00:44');
 INSERT INTO `sys_user` VALUES (41, 'awu', '13578556546', '阿五', 0, '3b36a96afa0dfd66aa915e0816e0e9f6', '9gHRa9ho4U', 0, '132321@qq.com', 1, '', 201, 'asdasdasd', 1, '', '', '', NULL, '2021-07-12 17:54:31', '2021-07-12 21:46:34', '2021-07-12 21:59:56');
 INSERT INTO `sys_user` VALUES (42, 'demo01', '13699888556', '测试01222', 0, '048dc94116558fb40920f3553ecd5fe8', 'KiVrfzKJQx', 1, '456@qq.com', 2, '', 109, '测试用户', 1, '', '', '', NULL, '2022-04-12 16:15:23', '2022-04-12 17:54:49', NULL);
 
@@ -955,12 +799,12 @@ CREATE TABLE `sys_user_online`  (
   `os` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作系统',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uni_token`(`token`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户在线状态表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 60 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户在线状态表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_user_online
 -- ----------------------------
-INSERT INTO `sys_user_online` VALUES (17, '1157002b2589ddfbdb34bb3caac863f4', '7ZUSfVIf2HyYjcv86SKPPs29v003ECPEScsdYsYYqO1xEIcOpHEu9FS4ZmjQsf1GCmQAky2EuUzyGJF53YyQWnIkMzq6/8K5VfMPKx1Dt7wrbx+P+2GCvaeUtBH8OcleUJg6TDzXKnby3T6A3ot83g==', '2023-01-16 18:40:52', 'demo', '::1', 'Chrome', 'Windows 10');
+INSERT INTO `sys_user_online` VALUES (59, 'c8693b269879a0277e35665d77553665', '7ZUSfVIf2HyYjcv86SKPPs29v003ECPEScsdYsYYqO1xEIcOpHEu9FS4ZmjQsf1GCmQAky2EuUzyGJF53YyQWhYgG6yhl9QAyS7qAIWCcLkF41pe5PBx6naY3c5zVNJ8lPk/9zVolW/G6MTF44N/iA==', '2023-02-06 08:56:18', 'demo', '::1', 'Chrome', 'Windows 10');
 
 -- ----------------------------
 -- Table structure for sys_user_post
@@ -1032,7 +876,7 @@ CREATE TABLE `tools_gen_table`  (
 -- ----------------------------
 -- Records of tools_gen_table
 -- ----------------------------
-INSERT INTO `tools_gen_table` VALUES (91, 'demo_gen', '代码生成测试表', 'DemoGen', 'crud', 'internal/app/demo', 'demo', 'demo_gen', '代码生成测试', 'gfast', '', '2022-11-01 17:27:43', '2022-12-16 17:30:01', '', b'1', 'id', 'asc', b'1');
+INSERT INTO `tools_gen_table` VALUES (91, 'demo_gen', '代码生成测试表', 'DemoGen', 'crud', 'internal/app/demo', 'demo', 'demo_gen', '代码生成测试', 'gfast', '', '2022-11-01 17:27:43', '2023-02-03 11:27:03', '', b'1', 'id', 'asc', b'1');
 INSERT INTO `tools_gen_table` VALUES (92, 'demo_gen_class', '代码生成关联测试表', 'DemoGenClass', 'crud', 'internal/app/demo', 'demo', 'demo_gen_class', '分类信息', 'gfast', '', '2022-11-03 06:36:57', '2022-12-15 15:17:45', '分类', b'1', 'id', 'asc', b'1');
 INSERT INTO `tools_gen_table` VALUES (93, 'demo_gen_tree', '代码生成树形结构测试表', 'DemoGenTree', 'tree', 'internal/app/demo', 'demo', 'demo_gen_tree', '代码生成树形结构测试', 'gfast', '{\"treeCode\":\"id\",\"treeName\":\"demoName\",\"treeParentCode\":\"parentId\"}', '2022-11-29 15:11:34', '2022-12-20 11:29:00', '', b'1', 'id', 'asc', b'1');
 
@@ -1093,7 +937,7 @@ INSERT INTO `tools_gen_table_column` VALUES (946, 91, 'demo_age', '年龄', 'int
 INSERT INTO `tools_gen_table_column` VALUES (947, 91, 'classes', '班级', 'varchar(30)', 'string', 'string', 'Classes', 'classes', b'0', b'0', b'0', b'1', b'1', b'1', b'1', b'1', 4, 4, 4, 4, 'EQ', 'select', '', 'demo_gen_class', 'DemoGenClass', 'demo', 'demo_gen_class', 'internal/app/demo', 'id', 'class_name', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (948, 91, 'demo_born', '出生年月', 'datetime', 'Time', 'string', 'DemoBorn', 'demoBorn', b'0', b'0', b'0', b'1', b'1', b'1', b'1', b'1', 5, 5, 5, 5, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (949, 91, 'demo_gender', '性别', 'tinyint(3) unsigned', 'uint', 'number', 'DemoGender', 'demoGender', b'0', b'0', b'0', b'1', b'1', b'1', b'1', b'1', 6, 6, 6, 6, 'EQ', 'radio', 'sys_user_sex', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
-INSERT INTO `tools_gen_table_column` VALUES (950, 91, 'created_at', '创建日期', 'datetime', 'Time', 'string', 'CreatedAt', 'createdAt', b'0', b'0', b'0', b'0', b'0', b'1', b'1', b'0', 7, 7, 7, 7, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (950, 91, 'created_at', '创建日期', 'datetime', 'Time', 'string', 'CreatedAt', 'createdAt', b'0', b'0', b'0', b'0', b'0', b'1', b'1', b'1', 7, 7, 7, 7, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (951, 91, 'updated_at', '修改日期', 'datetime', 'Time', 'string', 'UpdatedAt', 'updatedAt', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', 8, 8, 8, 8, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (952, 91, 'deleted_at', '删除日期', 'datetime', 'Time', 'string', 'DeletedAt', 'deletedAt', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', 9, 9, 9, 9, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (953, 91, 'created_by', '创建人', 'bigint(20) unsigned', 'uint64', 'number', 'CreatedBy', 'createdBy', b'0', b'0', b'0', b'0', b'0', b'1', b'1', b'0', 10, 10, 10, 10, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
