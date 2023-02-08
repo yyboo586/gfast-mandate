@@ -46,6 +46,7 @@ type (
 		Delete(ctx context.Context, ids []int) (err error)
 		GetUsers(ctx context.Context, ids []int) (users []*model.SysUserSimpleRes, err error)
 		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}) (where g.Map, err error)
+		HasAccessByDataWhere(ctx context.Context, where g.Map,uid interface{}) bool
 	}
 )
 

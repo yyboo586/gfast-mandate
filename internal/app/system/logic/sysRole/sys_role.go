@@ -237,6 +237,8 @@ func (s *sSysRole) RoleDataScope(ctx context.Context, req *system.DataScopeReq) 
 				_, err = tx.Model(dao.SysRoleDept.Table()).Data(data).Insert()
 				liberr.ErrIsNil(ctx, err, "设置失败")
 			}
+			//清除缓存
+			commonService.Cache().Remove(ctx, consts.CacheSysRole)
 		})
 		return err
 	})

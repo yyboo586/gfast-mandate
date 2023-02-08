@@ -678,7 +678,7 @@ func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser
 						}
 						dList = append(dList, m)
 					}
-					l := libUtils.FindSonByParentId(dList, gconv.Int(userInfo.DeptId), "pid", "id")
+					l := libUtils.FindSonByParentId(dList, userInfo.DeptId, "pid", "id")
 					for _, li := range l {
 						deptIdArr.Add(gconv.Int64(li["id"]))
 					}
@@ -694,4 +694,18 @@ func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser
 		}
 	}
 	return
+}
+
+// HasAccessByDataWhere 判断用户是否有数据权限
+func (s *sSysUser) HasAccessByDataWhere(ctx context.Context, where g.Map, uid interface{}) bool {
+	err := g.Try(ctx, func(ctx context.Context) {
+		rec, err := dao.SysUser.Ctx(ctx).As("user").
+			Fields("user.id").
+			Where("user.id",uid).Where(where).One()
+		liberr.ErrIsNil(ctx, err)
+		if rec.IsEmpty() {
+			liberr.ErrIsNil(ctx, gerror.New("没有数据"))
+		}
+	})
+	return err == nil
 }
