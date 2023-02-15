@@ -1052,7 +1052,13 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 					liberr.ErrIsNil(ctx, err)
 				}
 			}
-			//生成对应模块的logic
+			//生成模块路由
+			err = s.genModuleRouter(curDir, goModName, extendData.ModuleName)
+			liberr.ErrIsNil(ctx, err)
+			//生成模块boot logic
+			err = s.genModuleBootLogic(curDir, extendData.ModuleName)
+			liberr.ErrIsNil(ctx, err)
+			//生成对应模块的业务logic
 			err = s.genModuleLogic(curDir, goModName, extendData.PackageName)
 			liberr.ErrIsNil(ctx, err)
 		}
@@ -1169,7 +1175,7 @@ func (s *sToolsGenTable) trimBreak(str string) (rStr string, err error) {
 	return
 }
 
-// GenModuleRouter 生成模块路由
+// GenModuleRouter 生成模块logic
 func (s *sToolsGenTable) genModuleLogic(curDir, goModName, packageName string) (err error) {
 	var (
 		packages []string
@@ -1194,5 +1200,39 @@ func (s *sToolsGenTable) genModuleLogic(curDir, goModName, packageName string) (
 	}
 	code = fmt.Sprintf(`package logic%s%s`, "\n\n", code)
 	err = s.createFile(path+"/logic.go", code, true)
+	return
+}
+
+func (s *sToolsGenTable) genModuleRouter(curDir, goModName, moduleName string) (err error) {
+	path := strings.Join([]string{curDir, "/internal/router/" + moduleName + ".go"}, "")
+	if gfile.IsFile(path) || moduleName == "system" {
+		return
+	}
+	moduleNameUpper := gstr.CaseCamel(moduleName)
+	code := fmt.Sprintf(`package router
+import (
+	"context"
+	"github.com/gogf/gf/v2/net/ghttp"
+	%sRouter "%s/internal/app/%s/router"
+)
+
+func (router *Router) Bind%sModuleController(ctx context.Context, group *ghttp.RouterGroup) {
+	%sRouter.R.BindController(ctx, group)
+}`, moduleName, goModName, moduleName, moduleNameUpper, moduleName)
+	err = s.createFile(path, code, true)
+	return
+}
+
+func (s *sToolsGenTable) genModuleBootLogic(curDir, moduleName string) (err error) {
+	path := strings.Join([]string{curDir, "/internal/app/boot/" + moduleName + ".go"}, "")
+	if gfile.IsFile(path) || moduleName == "system" {
+		return
+	}
+	code := fmt.Sprintf(`package boot
+import (
+	_ "github.com/tiger1103/gfast/v3/internal/app/%s/logic"
+)
+`, moduleName)
+	err = s.createFile(path, code, true)
 	return
 }
