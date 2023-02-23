@@ -2,16 +2,19 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/net/goai"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/tiger1103/gfast/v3/internal/consts"
 	"github.com/tiger1103/gfast/v3/internal/router"
 )
 
 var (
+
 	Main = gcmd.Command{
 		Name:  "main",
 		Usage: "main",
@@ -23,6 +26,16 @@ var (
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				router.R.BindController(ctx, group)
 			})
+			//重新配置swaggerUI静态页面--start--,若要使用原版gf字段swaggerUI请删除或注释此段
+			s.BindHookHandler(g.Cfg().MustGet(ctx,"server.swaggerPath").String()+"/*", ghttp.HookBeforeServe, func(r *ghttp.Request) {
+				content := gstr.ReplaceByMap(consts.SwaggerUITemplate, map[string]string{
+					`{SwaggerUIDocUrl}`: g.Cfg().MustGet(ctx, "server.openapiPath").String(),
+					`{SwaggerUIDocNamePlaceHolder}`: gstr.TrimRight(fmt.Sprintf(`//%s`, r.Host)),
+				})
+				r.Response.Write(content)
+				r.ExitAll()
+			})
+			//重新配置swaggerUI静态页面--end--
 			enhanceOpenAPIDoc(s)
 			s.Run()
 			return nil
