@@ -422,6 +422,7 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 							dbColumn.IsCascade = column.IsCascade
 							dbColumn.ParentColumnName = column.ParentColumnName
 							dbColumn.CascadeColumnName = column.CascadeColumnName
+							dbColumn.TsType = column.TsType
 							if tc, e := options["treeParentCode"]; options != nil && e && tc != "" && tc == dbColumn.HtmlField {
 								dbColumn.IsQuery = false
 								dbColumn.IsList = false
