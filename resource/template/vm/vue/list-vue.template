@@ -308,6 +308,23 @@
             @pagination="{{$businessName}}List"
         />
     </el-card>
+    <{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add
+        ref="addRef"
+        {{range $index, $column := .table.Columns}}
+        {{if ne $column.DictType ""}}
+        :{{$column.HtmlField}}Options="{{$column.DictType}}"
+        {{else if ne $column.LinkTableName ""}}
+        {{if $column.IsCascade}}
+        {{/*级联处理*/}}
+        {{else}}
+        {{/*关联表处理*/}}
+        :{{$column.HtmlField}}Options="{{$column.HtmlField}}Options"
+        @get{{$column.LinkTableClass}}Items{{$column.GoField}}="get{{$column.LinkTableClass}}Items{{$column.GoField}}"
+        {{end}}
+        {{end}}
+        {{end}}
+        @{{$businessName}}List="{{$businessName}}List"
+    ></{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add>
     <{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit
        ref="editRef"
        {{range $index, $column := .table.Columns}}
@@ -401,11 +418,13 @@ import {
     Linked{{$.table.ClassName}}{{$linkedTable.ClassName}},
     {{end}}
 } from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
+import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/add.vue"
 import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/edit.vue"
 import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/detail.vue"
 export default defineComponent({
     name: "{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}List",
     components:{
+        {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add,
         {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit,
         {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail
     },
@@ -413,6 +432,7 @@ export default defineComponent({
         const {proxy} = <any>getCurrentInstance()
         const loading = ref(false)
         const queryRef = ref()
+        const addRef = ref();
         const editRef = ref();
         const detailRef = ref();
         // 是否显示所有搜索选项
@@ -430,17 +450,19 @@ export default defineComponent({
             }
         })
         // 字典选项数据
+        {{$dictArr:=newArray}}
+        {{range $index, $column := .table.Columns}}
+        {{if and (ne $column.DictType "") (ne (inArray $dictArr $column.DictType) true)}}
+            {{$dictArr = append $dictArr $column.DictType}}
+        {{end}}
+        {{end}}
         const {
-            {{range $index, $column := .table.Columns}}
-                {{if ne $column.DictType ""}}
-                {{$column.DictType}},
-                {{end}}
+            {{range $index, $column := $dictArr}}
+            {{$column}},
             {{end}}
         } = proxy.useDict(
-            {{range $index, $column := .table.Columns}}
-                {{if ne $column.DictType ""}}
-                '{{$column.DictType}}',
-                {{end}}
+            {{range $index, $column := $dictArr}}
+            '{{$column}}',
             {{end}}
         )
         {{range $index, $column := .table.Columns}}
@@ -591,7 +613,7 @@ export default defineComponent({
             multiple.value = !selection.length
         }
         const handleAdd =  ()=>{
-            editRef.value.openDialog()
+            addRef.value.openDialog()
         }
         const handleUpdate = (row: {{$.table.ClassName}}TableColumns) => {
             if(!row){
@@ -632,6 +654,7 @@ export default defineComponent({
         }
         return {
             proxy,
+            addRef,
             editRef,
             detailRef,
             showAll,

@@ -202,7 +202,7 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
 ////
 func (s *s{{.table.ClassName}})Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (err error){
     err = g.Try(ctx, func(ctx context.Context) {
-        {{range $index, $column := .table.EditColumns}}
+        {{range $index, $column := .table.InsertColumns}}
         {{if eq $column.HtmlType "checkbox"}}
         {{$column.HtmlField}} := ""
         req.{{$column.GoField}}.FilterEmpty()
@@ -220,7 +220,7 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *{{.table.ModuleName
             {{if .table.IsPkInsertable}}
             {{.table.PkColumn.GoField}}:req.{{.table.PkColumn.GoField}},
             {{end}}
-            {{range $index, $column := .table.EditColumns}}
+            {{range $index, $column := .table.InsertColumns}}
             {{if eq $column.HtmlType "checkbox"}}
             {{$column.GoField}}:{{$column.HtmlField}},
             {{else}}

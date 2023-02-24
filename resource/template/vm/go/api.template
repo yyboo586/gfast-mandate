@@ -25,6 +25,11 @@ package {{.table.ModuleName }}
         {{$hasGtime = true}}
     {{end}}
 {{end}}
+{{range $index,$column :=.table.InsertColumns}}
+    {{if eq $column.GoType "Time"}}
+        {{$hasGtime = true}}
+    {{end}}
+{{end}}
 import (
     {{if $hasArr}}
     "github.com/gogf/gf/v2/container/garray"
@@ -67,7 +72,7 @@ type {{.table.ClassName}}AddReq struct {
     {{if .table.IsPkInsertable}}
     {{.table.PkColumn.GoField}}    {{.table.PkColumn.GoType}}  `p:"{{.table.PkColumn.HtmlField}}" v:"required#主键ID不能为空"`
     {{end}}
-    {{range $index, $column := .table.EditColumns}}
+    {{range $index, $column := .table.InsertColumns}}
     {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox"}}garray.StrArray{{else}}{{$column.GoType}}{{end}}   `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}}`
     {{end}}
     {{if .table.HasCreatedBy}}

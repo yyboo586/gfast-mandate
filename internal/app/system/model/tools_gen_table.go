@@ -45,7 +45,8 @@ type ToolsGenTableEx struct {
 	HasUpdatedBy   bool                     // 是否有updated_by字段
 	HasConversion  bool                     // service中是否有转换函数
 	Columns        []*ToolsGenTableColumnEx // 表列信息
-	EditColumns    []*ToolsGenTableColumnEx // 新增、编辑界面列信息，主键单独判断不在此列
+	InsertColumns  []*ToolsGenTableColumnEx // 新增界面列信息，主键单独判断不在此列
+	EditColumns    []*ToolsGenTableColumnEx // 编辑界面列信息，主键单独判断不在此列
 	ListColumns    []*ToolsGenTableColumnEx // 列表界面列信息
 	DetailColumns  []*ToolsGenTableColumnEx // 详情界面列信息
 	QueryColumns   []*ToolsGenTableColumnEx // 查询表单列信息

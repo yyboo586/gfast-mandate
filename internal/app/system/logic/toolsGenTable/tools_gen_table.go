@@ -663,6 +663,16 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		return
 	}
 
+	vueAddKey := "vueAdd"
+	vueAddValue := ""
+	var tmpVueAddModel string
+	if tmpVueAddModel, err = view.Parse(ctx, "vue/add-vue.template", tplData); err == nil {
+		vueAddValue = tmpVueAddModel
+		vueAddValue, err = s.trimBreak(vueAddValue)
+	} else {
+		return
+	}
+
 	vueEditKey := "vueEdit"
 	vueEditValue := ""
 	var tmpVueEditModel string
@@ -699,6 +709,7 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		tsApiKey:       tsApiValue,
 		tsModelKey:     tsModelValue,
 		vueKey:         vueValue,
+		vueAddKey:      vueAddValue,
 		vueEditKey:     vueEditValue,
 		vueDetailKey:   vueDetailValue,
 	}
@@ -735,6 +746,7 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 	allColumnExs := make([]*model.ToolsGenTableColumnEx, len(columns))
 
 	var (
+		insertColumns []*model.ToolsGenTableColumnEx
 		editColumns   []*model.ToolsGenTableColumnEx
 		listColumns   []*model.ToolsGenTableColumnEx
 		detailColumns []*model.ToolsGenTableColumnEx
@@ -751,6 +763,12 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 		allColumnExs[i] = columnEx
 		tableEx.IsPkInsertable = tableEx.IsPkInsertable || column.IsPk && !column.IsIncrement
 		tableEx.IsPkListable = tableEx.IsPkListable || column.IsPk && column.IsList
+		if column.IsInsert && !service.ToolsGenTableColumn().IsNotEdit(columnName) && !column.IsPk {
+			insertColumns = append(insertColumns, columnEx)
+			columnEx.IsInsert = true
+		} else {
+			columnEx.IsInsert = false
+		}
 		if column.IsEdit && !service.ToolsGenTableColumn().IsNotEdit(columnName) && !column.IsPk {
 			editColumns = append(editColumns, columnEx)
 			columnEx.IsEdit = true
@@ -843,7 +861,9 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 			break
 		}
 	}
-
+	sort.Slice(insertColumns, func(i, j int) bool {
+		return insertColumns[i].SortOrderEdit < insertColumns[j].SortOrderEdit
+	})
 	sort.Slice(editColumns, func(i, j int) bool {
 		return editColumns[i].SortOrderEdit < editColumns[j].SortOrderEdit
 	})
@@ -858,6 +878,7 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 	})
 
 	tableEx.Columns = allColumnExs
+	tableEx.InsertColumns = insertColumns
 	tableEx.EditColumns = editColumns
 	tableEx.DetailColumns = detailColumns
 	tableEx.ListColumns = listColumns
@@ -1045,6 +1066,10 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 					liberr.ErrIsNil(ctx, err)
 				case "vueDetail":
 					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/detail", ".vue"}, "")
+					err = s.createFile(path, code, extendData.Overwrite)
+					liberr.ErrIsNil(ctx, err)
+				case "vueAdd":
+					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/add", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vueEdit":
