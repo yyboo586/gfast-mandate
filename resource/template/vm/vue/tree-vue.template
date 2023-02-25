@@ -15,7 +15,7 @@
             <el-row>
             {{$colIndex := 0}}
             {{range $index, $column := .table.QueryColumns}}
-              {{if and $column.IsQuery (ne $column.ColumnName "created_by") (ne $column.ColumnName "updated_by") (ne $column.ColumnName "created_at") (ne $column.ColumnName "updated_at") (ne $column.ColumnName "deleted_at")}}
+              {{if and $column.IsQuery (ne $column.ColumnName "created_by") (ne $column.ColumnName "updated_by")}}
                 {{if eq $colIndex 2}}
                 <el-col :span="8" :class="!showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
@@ -71,6 +71,7 @@
                     <el-date-picker
                         clearable  style="width: 200px"
                         v-model="tableData.param.{{$column.HtmlField}}"
+                        value-format="YYYY-MM-DD"
                     {{if eq $column.QueryType "BETWEEN"}}
                         type="daterange"
                         range-separator="至"
@@ -90,6 +91,8 @@
                     <el-date-picker
                         clearable  style="width: 200px"
                         v-model="tableData.param.{{$column.HtmlField}}"
+                        format="YYYY-MM-DD HH:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
                     {{if eq $column.QueryType "BETWEEN"}}
                         type="datetimerange"
                         range-separator="至"
@@ -131,21 +134,6 @@
                 </el-col>
                   {{$colIndex = ($colIndex | plus 1)}}
                 {{end}}
-              {{end}}
-              {{if eq $column.ColumnName "created_at"}}
-              <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
-                  <el-form-item label="创建日期" prop="dateRange">
-                      <el-date-picker
-                          clearable style="width: 200px"
-                          v-model="tableData.param.dateRange"
-                          type="daterange"
-                          range-separator="-"
-                          value-format="YYYY-MM-DD"
-                          start-placeholder="开始日期"
-                          end-placeholder="结束日期"
-                      ></el-date-picker>
-                  </el-form-item>
-              </el-col>
               {{end}}
             {{end}}
             {{if gt $colIndex 2}}
