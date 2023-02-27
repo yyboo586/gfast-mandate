@@ -24,7 +24,11 @@
         {{if or (eq $column.HtmlType "input") (eq $column.HtmlType "textarea") (eq $column.HtmlType "radio") (eq $column.HtmlType "select")}}
           <el-col :span="{{$column.ColSpan}}">
           {{if ne $column.LinkTableName ""}}
-            <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.getOptionValue(formData.{{$column.HtmlField}}, get{{$column.GoField}}Op) {{"}}"}}</el-form-item>
+            {{range $ti, $linkedTable := $.table.LinkedTables}}
+            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.{{CaseCamelLower $column.LinkLabelName}}:'' {{"}}"}}</el-form-item>
+            {{end}}
+            {{end}}
           {{else if ne $column.DictType ""}}
             <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.getOptionValue(formData.{{$column.HtmlField}}, {{$column.HtmlField}}Options,'value','label') {{"}}"}}</el-form-item>
           {{else}}
@@ -242,6 +246,11 @@
           {{$column.HtmlField}}: [] ,
           {{else}}
           {{$column.HtmlField}}: undefined,
+          {{range $ti, $linkedTable := $.table.LinkedTables}}
+          {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+          linked{{$column.GoField}}:{{ "{" }}{{CaseCamelLower $column.LinkLabelId}}:undefined,{{CaseCamelLower $column.LinkLabelName}}:undefined {{ "}" }},
+          {{end}}
+          {{end}}
           {{end}}
           {{end}}
           {{range $ti, $linkedTable := .table.LinkedTables}}
@@ -340,6 +349,11 @@
             {{$column.HtmlField}}: [] ,
             {{else}}
             {{$column.HtmlField}}: undefined,
+            {{end}}
+            {{range $ti, $linkedTable := $.table.LinkedTables}}
+            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            linked{{$column.GoField}}:{{ "{" }}{{CaseCamelLower $column.LinkLabelId}}:undefined,{{CaseCamelLower $column.LinkLabelName}}:undefined {{ "}" }},
+            {{end}}
             {{end}}
             {{end}}
             {{range $ti, $linkedTable := .table.LinkedTables}}

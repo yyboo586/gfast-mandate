@@ -31,6 +31,11 @@ export interface {{.table.ClassName}}TableColumns {
 export interface {{.table.ClassName}}InfoData {
     {{range $index, $column := .table.Columns}}
     {{if $column.IsPk}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else}}{{$column.TsType}}|undefined{{end}};        // {{$column.ColumnComment}} {{else}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else}}{{$column.TsType}}|undefined{{end}}; // {{$column.ColumnComment}} {{end}}
+    {{range $ti, $linkedTable := $.table.LinkedTables}}
+    {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+    linked{{$column.GoField}}:Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}; // {{$column.ColumnComment}}
+    {{end}}
+    {{end}}
     {{end}}
     {{range $ti, $linkedTable := .table.LinkedTables}}
     linked{{$.table.ClassName}}{{$linkedTable.ClassName}}:Linked{{$.table.ClassName}}{{$linkedTable.ClassName}};
