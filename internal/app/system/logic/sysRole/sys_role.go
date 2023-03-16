@@ -9,6 +9,7 @@ package sysRole
 
 import (
 	"context"
+
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -52,7 +53,10 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 		if req.PageSize == 0 {
 			req.PageSize = consts.PageSize
 		}
-		err = model.Page(res.CurrentPage, req.PageSize).Order("id asc").Scan(&res.List)
+		model = model.As("a")
+		model = model.LeftJoin("casbin_rule", "b", "b.v1 = a.id  AND SUBSTR( b.v0, 1, 2 ) = 'u_' ")
+		model = model.Group("a.id")
+		err = model.Page(res.CurrentPage, req.PageSize).Order("id asc").Fields("a.*, count(b.v0) user_cnt").Scan(&res.List)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
 	})
 	return

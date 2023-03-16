@@ -10,6 +10,8 @@ package sysUser
 import (
 	"context"
 	"fmt"
+	"reflect"
+
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -29,7 +31,6 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 	"github.com/tiger1103/gfast/v3/library/libUtils"
 	"github.com/tiger1103/gfast/v3/library/liberr"
-	"reflect"
 )
 
 func init() {
@@ -305,6 +306,40 @@ func (s *sSysUser) GetPermissions(ctx context.Context, roleIds []uint) (userButt
 	return
 }
 
+func fieldsEx() []string {
+	s := dao.SysUser.Columns()
+	return []string{
+		s.Id,
+		s.UserName,
+		s.Mobile,
+		s.UserNickname,
+		s.Birthday,
+		s.UserStatus,
+		s.UserEmail,
+		s.Sex,
+		s.Avatar,
+		s.DeptId,
+		s.Remark,
+		s.IsAdmin,
+		s.Address,
+		s.Describe,
+		s.LastLoginIp,
+		s.LastLoginTime,
+		s.CreatedAt,
+		s.UpdatedAt,
+		s.DeletedAt,
+	}
+}
+
+func inSlice(field string, excludes []string) bool {
+	for _, exclude := range excludes {
+		if exclude == field {
+			return true
+		}
+	}
+	return false
+}
+
 // List 用户列表
 func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total interface{}, userList []*entity.SysUser, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
@@ -327,6 +362,11 @@ func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total i
 		if len(req.DateRange) > 0 {
 			m = m.Where("created_at >=? AND created_at <=?", req.DateRange[0], req.DateRange[1])
 		}
+
+		if req.RoleId > 0 {
+			m = m.As("a").LeftJoin("casbin_rule", "b", "b.v0 = CONCAT('u_',a.id )")
+			m = m.Where("v1 = ? and SUBSTR(v0,1,2) = 'u_'", req.RoleId)
+		}
 		if req.PageSize == 0 {
 			req.PageSize = consts.PageSize
 		}
@@ -335,8 +375,15 @@ func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total i
 		}
 		total, err = m.Count()
 		liberr.ErrIsNil(ctx, err, "获取用户数据失败")
-		err = m.FieldsEx(dao.SysUser.Columns().UserPassword, dao.SysUser.Columns().UserSalt).
-			Page(req.PageNum, req.PageSize).Order("id asc").Scan(&userList)
+
+		// 排除password字段
+		if req.RoleId > 0 {
+			m = m.Fields(fieldsEx())
+		} else {
+			m = m.FieldsEx(dao.SysUser.Columns().UserPassword, dao.SysUser.Columns().UserSalt)
+		}
+
+		err = m.Page(req.PageNum, req.PageSize).Order("id asc").Scan(&userList)
 		liberr.ErrIsNil(ctx, err, "获取用户列表失败")
 	})
 	return
@@ -701,7 +748,7 @@ func (s *sSysUser) HasAccessByDataWhere(ctx context.Context, where g.Map, uid in
 	err := g.Try(ctx, func(ctx context.Context) {
 		rec, err := dao.SysUser.Ctx(ctx).As("user").
 			Fields("user.id").
-			Where("user.id",uid).Where(where).One()
+			Where("user.id", uid).Where(where).One()
 		liberr.ErrIsNil(ctx, err)
 		if rec.IsEmpty() {
 			liberr.ErrIsNil(ctx, gerror.New("没有数据"))

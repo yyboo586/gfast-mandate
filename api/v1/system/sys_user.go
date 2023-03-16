@@ -22,6 +22,7 @@ type UserMenusRes struct {
 type UserSearchReq struct {
 	g.Meta   `path:"/user/list" tags:"用户管理" method:"get" summary:"用户列表"`
 	DeptId   string `p:"deptId"` //部门id
+	RoleId   uint   `p:"roleId"`
 	Mobile   string `p:"mobile"`
 	Status   string `p:"status"`
 	KeyWords string `p:"keyWords"`
