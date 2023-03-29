@@ -1,4 +1,4 @@
-package boot
+package libValidate
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func init() {
+func Register() {
 	gvalid.RegisterRule("integer-array", IntegerArray)
 	gvalid.RegisterRule("float-array", FloatArray)
 	gvalid.RegisterRule("date-array", DateArray)

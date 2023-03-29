@@ -14,7 +14,7 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 )
 
-func init() {
+func Run() {
 	task1 := &model.TimeTask{
 		FuncName: "test1",
 		Run:      Test1,

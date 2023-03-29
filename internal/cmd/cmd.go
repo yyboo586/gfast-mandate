@@ -11,10 +11,12 @@ import (
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/tiger1103/gfast/v3/internal/consts"
 	"github.com/tiger1103/gfast/v3/internal/router"
+	"github.com/tiger1103/gfast/v3/library/libValidate"
+	"github.com/tiger1103/gfast/v3/library/upload"
+	"github.com/tiger1103/gfast/v3/task"
 )
 
 var (
-
 	Main = gcmd.Command{
 		Name:  "main",
 		Usage: "main",
@@ -27,9 +29,9 @@ var (
 				router.R.BindController(ctx, group)
 			})
 			//重新配置swaggerUI静态页面--start--,若要使用原版gf字段swaggerUI请删除或注释此段
-			s.BindHookHandler(g.Cfg().MustGet(ctx,"server.swaggerPath").String()+"/*", ghttp.HookBeforeServe, func(r *ghttp.Request) {
+			s.BindHookHandler(g.Cfg().MustGet(ctx, "server.swaggerPath").String()+"/*", ghttp.HookBeforeServe, func(r *ghttp.Request) {
 				content := gstr.ReplaceByMap(consts.SwaggerUITemplate, map[string]string{
-					`{SwaggerUIDocUrl}`: g.Cfg().MustGet(ctx, "server.openapiPath").String(),
+					`{SwaggerUIDocUrl}`:             g.Cfg().MustGet(ctx, "server.openapiPath").String(),
 					`{SwaggerUIDocNamePlaceHolder}`: gstr.TrimRight(fmt.Sprintf(`//%s`, r.Host)),
 				})
 				r.Response.Write(content)
@@ -37,11 +39,23 @@ var (
 			})
 			//重新配置swaggerUI静态页面--end--
 			enhanceOpenAPIDoc(s)
+			//注册相关组件
+			register()
 			s.Run()
 			return nil
 		},
 	}
 )
+
+// 相关组件注册
+func register() {
+	//注册上传组件
+	upload.Register()
+	//注册自定义验证规则
+	libValidate.Register()
+	//执行计划任务
+	task.Run()
+}
 
 func enhanceOpenAPIDoc(s *ghttp.Server) {
 	openapi := s.GetOpenApi()

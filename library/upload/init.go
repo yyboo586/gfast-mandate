@@ -39,7 +39,7 @@ func GetUploader(key UploaderType) IUpload {
 	return nil
 }
 
-func init() {
+func Register() {
 
 	RegisterUploader(SourceLocal, &Local{})
 	RegisterUploader(SourceTencent, &Tencent{})
