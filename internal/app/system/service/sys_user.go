@@ -22,6 +22,7 @@ type (
 		NotCheckAuthAdminIds(ctx context.Context) *gset.Set
 		GetAdminUserByUsernamePassword(ctx context.Context, req *system.UserLoginReq) (user *model.LoginUserRes, err error)
 		GetUserByUsername(ctx context.Context, userName string) (user *model.LoginUserRes, err error)
+		GetUserById(ctx context.Context, id uint64) (user *model.LoginUserRes, err error)
 		LoginLog(ctx context.Context, params *model.LoginLogParams)
 		UpdateLoginInfo(ctx context.Context, id uint64, ip string) (err error)
 		GetAdminRules(ctx context.Context, userId uint64) (menuList []*model.UserMenus, permissions []string, err error)
@@ -46,7 +47,8 @@ type (
 		Delete(ctx context.Context, ids []int) (err error)
 		GetUsers(ctx context.Context, ids []int) (users []*model.SysUserSimpleRes, err error)
 		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}) (where g.Map, err error)
-		HasAccessByDataWhere(ctx context.Context, where g.Map,uid interface{}) bool
+		HasAccessByDataWhere(ctx context.Context, where g.Map, uid interface{}) bool
+		AccessRule(ctx context.Context, userId uint64, rule string) bool
 	}
 )
 

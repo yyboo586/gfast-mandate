@@ -86,6 +86,16 @@ func (s *sSysUser) GetUserByUsername(ctx context.Context, userName string) (user
 	return
 }
 
+// GetUserById 通过用户名获取用户信息
+func (s *sSysUser) GetUserById(ctx context.Context, id uint64) (user *model.LoginUserRes, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		user = &model.LoginUserRes{}
+		err = dao.SysUser.Ctx(ctx).Fields(user).WherePri(id).Scan(user)
+		liberr.ErrIsNil(ctx, err, "获取用户信息失败")
+	})
+	return
+}
+
 // LoginLog 记录登录日志
 func (s *sSysUser) LoginLog(ctx context.Context, params *model.LoginLogParams) {
 	ua := user_agent.New(params.UserAgent)
@@ -755,4 +765,48 @@ func (s *sSysUser) HasAccessByDataWhere(ctx context.Context, where g.Map, uid in
 		}
 	})
 	return err == nil
+}
+
+// AccessRule 判断用户是否有某一菜单规则权限
+func (s *sSysUser) AccessRule(ctx context.Context, userId uint64, rule string) bool {
+	//获取无需验证权限的用户id
+	tagSuperAdmin := false
+	s.NotCheckAuthAdminIds(ctx).Iterator(func(v interface{}) bool {
+		if gconv.Uint64(v) == userId {
+			tagSuperAdmin = true
+			return false
+		}
+		return true
+	})
+	if tagSuperAdmin {
+		return true
+	}
+	menuList, err := service.SysAuthRule().GetMenuList(ctx)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return false
+	}
+	var menu *model.SysAuthRuleInfoRes
+	for _, m := range menuList {
+		ms := gstr.SubStr(m.Name, 0, gstr.Pos(m.Name, "?"))
+		if m.Name == rule || ms == rule {
+			menu = m
+			break
+		}
+	}
+	// 不存在的规则直接false
+	if menu == nil {
+		return false
+	}
+	enforcer, err := commonService.CasbinEnforcer(ctx)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return false
+	}
+	hasAccess, err := enforcer.Enforce(fmt.Sprintf("%s%d", service.SysUser().GetCasBinUserPrefix(), userId), gconv.String(menu.Id), "All")
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return false
+	}
+	return hasAccess
 }
