@@ -36,14 +36,15 @@ type sSysRole struct {
 
 func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListReq) (res *system.RoleListRes, err error) {
 	res = new(system.RoleListRes)
-	g.Try(ctx, func(ctx context.Context) {
+	err = g.Try(ctx, func(ctx context.Context) {
 		model := dao.SysRole.Ctx(ctx)
 		if req.RoleName != "" {
-			model = model.Where("name like ?", "%"+req.RoleName+"%")
+			model = model.Where("a.name like ?", "%"+req.RoleName+"%")
 		}
 		if req.Status != "" {
-			model = model.Where("status", gconv.Int(req.Status))
+			model = model.Where("a.status", gconv.Int(req.Status))
 		}
+		model = model.As("a")
 		res.Total, err = model.Count()
 		liberr.ErrIsNil(ctx, err, "获取角色数据失败")
 		if req.PageNum == 0 {
@@ -53,7 +54,6 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 		if req.PageSize == 0 {
 			req.PageSize = consts.PageSize
 		}
-		model = model.As("a")
 		model = model.LeftJoin("casbin_rule", "b", "b.v1 = a.id  AND SUBSTR( b.v0, 1, 2 ) = 'u_' ")
 		model = model.Group("a.id")
 		err = model.Page(res.CurrentPage, req.PageSize).Order("id asc").Fields("a.*, count(b.v0) user_cnt").Scan(&res.List)
