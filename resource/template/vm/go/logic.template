@@ -272,7 +272,7 @@ func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *{{.table.ModuleNam
 func (s *s{{.table.ClassName}})Delete(ctx context.Context, {{$.table.PkColumn.HtmlField}}s []{{$.table.PkColumn.GoType}}) (err error){
     err = g.Try(ctx,func(ctx context.Context){
         {{if eq .table.TplCategory "tree"}}
-        ids, err = s.GetChildrenIds(ctx,ids)
+        {{$.table.PkColumn.HtmlField}}s, err = s.GetChildrenIds(ctx,{{$.table.PkColumn.HtmlField}}s)
         liberr.ErrIsNil(ctx,err)
         {{end}}
         _, err = dao.{{.table.ClassName}}.Ctx(ctx).Delete(dao.{{.table.ClassName}}.Columns().{{$pkGoField}}+" in (?)", {{$.table.PkColumn.HtmlField}}s)
