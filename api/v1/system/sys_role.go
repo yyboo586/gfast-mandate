@@ -8,6 +8,7 @@
 package system
 
 import (
+	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/frame/g"
 	commonApi "github.com/tiger1103/gfast/v3/api/v1/common"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model"
@@ -32,8 +33,9 @@ type RoleGetParamsReq struct {
 }
 
 type RoleGetParamsRes struct {
-	g.Meta `mime:"application/json"`
-	Menu   []*model.SysAuthRuleInfoRes `json:"menu"`
+	g.Meta      `mime:"application/json"`
+	Menu        []*model.SysAuthRuleInfoRes `json:"menu"`
+	AccessMenus *garray.Array               `json:"accessMenus"`
 }
 
 type RoleAddReq struct {
@@ -50,7 +52,8 @@ type RoleAddRes struct {
 
 type RoleGetReq struct {
 	g.Meta `path:"/role/get" tags:"角色管理" method:"get" summary:"获取角色信息"`
-	Id     uint `p:"id" v:"required#角色id不能为空""`
+	commonApi.Author
+	Id uint `p:"id" v:"required#角色id不能为空""`
 }
 
 type RoleGetRes struct {
@@ -60,7 +63,8 @@ type RoleGetRes struct {
 }
 
 type RoleEditReq struct {
-	g.Meta    `path:"/role/edit" tags:"角色管理" method:"put" summary:"修改角色"`
+	g.Meta `path:"/role/edit" tags:"角色管理" method:"put" summary:"修改角色"`
+	commonApi.Author
 	Id        int64  `p:"id" v:"required#角色id必须"`
 	Name      string `p:"name" v:"required#角色名称不能为空"`
 	Status    uint   `p:"status"    `

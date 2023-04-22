@@ -7,6 +7,7 @@ package service
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/container/garray"
 
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/database/gdb"
@@ -19,6 +20,7 @@ import (
 type (
 	ISysUser interface {
 		GetCasBinUserPrefix() string
+		IsSupperAdmin(ctx context.Context, userId uint64) bool
 		NotCheckAuthAdminIds(ctx context.Context) *gset.Set
 		GetAdminUserByUsernamePassword(ctx context.Context, req *system.UserLoginReq) (user *model.LoginUserRes, err error)
 		GetUserByUsername(ctx context.Context, userName string) (user *model.LoginUserRes, err error)
@@ -29,6 +31,7 @@ type (
 		GetAdminRole(ctx context.Context, userId uint64, allRoleList []*entity.SysRole) (roles []*entity.SysRole, err error)
 		GetAdminRoleIds(ctx context.Context, userId uint64) (roleIds []uint, err error)
 		GetAllMenus(ctx context.Context) (menus []*model.UserMenus, err error)
+		GetAdminMenusIdsByRoleIds(ctx context.Context, roleIds []uint) (menuIds *garray.Array, err error)
 		GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (menus []*model.UserMenus, err error)
 		GetMenusTree(menus []*model.UserMenus, pid uint) []*model.UserMenus
 		GetPermissions(ctx context.Context, roleIds []uint) (userButtons []string, err error)
@@ -37,7 +40,7 @@ type (
 		Add(ctx context.Context, req *system.UserAddReq) (err error)
 		Edit(ctx context.Context, req *system.UserEditReq) (err error)
 		AddUserPost(ctx context.Context, tx gdb.TX, postIds []int64, userId int64) (err error)
-		EditUserRole(ctx context.Context, roleIds []int64, userId int64) (err error)
+		EditUserRole(ctx context.Context, roleIds []uint, userId int64) (err error)
 		UserNameOrMobileExists(ctx context.Context, userName, mobile string, id ...int64) error
 		GetEditUser(ctx context.Context, id uint64) (res *system.UserGetEditRes, err error)
 		GetUserInfoById(ctx context.Context, id uint64, withPwd ...bool) (user *entity.SysUser, err error)

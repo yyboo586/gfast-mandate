@@ -67,14 +67,7 @@ func (s *sMiddleware) Auth(r *ghttp.Request) {
 		libResponse.FailJson(true, r, "对不起！演示系统，不能删改数据！")
 	}*/
 	//获取无需验证权限的用户id
-	tagSuperAdmin := false
-	service.SysUser().NotCheckAuthAdminIds(ctx).Iterator(func(v interface{}) bool {
-		if gconv.Uint64(v) == adminId {
-			tagSuperAdmin = true
-			return false
-		}
-		return true
-	})
+	tagSuperAdmin := service.SysUser().IsSupperAdmin(ctx, service.Context().GetUserId(ctx))
 	if tagSuperAdmin {
 		r.Middleware.Next()
 		//不要再往后面执行

@@ -43,7 +43,6 @@ type SysUserPostInfoRes struct {
 	PostName string `json:"postName"`
 }
 
-
 type SysUserSimpleRes struct {
 	gmeta.Meta   `orm:"table:sys_user"`
 	Id           uint64 `orm:"id"       json:"id"`                   //

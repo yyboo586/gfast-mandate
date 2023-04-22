@@ -28,4 +28,5 @@ type ToolsGenTable struct {
 	SortColumn     string      `json:"sortColumn"     description:"排序字段名"`
 	SortType       string      `json:"sortType"       description:"排序方式 (asc顺序 desc倒序)"`
 	ShowDetail     bool        `json:"showDetail"     description:"是否有查看详情功能"`
+	ExcelPort      bool        `json:"excelPort" description:"是否有excel导入导出功能"`
 }

@@ -9,7 +9,8 @@ package sysRole
 
 import (
 	"context"
-
+	"errors"
+	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -43,6 +44,17 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 		}
 		if req.Status != "" {
 			model = model.Where("a.status", gconv.Int(req.Status))
+		}
+		userId := service.Context().GetUserId(ctx)
+		//获取当前用户所属角色ids
+		if !service.SysUser().IsSupperAdmin(ctx, userId) {
+			var roleIds []uint
+			roleIds, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+			liberr.ErrIsNil(ctx, err)
+			if len(roleIds) == 0 {
+				return
+			}
+			model = model.Where("a."+dao.SysRole.Columns().Id+" in(?) OR a.created_by = ?", roleIds, userId)
 		}
 		model = model.As("a")
 		res.Total, err = model.Count()
@@ -117,6 +129,9 @@ func (s *sSysRole) AddRole(ctx context.Context, req *system.RoleAddReq) (err err
 		err = g.Try(ctx, func(ctx context.Context) {
 			roleId, e := dao.SysRole.Ctx(ctx).TX(tx).InsertAndGetId(req)
 			liberr.ErrIsNil(ctx, e, "添加角色失败")
+			//过滤ruleIds 把没有权限的过滤掉
+			req.MenuIds, err = s.filterAccessRuleIds(ctx, req.MenuIds)
+			liberr.ErrIsNil(ctx, err)
 			//添加角色权限
 			e = s.AddRoleRule(ctx, req.MenuIds, roleId)
 			liberr.ErrIsNil(ctx, e)
@@ -130,6 +145,10 @@ func (s *sSysRole) AddRole(ctx context.Context, req *system.RoleAddReq) (err err
 
 func (s *sSysRole) Get(ctx context.Context, id uint) (res *entity.SysRole, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
+		//判断是否具有此角色的权限
+		if !s.hasManageAccess(ctx, id) {
+			liberr.ErrIsNil(ctx, errors.New("没有查看这个角色的权限"))
+		}
 		err = dao.SysRole.Ctx(ctx).WherePri(id).Scan(&res)
 		liberr.ErrIsNil(ctx, err, "获取角色信息失败")
 	})
@@ -150,10 +169,39 @@ func (s *sSysRole) GetFilteredNamedPolicy(ctx context.Context, id uint) (gpSlice
 	return
 }
 
+func (s *sSysRole) hasManageAccess(ctx context.Context, roleId uint) bool {
+	if !service.SysUser().IsSupperAdmin(ctx, service.Context().GetUserId(ctx)) {
+		var (
+			roleIds   []uint
+			hasAccess bool
+			err       error
+		)
+		roleIds, err = service.SysUser().GetAdminRoleIds(ctx, service.Context().GetUserId(ctx))
+		if err != nil {
+			g.Log().Error(ctx, err)
+			return false
+		}
+		if len(roleIds) > 0 {
+			for _, v := range roleIds {
+				if v == roleId {
+					hasAccess = true
+					break
+				}
+			}
+		}
+		return hasAccess
+	}
+	return true
+}
+
 // EditRole 修改角色
 func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err error) {
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
+			//判断是否具有修改此角色的权限
+			if !s.hasManageAccess(ctx, gconv.Uint(req.Id)) {
+				liberr.ErrIsNil(ctx, errors.New("没有修改这个角色的权限"))
+			}
 			_, e := dao.SysRole.Ctx(ctx).TX(tx).WherePri(req.Id).Data(&do.SysRole{
 				Status:    req.Status,
 				ListOrder: req.ListOrder,
@@ -161,6 +209,9 @@ func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err e
 				Remark:    req.Remark,
 			}).Update()
 			liberr.ErrIsNil(ctx, e, "修改角色失败")
+			//过滤ruleIds 把没有权限的过滤掉
+			req.MenuIds, err = s.filterAccessRuleIds(ctx, req.MenuIds)
+			liberr.ErrIsNil(ctx, err)
 			//删除角色权限
 			e = s.DelRoleRule(ctx, req.Id)
 			liberr.ErrIsNil(ctx, e)
@@ -175,10 +226,40 @@ func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err e
 	return
 }
 
+// 从给定的menuIds中过滤掉用户没有操作权限的菜单id
+func (s *sSysRole) filterAccessRuleIds(ctx context.Context, menuIds []uint) (newRuleIds []uint, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		//若不是超管，过滤ruleIds 把没有权限的过滤掉
+		if !service.SysUser().IsSupperAdmin(ctx, service.Context().GetUserId(ctx)) {
+			var (
+				userRoleIds []uint
+				accessMenus *garray.Array
+			)
+			userRoleIds, err = service.SysUser().GetAdminRoleIds(ctx, service.Context().GetUserId(ctx))
+			liberr.ErrIsNil(ctx, err)
+			accessMenus, err = service.SysUser().GetAdminMenusIdsByRoleIds(ctx, userRoleIds)
+			for _, v := range menuIds {
+				if accessMenus.Contains(v) {
+					newRuleIds = append(newRuleIds, v)
+				}
+			}
+		} else {
+			newRuleIds = menuIds
+		}
+	})
+	return
+}
+
 // DeleteByIds 删除角色
 func (s *sSysRole) DeleteByIds(ctx context.Context, ids []int64) (err error) {
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
+			for _, id := range ids {
+				//判断是否有删除该角色的权限
+				if !s.hasManageAccess(ctx, gconv.Uint(id)) {
+					liberr.ErrIsNil(ctx, errors.New("没有删除这个角色的权限"))
+				}
+			}
 			_, err = dao.SysRole.Ctx(ctx).TX(tx).Where(dao.SysRole.Columns().Id+" in(?)", ids).Delete()
 			liberr.ErrIsNil(ctx, err, "删除角色失败")
 			//删除角色权限

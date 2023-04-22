@@ -29,6 +29,14 @@ func (c *roleController) List(ctx context.Context, req *system.RoleListReq) (res
 func (c *roleController) GetParams(ctx context.Context, req *system.RoleGetParamsReq) (res *system.RoleGetParamsRes, err error) {
 	res = new(system.RoleGetParamsRes)
 	res.Menu, err = service.SysAuthRule().GetMenuList(ctx)
+	if err != nil {
+		return
+	}
+	roleIds, err := service.SysUser().GetAdminRoleIds(ctx, service.Context().GetUserId(ctx))
+	if err != nil {
+		return
+	}
+	res.AccessMenus, err = service.SysUser().GetAdminMenusIdsByRoleIds(ctx, roleIds)
 	return
 }
 

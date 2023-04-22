@@ -10,6 +10,7 @@ package sysUser
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/container/garray"
 	"reflect"
 
 	"github.com/gogf/gf/v2/container/gset"
@@ -51,8 +52,17 @@ func (s *sSysUser) GetCasBinUserPrefix() string {
 	return s.casBinUserPrefix
 }
 
+// IsSupperAdmin 判断用户是否超管
+func (s *sSysUser) IsSupperAdmin(ctx context.Context, userId uint64) bool {
+	superAdminIds := s.NotCheckAuthAdminIds(ctx)
+	if superAdminIds.Contains(userId) {
+		return true
+	}
+	return false
+}
+
 func (s *sSysUser) NotCheckAuthAdminIds(ctx context.Context) *gset.Set {
-	ids := g.Cfg().MustGet(ctx, "system.notCheckAuthAdminIds")
+	ids := g.Cfg().MustGet(ctx, "system.notCheckAuthAdminIds").Uint64s()
 	if !g.IsNil(ids) {
 		return gset.NewFrom(ids)
 	}
@@ -118,7 +128,7 @@ func (s *sSysUser) LoginLog(ctx context.Context, params *model.LoginLogParams) {
 }
 
 func (s *sSysUser) UpdateLoginInfo(ctx context.Context, id uint64, ip string) (err error) {
-	g.Try(ctx, func(ctx context.Context) {
+	err = g.Try(ctx, func(ctx context.Context) {
 		_, err = dao.SysUser.Ctx(ctx).WherePri(id).Unscoped().Update(g.Map{
 			dao.SysUser.Columns().LastLoginIp:   ip,
 			dao.SysUser.Columns().LastLoginTime: gtime.Now(),
@@ -132,15 +142,7 @@ func (s *sSysUser) UpdateLoginInfo(ctx context.Context, id uint64, ip string) (e
 func (s *sSysUser) GetAdminRules(ctx context.Context, userId uint64) (menuList []*model.UserMenus, permissions []string, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		//是否超管
-		isSuperAdmin := false
-		//获取无需验证权限的用户id
-		s.NotCheckAuthAdminIds(ctx).Iterator(func(v interface{}) bool {
-			if gconv.Uint64(v) == userId {
-				isSuperAdmin = true
-				return false
-			}
-			return true
-		})
+		isSuperAdmin := s.IsSupperAdmin(ctx, userId)
 		//获取用户菜单数据
 		allRoles, err := service.SysRole().GetRoleList(ctx)
 		liberr.ErrIsNil(ctx, err)
@@ -225,26 +227,52 @@ func (s *sSysUser) GetAllMenus(ctx context.Context) (menus []*model.UserMenus, e
 	return
 }
 
-func (s *sSysUser) GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (menus []*model.UserMenus, err error) {
+func (s *sSysUser) GetAdminMenusIdsByRoleIds(ctx context.Context, roleIds []uint) (menuIds *garray.Array, err error) {
 	//获取角色对应的菜单id
+	menuIds = garray.New()
 	err = g.Try(ctx, func(ctx context.Context) {
+		if s.IsSupperAdmin(ctx, service.Context().GetUserId(ctx)) {
+			var menus []*model.SysAuthRuleInfoRes
+			menus, err = service.SysAuthRule().GetMenuList(ctx)
+			liberr.ErrIsNil(ctx, err)
+			for _, m := range menus {
+				menuIds.Append(m.Id)
+			}
+			return
+		}
 		enforcer, e := commonService.CasbinEnforcer(ctx)
 		liberr.ErrIsNil(ctx, e)
-		menuIds := map[int64]int64{}
 		for _, roleId := range roleIds {
 			//查询当前权限
 			gp := enforcer.GetFilteredPolicy(0, gconv.String(roleId))
 			for _, p := range gp {
-				mid := gconv.Int64(p[1])
-				menuIds[mid] = mid
+				menuIds.Append(gconv.Uint(p[1]))
 			}
 		}
+	})
+	return
+}
+
+func (s *sSysUser) GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (menus []*model.UserMenus, err error) {
+	//获取角色对应的菜单id
+	err = g.Try(ctx, func(ctx context.Context) {
+		var (
+			menuArr *garray.Array
+			menuIds = map[uint]uint{}
+		)
+		menuArr, err = s.GetAdminMenusIdsByRoleIds(ctx, roleIds)
+		liberr.ErrIsNil(ctx, err)
+		menuArr.Iterator(func(k int, v interface{}) bool {
+			mp := gconv.Uint(v)
+			menuIds[mp] = mp
+			return true
+		})
 		//获取所有开启的菜单
 		allMenus, err := service.SysAuthRule().GetIsMenuList(ctx)
 		liberr.ErrIsNil(ctx, err)
 		menus = make([]*model.UserMenus, 0, len(allMenus))
 		for _, v := range allMenus {
-			if _, ok := menuIds[gconv.Int64(v.Id)]; gstr.Equal(v.Condition, "nocheck") || ok {
+			if _, ok := menuIds[v.Id]; gstr.Equal(v.Condition, "nocheck") || ok {
 				var roleMenu *model.UserMenu
 				roleMenu = s.setMenuData(roleMenu, v)
 				menus = append(menus, &model.UserMenus{UserMenu: roleMenu})
@@ -442,6 +470,35 @@ func (s *sSysUser) getSearchDeptIds(ctx context.Context, deptId uint64) (deptIds
 	return
 }
 
+// 过滤用户可操作的角色
+func (s *sSysUser) filterRoleIds(ctx context.Context, roleIds []uint, userId uint64) (newRoleIds []uint, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		var (
+			accessRoleList []uint
+			roleList       []*entity.SysRole
+		)
+		accessRoleList, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+		liberr.ErrIsNil(ctx, err)
+		roleList, err = service.SysRole().GetRoleList(ctx)
+		liberr.ErrIsNil(ctx, err)
+		//自己创建的角色可以被授权
+		for _, v := range roleList {
+			if v.CreatedBy == userId {
+				accessRoleList = append(accessRoleList, v.Id)
+			}
+		}
+		for _, r := range roleIds {
+			for _, a := range accessRoleList {
+				if r == a {
+					newRoleIds = append(newRoleIds, r)
+					break
+				}
+			}
+		}
+	})
+	return
+}
+
 func (s *sSysUser) Add(ctx context.Context, req *system.UserAddReq) (err error) {
 	err = s.UserNameOrMobileExists(ctx, req.UserName, req.Mobile)
 	if err != nil {
@@ -465,6 +522,8 @@ func (s *sSysUser) Add(ctx context.Context, req *system.UserAddReq) (err error) 
 				IsAdmin:      req.IsAdmin,
 			})
 			liberr.ErrIsNil(ctx, e, "添加用户失败")
+			req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
+			liberr.ErrIsNil(ctx, err)
 			e = s.addUserRole(ctx, req.RoleIds, userId)
 			liberr.ErrIsNil(ctx, e, "设置用户权限失败")
 			e = s.AddUserPost(ctx, tx, req.PostIds, userId)
@@ -493,6 +552,8 @@ func (s *sSysUser) Edit(ctx context.Context, req *system.UserEditReq) (err error
 				IsAdmin:      req.IsAdmin,
 			})
 			liberr.ErrIsNil(ctx, err, "修改用户信息失败")
+			req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
+			liberr.ErrIsNil(ctx, err)
 			//设置用户所属角色信息
 			err = s.EditUserRole(ctx, req.RoleIds, req.UserId)
 			liberr.ErrIsNil(ctx, err, "设置用户权限失败")
@@ -528,7 +589,7 @@ func (s *sSysUser) AddUserPost(ctx context.Context, tx gdb.TX, postIds []int64, 
 }
 
 // AddUserRole 添加用户角色信息
-func (s *sSysUser) addUserRole(ctx context.Context, roleIds []int64, userId int64) (err error) {
+func (s *sSysUser) addUserRole(ctx context.Context, roleIds []uint, userId int64) (err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		enforcer, e := commonService.CasbinEnforcer(ctx)
 		liberr.ErrIsNil(ctx, e)
@@ -541,13 +602,14 @@ func (s *sSysUser) addUserRole(ctx context.Context, roleIds []int64, userId int6
 }
 
 // EditUserRole 修改用户角色信息
-func (s *sSysUser) EditUserRole(ctx context.Context, roleIds []int64, userId int64) (err error) {
+func (s *sSysUser) EditUserRole(ctx context.Context, roleIds []uint, userId int64) (err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		enforcer, e := commonService.CasbinEnforcer(ctx)
 		liberr.ErrIsNil(ctx, e)
 
 		//删除用户旧角色信息
-		enforcer.RemoveFilteredGroupingPolicy(0, fmt.Sprintf("%s%d", s.casBinUserPrefix, userId))
+		_, err = enforcer.RemoveFilteredGroupingPolicy(0, fmt.Sprintf("%s%d", s.casBinUserPrefix, userId))
+		liberr.ErrIsNil(ctx, err)
 		for _, v := range roleIds {
 			_, err = enforcer.AddGroupingPolicy(fmt.Sprintf("%s%d", s.casBinUserPrefix, userId), gconv.String(v))
 			liberr.ErrIsNil(ctx, err)
@@ -770,14 +832,7 @@ func (s *sSysUser) HasAccessByDataWhere(ctx context.Context, where g.Map, uid in
 // AccessRule 判断用户是否有某一菜单规则权限
 func (s *sSysUser) AccessRule(ctx context.Context, userId uint64, rule string) bool {
 	//获取无需验证权限的用户id
-	tagSuperAdmin := false
-	s.NotCheckAuthAdminIds(ctx).Iterator(func(v interface{}) bool {
-		if gconv.Uint64(v) == userId {
-			tagSuperAdmin = true
-			return false
-		}
-		return true
-	})
+	tagSuperAdmin := s.IsSupperAdmin(ctx, userId)
 	if tagSuperAdmin {
 		return true
 	}

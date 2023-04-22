@@ -55,6 +55,32 @@ func (c *userController) GetParams(ctx context.Context, req *system.UserGetParam
 		return
 	}
 	res.Posts, err = service.SysPost().GetUsedPost(ctx)
+	if err != nil {
+		return
+	}
+	userId := service.Context().GetUserId(ctx)
+	res.RoleAccess, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+	if err != nil {
+		return
+	}
+	//判断是否超管
+	if service.SysUser().IsSupperAdmin(ctx, userId) {
+		//自己创建的角色可以被授权
+		for _, v := range res.RoleList {
+			res.RoleAccess = append(res.RoleAccess, v.Id)
+		}
+	} else {
+		res.RoleAccess, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+		if err != nil {
+			return
+		}
+		//自己创建的角色可以被授权
+		for _, v := range res.RoleList {
+			if v.CreatedBy == userId {
+				res.RoleAccess = append(res.RoleAccess, v.Id)
+			}
+		}
+	}
 	return
 }
 

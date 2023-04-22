@@ -41,9 +41,10 @@ type UserGetParamsReq struct {
 }
 
 type UserGetParamsRes struct {
-	g.Meta   `mime:"application/json"`
-	RoleList []*entity.SysRole `json:"roleList"`
-	Posts    []*entity.SysPost `json:"posts"`
+	g.Meta     `mime:"application/json"`
+	RoleList   []*entity.SysRole `json:"roleList"`
+	Posts      []*entity.SysPost `json:"posts"`
+	RoleAccess []uint            `json:"roleAccess"`
 }
 
 // SetUserReq 添加修改用户公用请求字段
@@ -54,7 +55,7 @@ type SetUserReq struct {
 	Mobile   string  `p:"mobile" v:"required|phone#手机号不能为空|手机号格式错误"`
 	PostIds  []int64 `p:"postIds"`
 	Remark   string  `p:"remark"`
-	RoleIds  []int64 `p:"roleIds"`
+	RoleIds  []uint  `p:"roleIds"`
 	Sex      int     `p:"sex"`
 	Status   uint    `p:"status"`
 	IsAdmin  int     `p:"isAdmin"` // 是否后台管理员 1 是  0   否

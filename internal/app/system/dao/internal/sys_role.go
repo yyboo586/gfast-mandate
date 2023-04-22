@@ -27,6 +27,7 @@ type SysRoleColumns struct {
 	DataScope string // 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
 	CreatedAt string // 创建时间
 	UpdatedAt string // 更新时间
+	CreatedBy string // 创建人
 }
 
 // sysRoleColumns holds the columns for table sys_role.
@@ -39,6 +40,7 @@ var sysRoleColumns = SysRoleColumns{
 	DataScope: "data_scope",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
+	CreatedBy: "created_by",
 }
 
 // NewSysRoleDao creates and returns a new DAO object for table data access.
