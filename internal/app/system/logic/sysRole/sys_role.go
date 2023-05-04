@@ -127,6 +127,7 @@ func (s *sSysRole) DelRoleRule(ctx context.Context, roleId int64) (err error) {
 func (s *sSysRole) AddRole(ctx context.Context, req *system.RoleAddReq) (err error) {
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
+			req.CreatedBy = service.Context().GetUserId(ctx)
 			roleId, e := dao.SysRole.Ctx(ctx).TX(tx).InsertAndGetId(req)
 			liberr.ErrIsNil(ctx, e, "添加角色失败")
 			//过滤ruleIds 把没有权限的过滤掉
@@ -170,12 +171,25 @@ func (s *sSysRole) GetFilteredNamedPolicy(ctx context.Context, id uint) (gpSlice
 }
 
 func (s *sSysRole) hasManageAccess(ctx context.Context, roleId uint) bool {
-	if !service.SysUser().IsSupperAdmin(ctx, service.Context().GetUserId(ctx)) {
+	currentUserId:=service.Context().GetUserId(ctx)
+	if !service.SysUser().IsSupperAdmin(ctx, currentUserId) {
 		var (
 			roleIds   []uint
 			hasAccess bool
 			err       error
+			list []*entity.SysRole
 		)
+		list,err = s.GetRoleList(ctx)
+		if err != nil {
+			g.Log().Error(ctx, err)
+			return false
+		}
+		for _,v:=range list{
+			//判断是否当前用户所建角色
+			if roleId==v.Id && v.CreatedBy==currentUserId{
+				return true
+			}
+		}
 		roleIds, err = service.SysUser().GetAdminRoleIds(ctx, service.Context().GetUserId(ctx))
 		if err != nil {
 			g.Log().Error(ctx, err)

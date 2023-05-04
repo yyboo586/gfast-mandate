@@ -45,6 +45,7 @@ type RoleAddReq struct {
 	ListOrder uint   `p:"listOrder" `
 	Remark    string `p:"remark"    `
 	MenuIds   []uint `p:"menuIds"`
+	CreatedBy uint64
 }
 
 type RoleAddRes struct {

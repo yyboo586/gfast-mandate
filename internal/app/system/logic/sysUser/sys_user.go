@@ -522,8 +522,11 @@ func (s *sSysUser) Add(ctx context.Context, req *system.UserAddReq) (err error) 
 				IsAdmin:      req.IsAdmin,
 			})
 			liberr.ErrIsNil(ctx, e, "添加用户失败")
-			req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
-			liberr.ErrIsNil(ctx, err)
+			//不是超管过滤提交角色数据
+			if !service.SysUser().IsSupperAdmin(ctx,service.Context().GetUserId(ctx)){
+				req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
+				liberr.ErrIsNil(ctx, err)
+			}
 			e = s.addUserRole(ctx, req.RoleIds, userId)
 			liberr.ErrIsNil(ctx, e, "设置用户权限失败")
 			e = s.AddUserPost(ctx, tx, req.PostIds, userId)
@@ -552,8 +555,10 @@ func (s *sSysUser) Edit(ctx context.Context, req *system.UserEditReq) (err error
 				IsAdmin:      req.IsAdmin,
 			})
 			liberr.ErrIsNil(ctx, err, "修改用户信息失败")
-			req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
-			liberr.ErrIsNil(ctx, err)
+			if !service.SysUser().IsSupperAdmin(ctx,service.Context().GetUserId(ctx)){
+				req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
+				liberr.ErrIsNil(ctx, err)
+			}
 			//设置用户所属角色信息
 			err = s.EditUserRole(ctx, req.RoleIds, req.UserId)
 			liberr.ErrIsNil(ctx, err, "设置用户权限失败")
