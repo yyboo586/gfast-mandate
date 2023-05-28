@@ -27,7 +27,7 @@ func init() {
 	service.RegisterSysDept(New())
 }
 
-func New() *sSysDept {
+func New() service.ISysDept {
 	return &sSysDept{}
 }
 

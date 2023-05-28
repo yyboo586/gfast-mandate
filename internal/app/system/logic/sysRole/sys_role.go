@@ -28,7 +28,7 @@ func init() {
 	service.RegisterSysRole(New())
 }
 
-func New() *sSysRole {
+func New() service.ISysRole {
 	return &sSysRole{}
 }
 
@@ -171,22 +171,22 @@ func (s *sSysRole) GetFilteredNamedPolicy(ctx context.Context, id uint) (gpSlice
 }
 
 func (s *sSysRole) hasManageAccess(ctx context.Context, roleId uint) bool {
-	currentUserId:=service.Context().GetUserId(ctx)
+	currentUserId := service.Context().GetUserId(ctx)
 	if !service.SysUser().IsSupperAdmin(ctx, currentUserId) {
 		var (
 			roleIds   []uint
 			hasAccess bool
 			err       error
-			list []*entity.SysRole
+			list      []*entity.SysRole
 		)
-		list,err = s.GetRoleList(ctx)
+		list, err = s.GetRoleList(ctx)
 		if err != nil {
 			g.Log().Error(ctx, err)
 			return false
 		}
-		for _,v:=range list{
+		for _, v := range list {
 			//判断是否当前用户所建角色
-			if roleId==v.Id && v.CreatedBy==currentUserId{
+			if roleId == v.Id && v.CreatedBy == currentUserId {
 				return true
 			}
 		}

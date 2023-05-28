@@ -42,7 +42,7 @@ type sSysUser struct {
 	casBinUserPrefix string //CasBin 用户id前缀
 }
 
-func New() *sSysUser {
+func New() service.ISysUser {
 	return &sSysUser{
 		casBinUserPrefix: "u_",
 	}
@@ -523,7 +523,7 @@ func (s *sSysUser) Add(ctx context.Context, req *system.UserAddReq) (err error) 
 			})
 			liberr.ErrIsNil(ctx, e, "添加用户失败")
 			//不是超管过滤提交角色数据
-			if !service.SysUser().IsSupperAdmin(ctx,service.Context().GetUserId(ctx)){
+			if !service.SysUser().IsSupperAdmin(ctx, service.Context().GetUserId(ctx)) {
 				req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
 				liberr.ErrIsNil(ctx, err)
 			}
@@ -555,7 +555,7 @@ func (s *sSysUser) Edit(ctx context.Context, req *system.UserEditReq) (err error
 				IsAdmin:      req.IsAdmin,
 			})
 			liberr.ErrIsNil(ctx, err, "修改用户信息失败")
-			if !service.SysUser().IsSupperAdmin(ctx,service.Context().GetUserId(ctx)){
+			if !service.SysUser().IsSupperAdmin(ctx, service.Context().GetUserId(ctx)) {
 				req.RoleIds, err = s.filterRoleIds(ctx, req.RoleIds, service.Context().GetUserId(ctx))
 				liberr.ErrIsNil(ctx, err)
 			}

@@ -9,7 +9,11 @@
 ////
 
 {{$structName := .table.BusinessName | CaseCamelLower}}
-
+{{$businessName := .table.BusinessName | CaseCamelLower}}
+{{$plugin:=""}}
+{{if ContainsI $.table.PackageName "plugins"}}
+    {{$plugin = "plugins/"}}
+{{end}}
 package controller
 ////
 
@@ -19,6 +23,14 @@ import (
     "{{.goModName}}/{{.table.PackageName}}/service"
     {{if ne $.table.ModuleName "system"}}
     systemController "{{.goModName}}/internal/app/system/controller"
+    {{end}}
+    {{if gt (len .table.LinkedTables) 0}}
+    "errors"
+    {{if ne $.table.ModuleName "system"}}
+    systemService "github.com/tiger1103/gfast/v3/internal/app/system/service"
+    {{else}}
+    "github.com/tiger1103/gfast/v3/internal/app/system/service"
+    {{end}}
     {{end}}
 )
 ////
@@ -34,29 +46,48 @@ var {{.table.ClassName}} = new({{$structName}}Controller)
 ////
 // List 列表
 func (c *{{$structName}}Controller) List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error) {
-	res, err = service.{{.table.ClassName}}().List(ctx, req)
-	return
+    res = new({{.table.ModuleName}}.{{.table.ClassName}}SearchRes)
+    res.{{.table.ClassName}}SearchRes, err = service.{{.table.ClassName}}().List(ctx, &req.{{.table.ClassName}}SearchReq)
+    return
 }
+
+
+{{if gt (len .table.LinkedTables) 0}}
+// LinkedDataSearch 相关连表查询数据
+func(c *{{$structName}}Controller) Linked{{$.table.ClassName}}DataSearch(ctx context.Context, req *{{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchReq) (res *{{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchRes, err error) {
+    {{$serviceVal := "service"}}
+    {{if ne $.table.ModuleName "system"}}
+        {{$serviceVal = "systemService"}}
+    {{end}}
+    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/list") {
+        err = errors.New("没有访问权限")
+        return
+    }
+    res = new({{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchRes)
+    res.Linked{{$.table.ClassName}}DataSearchRes,err = service.{{.table.ClassName}}().Linked{{$.table.ClassName}}DataSearch(ctx)
+    return
+}
+{{end}}
 
 ////
 // Get 获取{{.table.FunctionName}}
 func (c *{{$structName}}Controller) Get(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}GetReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}GetRes, err error) {
     res = new({{.table.ModuleName}}.{{.table.ClassName}}GetRes)
-	res.{{.table.ClassName}}InfoRes,err = service.{{.table.ClassName}}().GetBy{{.table.PkColumn.GoField}}(ctx, req.{{.table.PkColumn.GoField}})
-	return
+    res.{{.table.ClassName}}InfoRes,err = service.{{.table.ClassName}}().GetBy{{.table.PkColumn.GoField}}(ctx, req.{{.table.PkColumn.GoField}})
+    return
 }
 
 ////
 // Add 添加{{.table.FunctionName}}
 func (c *{{$structName}}Controller) Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}AddRes, err error) {
-	err = service.{{.table.ClassName}}().Add(ctx, req)
+	err = service.{{.table.ClassName}}().Add(ctx, req.{{.table.ClassName}}AddReq)
 	return
 }
 
 ////
 // Edit 修改{{.table.FunctionName}}
 func (c *{{$structName}}Controller) Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}EditRes, err error) {
-	err = service.{{.table.ClassName}}().Edit(ctx, req)
+	err = service.{{.table.ClassName}}().Edit(ctx, req.{{.table.ClassName}}EditReq)
 	return
 }
 

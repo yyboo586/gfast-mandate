@@ -21,7 +21,7 @@ func init() {
 
 type sContext struct{}
 
-func New() *sContext {
+func New() service.IContext {
 	return &sContext{}
 }
 

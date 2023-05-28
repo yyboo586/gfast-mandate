@@ -32,10 +32,10 @@
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
           <el-input v-model="formData.{{$column.HtmlField}}" placeholder="请输入{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}}/>
         </el-form-item>
-        {{else if eq $column.HtmlType "select" }}
+        {{else if eq $column.HtmlType "select" "selects"}}
           {{if ne $column.LinkTableName ""}}
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-          <el-select v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}} {{if $column.IsCascadeParent}}@change="form{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if not $column.IsCascade}}@click.native="get{{$column.LinkTableClass}}{{if $column.IsCascade}}Form{{end}}Items{{$column.GoField}}"{{end}}>
+          <el-select v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}} {{if $column.IsCascadeParent}}@change="form{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if eq $column.HtmlType "selects"}}multiple{{end}}>
               <el-option
               {{if $column.IsCascade}}
                   v-for="item in {{$column.HtmlField}}FormOptions"
@@ -70,8 +70,39 @@
           </el-select>
         </el-form-item>
           {{end}}
+        {{else if eq $column.HtmlType "treeSelect" "treeSelects"}}
+        {{if ne $column.LinkTableName ""}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          {{$tLabel:=""}}
+          {{$tValue:=""}}
+          {{range $li,$lc := $.table.LinkedTables}}
+            {{if eq $lc.TableName $column.LinkTableName}}
+              {{$tLabel = $lc.OptionsStruct.TreeName}}
+              {{$tValue = $lc.OptionsStruct.TreeCode}}
+            {{end}}
+          {{end}}
+          <el-cascader
+                  v-model="formData.{{$column.HtmlField}}"
+                  placeholder="请选择"
+                  :options="{{$column.HtmlField}}Options"
+                  filterable
+                  clearable
+                  :props="{ label: '{{$tLabel}}',value: '{{$tValue}}',checkStrictly: true,emitPath: false {{if eq $column.HtmlType "treeSelects"}},multiple: true{{end}} }"
+          />
+        </el-form-item>
+        {{end}}
         {{else if eq $column.HtmlType "radio" }} {{/* else if eq $column.HtmlType "select" */}}
-          {{if ne $column.DictType ""}}
+        {{if ne $column.LinkTableName ""}}
+          <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+            <el-radio-group v-model="formData.{{$column.HtmlField}}">
+              <el-radio
+                      v-for="dict in {{$column.HtmlField}}Options"
+                      :key="dict.key"
+                      :label="dict.key"
+              >{{ VueTag "{{" }}dict.value {{VueTag "}}"}}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        {{else if ne $column.DictType ""}}
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
           <el-radio-group v-model="formData.{{$column.HtmlField}}">
             <el-radio
@@ -109,7 +140,18 @@
           <el-input v-model="formData.{{$column.HtmlField}}" type="textarea" placeholder="请输入{{$column.ColumnComment}}" />
         </el-form-item>
         {{else if eq $column.HtmlType "checkbox" }}
-        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+        {{if ne $column.LinkTableName ""}}
+          <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+            <el-checkbox-group v-model="formData.{{$column.HtmlField}}">
+              <el-checkbox
+                      v-for="dict in {{$column.HtmlField}}Options"
+                      :key="dict.key"
+                      :label="dict.key"
+              >{{ VueTag "{{" }}dict.value {{VueTag "}}"}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        {{else if  ne $column.DictType ""}}
+         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
           <el-checkbox-group v-model="formData.{{$column.HtmlField}}">
             <el-checkbox
               v-for="dict in {{$column.HtmlField}}Options"
@@ -117,7 +159,8 @@
               :label="dict.value"
             >{{ VueTag "{{" }}dict.label {{VueTag "}}"}}</el-checkbox>
           </el-checkbox-group>
-        </el-form-item>
+         </el-form-item>
+        {{end}}
         {{else if eq $column.HtmlType "richtext"}}
         <el-form-item label="{{$column.ColumnComment}}">
           <gf-ueditor editorId="ue{{$.table.ClassName}}{{$column.GoField}}" v-model="formData.{{$column.HtmlField}}" @setEditContent="set{{$column.GoField}}EditContent"></gf-ueditor>
@@ -231,10 +274,7 @@ import {
   {{.table.ClassName}}TableColumns,
   {{.table.ClassName}}InfoData,
   {{.table.ClassName}}TableDataState,
-  {{.table.ClassName}}EditState,
-  {{range $ti, $linkedTable := .table.LinkedTables}}
-  Linked{{$.table.ClassName}}{{$linkedTable.ClassName}},
-  {{end}}
+  {{.table.ClassName}}EditState
 } from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
 export default defineComponent({
   name:"{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit",
@@ -297,7 +337,7 @@ export default defineComponent({
         {{range $index, $column := .table.Columns}}
         {{if eq $column.HtmlType "radio"}}
         {{$column.HtmlField}}: false ,
-        {{else if eq $column.HtmlType "images" "file" "files" "checkbox"}}
+        {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}}: [] ,
         {{else}}
         {{$column.HtmlField}}: undefined,
@@ -326,16 +366,23 @@ export default defineComponent({
     const openDialog = (row?: {{.table.ClassName}}InfoData) => {
       resetForm();
       if(row) {
-        {{range $index,$column := .table.EditColumns}}
-        {{if ne $column.LinkTableName ""}}
-        get{{$column.LinkTableClass}}Items{{$column.GoField}}()
-        {{end}}
-        {{end}}
         get{{.table.ClassName}}(row.{{.table.PkColumn.HtmlField}}!).then((res:any)=>{
           const data = res.data;
           {{range $index, $column := .table.EditColumns}}
-          {{if eq $column.HtmlType "checkbox"}}
+          {{if eq $column.HtmlType "checkbox" "selects"}}
           data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",")
+          {{else if eq $column.HtmlType "treeSelects"}}
+          {{$isNumber := false}}
+          {{range $li,$lc := $.table.LinkedTables}}
+          {{if and (eq $lc.TableName $column.LinkTableName) (ne $lc.OptionsStruct.ColumnAttr.GoType "string")}}
+          {{$isNumber = true}}
+          {{end}}
+          {{end}}
+          {{if $isNumber}}
+          data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",").map((item:any)=>{return parseInt(item)})
+          {{else}}
+          data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",")
+          {{end}}
           {{else if and (eq $column.HtmlType "radio" "select") (ne $column.DictType "")}}
           data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
           {{else if eq $column.HtmlType "imagefile"}}
@@ -392,7 +439,7 @@ export default defineComponent({
         {{range $index, $column := .table.Columns}}
         {{if eq $column.HtmlType "radio"}}
         {{$column.HtmlField}}: false ,
-        {{else if eq $column.HtmlType "images" "file" "files" "checkbox"}}
+        {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}}: [] ,
         {{else}}
         {{$column.HtmlField}}: undefined,
@@ -409,12 +456,7 @@ export default defineComponent({
     };
     {{$setUpData:=true}}
     {{range $index, $column := .table.Columns}}
-    {{if ne $column.LinkTableName ""}}
-    //关联{{$column.LinkTableName}}表选项
-    const get{{$column.LinkTableClass}}Items{{$column.GoField}} = () => {
-      emit("get{{$column.LinkTableClass}}Items{{$column.GoField}}")
-    }
-    {{else if eq $column.HtmlType "richtext"}}
+    {{if eq $column.HtmlType "richtext"}}
     //富文本编辑器{{$column.ColumnComment}}
     const set{{$column.GoField}}EditContent = (data:string) => {
       state.formData.{{$column.HtmlField}} = data
@@ -460,14 +502,7 @@ export default defineComponent({
       menuRef,
       formRef,
       {{range $index, $column := .table.Columns}}
-      {{if ne $column.LinkTableName ""}}
-      {{if $column.IsCascade}}
-      {{/*级联处理*/}}
-      {{else}}
-      {{/*关联表处理*/}}
-      get{{$column.LinkTableClass}}Items{{$column.GoField}},
-      {{end}}
-      {{else if eq $column.HtmlType "richtext"}}
+      {{if eq $column.HtmlType "richtext"}}
       //富文本编辑器{{$column.ColumnComment}}
       set{{$column.GoField}}EditContent,
       {{else if eq $column.HtmlType "imagefile"}}

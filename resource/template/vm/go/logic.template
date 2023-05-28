@@ -14,22 +14,32 @@ package logic
 ////
 {{$gjson:=false}}
 {{$usedSystemModule:=false}}
+{{$gstr:=false}}
 {{range $index, $column := .table.Columns}}
 {{if eq $column.HtmlType "images" "file" "files"}}
 {{$gjson = true}}
 {{end}}
-{{if eq $column.HtmlField "createdBy" "updatedBy" "deletedBy"}}
+{{if and (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy") (ne $.table.ModuleName "system")}}
 {{$usedSystemModule = true}}
+{{end}}
+{{if eq $column.HtmlType "selects" "checkbox"}}
+{{range $ti, $linkedTable := $.table.LinkedTables}}
+{{if eq $column.LinkTableClass $linkedTable.ClassName}}
+{{$gstr = true}}
+{{end}}
+{{end}}
 {{end}}
 {{end}}
 
 import (
     "context"
     "github.com/gogf/gf/v2/frame/g"
+    {{if $gstr}}
+    "github.com/gogf/gf/v2/text/gstr"
+    {{end}}
     {{if or .table.HasConversion (eq .table.TplCategory "tree")}}
     "github.com/gogf/gf/v2/util/gconv"
     {{end}}
-    "{{.goModName}}/api/v1/{{.table.ModuleName}}"
     "{{.goModName}}/{{.table.PackageName}}/dao"
     "{{.goModName}}/{{.table.PackageName}}/model"
     "{{.goModName}}/{{.table.PackageName}}/model/do"
@@ -44,6 +54,21 @@ import (
     "{{.goModName}}/library/libUtils"
     {{end}}
     "{{.goModName}}/library/liberr"
+
+
+    {{/*去重处理-导入关联表依赖包*/}}
+    {{$hasMethods:=newArray}}
+    {{range $index,$column:= .table.LinkedTables}}
+    {{if ne $column.TableName ""}}
+    {{if not (inArray $hasMethods (concat "list" $column.ClassName))}}
+    {{$hasMethods = append $hasMethods (concat "list" $column.ClassName)}}
+    {{/*关联{{$column.LinkTableName}}表选项*/}}
+    {{if ne $column.PackageName $.table.PackageName}}
+    linked{{$column.ClassName}}Dao {{$.goModName}}/{{$column.PackageName}}/dao
+    {{end}}
+    {{end}}
+    {{end}}
+    {{end}}
 )
 
 
@@ -68,14 +93,14 @@ func init() {
 	service.Register{{.table.ClassName}}(New())
 }
 ////
-func New() *s{{.table.ClassName}} {
+func New() service.I{{.table.ClassName}} {
 	return &s{{.table.ClassName}}{}
 }
 ////
 type s{{.table.ClassName}} struct{}
 ////
-func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (listRes *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error){
-    listRes = new({{.table.ModuleName}}.{{.table.ClassName}}SearchRes)
+func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes *model.{{.table.ClassName}}SearchRes, err error){
+    listRes = new(model.{{.table.ClassName}}SearchRes)
     err = g.Try(ctx, func(ctx context.Context) {
         m := dao.{{.table.ClassName}}.Ctx(ctx).WithAll()
         {{range $index, $column := .table.QueryColumns}}
@@ -128,15 +153,15 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleNam
         if req.OrderBy!=""{
             order = req.OrderBy
         }
-        var res []*model.{{.table.ClassName}}InfoRes
-        err = m.Fields({{.table.ModuleName}}.{{.table.ClassName}}SearchRes{}).Page(req.PageNum, req.PageSize).Order(order).Scan(&res)
+        var res []*model.{{.table.ClassName}}ListRes
+        err = m.Page(req.PageNum, req.PageSize).Order(order).Scan(&res)
         {{else}}
         order:= "{{.table.SortColumn}} {{.table.SortType}}"
         if req.OrderBy!=""{
             order = req.OrderBy
         }
-        var res []*model.{{.table.ClassName}}InfoRes
-        err = m.Fields({{.table.ModuleName}}.{{.table.ClassName}}SearchRes{}).Order(order).Scan(&res)
+        var res []*model.{{.table.ClassName}}ListRes
+        err = m.Order(order).Scan(&res)
         {{end}}
         liberr.ErrIsNil(ctx, err, "获取数据失败")
         listRes.List = make([]*model.{{.table.ClassName}}ListRes,len(res))
@@ -146,6 +171,16 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleNam
             {{$column.HtmlField}}:= ([]*comModel.UpFile)(nil)
             err = gjson.DecodeTo(v.{{$column.GoField}},&{{$column.HtmlField}})
             liberr.ErrIsNil(ctx,err)
+            {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+            {{range $ti, $linkedTable := $.table.LinkedTables}}
+            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            err = g.Model("{{$linkedTable.TableName}}").
+            Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
+            Where("id", gstr.Split(v.{{$column.GoField}}, ",")).
+            Scan(&v.Linked{{$column.GoField}})
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            {{end}}
             {{end}}
             {{end}}
             listRes.List[k] = &model.{{.table.ClassName}}ListRes{
@@ -153,6 +188,12 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleNam
                   {{range $index, $column := .table.Columns}}
                     {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
                 {{$column.GoField}} : v.{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlField "createdBy"}}
+                CreatedUser:v.CreatedUser,
+                    {{end}}
+                    {{if eq $column.HtmlField "UpdatedBy"}}
+                UpdatedUser:v.UpdatedUser,
                     {{end}}
                   {{end}}
                   {{range $index, $column := .table.Columns}}
@@ -174,6 +215,12 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleNam
                 {{.table.PkColumn.GoField}} : v.{{.table.PkColumn.GoField}},
                   {{end}}
                   {{range $index, $column := .table.ListColumns}}
+                  {{if eq $column.HtmlField "createdBy"}}
+                CreatedUser:v.CreatedUser,
+                  {{end}}
+                  {{if eq $column.HtmlField "UpdatedBy"}}
+                UpdatedUser:v.UpdatedUser,
+                  {{end}}
                     {{if eq $column.HtmlType "images" "file" "files"}}
                 {{$column.GoField}} : {{$column.HtmlField}},
                     {{else}}
@@ -192,18 +239,56 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *{{.table.ModuleNam
     return
 }
 ////
+{{if gt (len .table.LinkedTables) 0}}
+// LinkedDataSearch 相关连表查询数据
+func(s *s{{.table.ClassName}}) Linked{{$.table.ClassName}}DataSearch(ctx context.Context) (res *model.Linked{{$.table.ClassName}}DataSearchRes, err error) {
+    res = new(model.Linked{{$.table.ClassName}}DataSearchRes)
+    {{/*去重处理-导入关联表依赖包*/}}
+    {{$hasMethods3:=newArray}}
+    {{range $index,$column:= .table.LinkedTables}}
+    {{if ne $column.TableName ""}}
+    {{if not (inArray $hasMethods3 (concat "list" $column.ClassName))}}
+    {{$hasMethods3 = append $hasMethods3 (concat "list" $column.ClassName)}}
+    {{/*关联{{$column.LinkTableName}}表选项*/}}
+    res.Linked{{$.table.ClassName}}{{$column.ClassName}}, err = s.List{{$.table.ClassName}}{{$column.ClassName}}(ctx)
+    liberr.ErrIsNil(ctx,err,"获取关联表信息失败")
+    {{end}}
+    {{end}}
+    {{end}}
+    return
+}
+{{end}}
+
+////
 func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.table.PkColumn.HtmlField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error){
     err =g.Try(ctx, func(ctx context.Context){
         err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
         liberr.ErrIsNil(ctx,err,"获取信息失败")
+        {{range $index, $column := .table.Columns}}
+        {{if and $column.IsList (eq $column.HtmlType "images" "file" "files")}}
+            {{$column.HtmlField}}:= ([]*comModel.UpFile)(nil)
+            err = gjson.DecodeTo(v.{{$column.GoField}},&{{$column.HtmlField}})
+            liberr.ErrIsNil(ctx,err)
+        {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+        {{range $ti, $linkedTable := $.table.LinkedTables}}
+        {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            err = g.Model("{{$linkedTable.TableName}}").
+            Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
+            Where("id", gstr.Split(res.{{$column.GoField}}, ",")).
+            Scan(&res.Linked{{$column.GoField}})
+            liberr.ErrIsNil(ctx, err)
+        {{end}}
+        {{end}}
+        {{end}}
+        {{end}}
     })
     return
 }
 ////
-func (s *s{{.table.ClassName}})Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (err error){
+func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.ClassName}}AddReq) (err error){
     err = g.Try(ctx, func(ctx context.Context) {
-        {{range $index, $column := .table.InsertColumns}}
-        {{if eq $column.HtmlType "checkbox"}}
+        {{range $index, $column := .table.EditColumns}}
+        {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}} := ""
         req.{{$column.GoField}}.FilterEmpty()
         if !req.{{$column.GoField}}.IsEmpty(){
@@ -220,8 +305,8 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *{{.table.ModuleName
             {{if .table.IsPkInsertable}}
             {{.table.PkColumn.GoField}}:req.{{.table.PkColumn.GoField}},
             {{end}}
-            {{range $index, $column := .table.InsertColumns}}
-            {{if eq $column.HtmlType "checkbox"}}
+            {{range $index, $column := .table.EditColumns}}
+            {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
             {{$column.GoField}}:{{$column.HtmlField}},
             {{else}}
             {{$column.GoField}}:req.{{$column.GoField}},
@@ -236,10 +321,10 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *{{.table.ModuleName
     return
 }
 ////
-func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (err error){
+func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *model.{{.table.ClassName}}EditReq) (err error){
     err = g.Try(ctx, func(ctx context.Context) {
         {{range $index, $column := .table.EditColumns}}
-        {{if eq $column.HtmlType "checkbox"}}
+        {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}} := ""
         req.{{$column.GoField}}.FilterEmpty()
         if !req.{{$column.GoField}}.IsEmpty(){
@@ -254,7 +339,7 @@ func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *{{.table.ModuleNam
         {{end}}
         _, err = dao.{{.table.ClassName}}.Ctx(ctx).WherePri(req.{{.table.PkColumn.GoField}}).Update(do.{{.table.ClassName}}{
             {{range $index, $column := .table.EditColumns}}
-            {{if eq $column.HtmlType "checkbox"}}
+            {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
             {{$column.GoField}}:{{$column.HtmlField}},
             {{else}}
             {{$column.GoField}}:req.{{$column.GoField}},
@@ -288,7 +373,7 @@ func (s *s{{.table.ClassName}})GetChildrenIds(ctx context.Context,ids []{{$.tabl
     err = g.Try(ctx,func(ctx context.Context){
         //获取所有
         var all *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes
-        all, err = s.List(ctx, &{{.table.ModuleName}}.{{.table.ClassName}}SearchReq{})
+        all.{{.table.ClassName}}SearchRes, err = s.List(ctx, &model.{{.table.ClassName}}SearchReq{})
         liberr.ErrIsNil(ctx,err)
         list := make(g.List, len(all.List))
         for k, info := range all.List {
@@ -304,4 +389,25 @@ func (s *s{{.table.ClassName}})GetChildrenIds(ctx context.Context,ids []{{$.tabl
     })
 	return
 }
+{{end}}
+
+{{/*去重处理-导入关联表依赖包*/}}
+{{$hasMethods2:=newArray}}
+{{range $index,$column:= .table.LinkedTables}}
+{{if ne $column.TableName ""}}
+{{if not (inArray $hasMethods2 (concat "list" $column.ClassName))}}
+{{$hasMethods2 = append $hasMethods2 (concat "list" $column.ClassName)}}
+{{/*关联{{$column.LinkTableName}}表选项*/}}
+func (s *s{{$.table.ClassName}}) List{{$.table.ClassName}}{{$column.ClassName}}(ctx context.Context)(linked{{$.table.ClassName}}{{$column.ClassName}} []*model.Linked{{$.table.ClassName}}{{$column.ClassName}},err error){
+    err = g.Try(ctx,func(ctx context.Context){
+        err = {{if ne $column.PackageName $.table.PackageName}}linked{{$column.ClassName}}Dao{{else}}dao{{end}}.{{$column.ClassName}}.
+        Ctx(ctx).
+        Fields(model.Linked{{$.table.ClassName}}{{$column.ClassName}}{}).Scan(&linked{{$.table.ClassName}}{{$column.ClassName}})
+        liberr.ErrIsNil(ctx,err)
+    })
+    return
+}
+////
+{{end}}
+{{end}}
 {{end}}

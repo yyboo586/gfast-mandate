@@ -21,16 +21,28 @@
           {{ $hasRowEnd = false }}
         <el-row>
         {{end}}
-        {{if or (eq $column.HtmlType "input") (eq $column.HtmlType "textarea") (eq $column.HtmlType "radio") (eq $column.HtmlType "select")}}
+        {{if eq $column.HtmlType "input" "textarea" "radio" "checkbox" "select" "selects" "treeSelect" "treeSelects"}}
           <el-col :span="{{$column.ColSpan}}">
           {{if ne $column.LinkTableName ""}}
             {{range $ti, $linkedTable := $.table.LinkedTables}}
             {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+            <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.map((res:any)=>{return res.{{CaseCamelLower $column.LinkLabelName}}}).join('，'):'' {{"}}"}}</el-form-item>
+            {{else}}
             <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.{{CaseCamelLower $column.LinkLabelName}}:'' {{"}}"}}</el-form-item>
             {{end}}
             {{end}}
+            {{end}}
           {{else if ne $column.DictType ""}}
-            <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.getOptionValue(formData.{{$column.HtmlField}}, {{$column.HtmlField}}Options,'value','label') {{"}}"}}</el-form-item>
+          {{if eq $column.HtmlType "checkbox" }}
+          <el-form-item label="{{$column.ColumnComment}}">
+            <el-tag class="ml-2" type="success" v-for="(item,key) in formData.{{$column.HtmlField}}" :key="'{{$column.HtmlField}}-'+key">
+              {{"{{"}} proxy.getOptionValue(item, {{$column.HtmlField}}Options,'value','label') {{"}}"}}
+            </el-tag>
+          </el-form-item>
+          {{else}}
+          <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.getOptionValue(formData.{{$column.HtmlField}}, {{$column.HtmlField}}Options,'value','label') {{"}}"}}</el-form-item>
+          {{end}}
           {{else}}
             <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} formData.{{$column.HtmlField}} {{"}}"}}</el-form-item>
           {{end}}
@@ -42,14 +54,6 @@
         {{else if eq $column.HtmlType "datetime"}}
           <el-col :span="{{$column.ColSpan}}">
             <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.parseTime(formData.{{$column.HtmlField}}, '{y}-{m}-{d} {h}:{i}:{s}') {{"}}"}}</el-form-item>
-          </el-col>
-        {{else if eq $column.HtmlType "checkbox" }}
-          <el-col :span="{{$column.ColSpan}}">
-            <el-form-item label="{{$column.ColumnComment}}">
-              <el-tag class="ml-2" type="success" v-for="(item,key) in formData.{{$column.HtmlField}}" :key="'{{$column.HtmlField}}-'+key">
-                {{"{{"}} proxy.getOptionValue(item, {{$column.HtmlField}}Options,'value','label') {{"}}"}}
-              </el-tag>
-            </el-form-item>
           </el-col>
         {{else if eq $column.HtmlType "richtext"}}
           <el-col :span="{{$column.ColSpan}}">
@@ -148,12 +152,6 @@
     {{if and $column.IsStatus $column.IsList}}
     change{{$.table.ClassName}}{{$column.GoField}},
     {{end}}
-    {{if ne $column.LinkTableName ""}}
-    {{if not (inArray $hasImports (concat "list" $column.LinkTableClass))}}
-    {{$hasImports = append $hasImports (concat "list" $column.LinkTableClass)}}
-    list{{$column.LinkTableClass}},
-    {{end}}
-    {{end}}
     {{end}}
     {{if $getUserList}}
     getUserList,
@@ -176,10 +174,7 @@
     {{.table.ClassName}}TableColumns,
     {{.table.ClassName}}InfoData,
     {{.table.ClassName}}TableDataState,
-    {{.table.ClassName}}EditState,
-    {{range $ti, $linkedTable := .table.LinkedTables}}
-    Linked{{$.table.ClassName}}{{$linkedTable.ClassName}},
-    {{end}}
+    {{.table.ClassName}}EditState
   } from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
   export default defineComponent({
     name:"{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail",
@@ -242,13 +237,17 @@
           {{range $index, $column := .table.Columns}}
           {{if eq $column.HtmlType "radio"}}
           {{$column.HtmlField}}: false ,
-          {{else if eq $column.HtmlType "images" "file" "files" "checkbox"}}
+          {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
           {{$column.HtmlField}}: [] ,
           {{else}}
           {{$column.HtmlField}}: undefined,
           {{range $ti, $linkedTable := $.table.LinkedTables}}
           {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+          {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+          linked{{$column.GoField}}:[],
+          {{else}}
           linked{{$column.GoField}}:{{ "{" }}{{CaseCamelLower $column.LinkLabelId}}:undefined,{{CaseCamelLower $column.LinkLabelName}}:undefined {{ "}" }},
+          {{end}}
           {{end}}
           {{end}}
           {{end}}
@@ -278,8 +277,6 @@
           if(row) {
             get{{.table.ClassName}}(row.{{.table.PkColumn.HtmlField}}!).then((res:any)=>{
               const data = res.data;
-              {{$hasCreatedBy := false}}
-              {{$hasUpdatedBy := false}}
               {{range $index, $column := .table.DetailColumns}}
               {{if and (ne $treeParentCode "") (eq $column.HtmlField $treeParentCode)}}
               data.{{$treeParentCode}} = getTreeVal(props.{{$businessName}}Options,data.{{$treeParentCode}})
@@ -292,42 +289,13 @@
               data.{{$column.HtmlField}} =data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : []
               {{end}}
               {{if eq $column.HtmlField "createdBy"}}
-              {{$hasCreatedBy = true}}
+              data.createdBy = data?.createdUser.userNickname
               {{end}}
               {{if eq $column.HtmlField "updatedBy"}}
-              {{$hasUpdatedBy = true}}
+              data.updatedBy = data?.updatedUser.userNickname
               {{end}}
               {{end}}
-              {{if or $hasCreatedBy $hasUpdatedBy}}
-              let listUid = [];
-              {{end}}
-              {{if and $hasCreatedBy $hasUpdatedBy}}
-              listUid.push(data.createdBy,data.updatedBy)
-              {{else if $hasCreatedBy}}
-              listUid.push(data.createdBy)
-              {{else if $hasUpdatedBy}}
-              listUid.push(data.updatedBy)
-              {{end}}
-              {{if or $hasCreatedBy $hasUpdatedBy}}
-              getUserList(listUid).then((response:any) =>{
-                let users = response.data.list||[]
-                users.forEach((user:any)=>{
-                  {{if $hasCreatedBy}}
-                  if(data.createdBy==user.id){
-                    data.createdBy = user.userNickname
-                  }
-                  {{end}}
-                  {{if $hasUpdatedBy}}
-                  if(data.updatedBy==user.id){
-                    data.updatedBy = user.userNickname
-                  }
-                  {{end}}
-                })
-                state.formData = data;
-              })
-              {{else}}
               state.formData = data;
-              {{end}}
             })
           }
           state.isShowDialog = true;
@@ -345,14 +313,18 @@
             {{range $index, $column := .table.Columns}}
             {{if eq $column.HtmlType "radio"}}
             {{$column.HtmlField}}: false ,
-            {{else if eq $column.HtmlType "images" "file" "files" "checkbox"}}
+            {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
             {{$column.HtmlField}}: [] ,
             {{else}}
             {{$column.HtmlField}}: undefined,
             {{end}}
             {{range $ti, $linkedTable := $.table.LinkedTables}}
             {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+            linked{{$column.GoField}}:[],
+            {{else}}
             linked{{$column.GoField}}:{{ "{" }}{{CaseCamelLower $column.LinkLabelId}}:undefined,{{CaseCamelLower $column.LinkLabelName}}:undefined {{ "}" }},
+            {{end}}
             {{end}}
             {{end}}
             {{end}}

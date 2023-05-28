@@ -29,7 +29,7 @@ func init() {
 type sPersonal struct {
 }
 
-func New() *sPersonal {
+func New() service.IPersonal {
 	return &sPersonal{}
 }
 

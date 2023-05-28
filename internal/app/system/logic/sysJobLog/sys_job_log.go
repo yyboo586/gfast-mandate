@@ -22,7 +22,7 @@ func init() {
 	service.RegisterSysJobLog(New())
 }
 
-func New() *sSysJobLog {
+func New() service.ISysJobLog {
 	return new(sSysJobLog)
 }
 

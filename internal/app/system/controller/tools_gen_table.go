@@ -86,3 +86,8 @@ func (c *toolsGenTableController) BatchGenCode(ctx context.Context, req *system.
 	err = service.ToolsGenTable().GenCode(ctx, req.Ids)
 	return
 }
+
+func (c *toolsGenTableController) SyncTable(ctx context.Context, req *system.ToolsGenTableSyncTableReq) (res *system.ToolsGenTableSyncTableRes, err error) {
+	err = service.ToolsGenTable().SyncTable(ctx, req.TableId)
+	return
+}

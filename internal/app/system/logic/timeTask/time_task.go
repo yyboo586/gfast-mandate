@@ -17,7 +17,7 @@ func init() {
 	service.RegisterTaskList(New())
 }
 
-func New() *sTaskList {
+func New() service.ITaskList {
 	return &sTaskList{
 		mu: gmutex.New(),
 	}

@@ -48,7 +48,7 @@
                   </el-form-item>
                 </el-col>
                   {{$colIndex = ($colIndex | plus 1)}}
-                {{else if and (eq $column.HtmlType "select" "radio" "checkbox") (ne $column.DictType "") }}
+                {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.DictType "") }}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
                     <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable >
@@ -62,6 +62,28 @@
                   </el-form-item>
                 </el-col>
                   {{$colIndex = ($colIndex | plus 1)}}
+                {{else if and (eq $column.HtmlType "treeSelect" "treeSelects") (ne $column.LinkTableName "")}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        {{$tLabel:=""}}
+                        {{$tValue:=""}}
+                        {{range $li,$lc := $.table.LinkedTables}}
+                            {{if eq $lc.TableName $column.LinkTableName}}
+                                {{$tLabel = $lc.OptionsStruct.TreeName}}
+                                {{$tValue = $lc.OptionsStruct.TreeCode}}
+                            {{end}}
+                        {{end}}
+                        <el-cascader
+                                v-model="tableData.param.{{$column.HtmlField}}"
+                                placeholder="请选择"
+                                :options="{{$column.HtmlField}}Options"
+                                filterable
+                                clearable
+                                :props="{ label: '{{$tLabel}}',value: '{{$tValue}}',checkStrictly: true,emitPath: false }"
+                        />
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
                 {{else if eq $column.HtmlType "date"}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
@@ -103,10 +125,10 @@
                   </el-form-item>
                 </el-col>
                   {{$colIndex = ($colIndex | plus 1)}}
-                {{else if and (eq $column.HtmlType "select" "radio" "checkbox") (ne $column.LinkTableName "")}}
+                {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.LinkTableName "")}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if not $column.IsCascade}}@click.native="get{{$column.LinkTableClass}}{{if $column.IsCascade}}Query{{end}}Items{{$column.GoField}}"{{end}}>
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}}>
                       <el-option
                       {{if $column.IsCascade}}
                           v-for="item in {{$column.HtmlField}}QueryOptions"
@@ -120,7 +142,29 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
-                  {{$colIndex = ($colIndex | plus 1)}}
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if and (eq $column.HtmlType "treeSelect" "treeSelects") (ne $column.LinkTableName "")}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        {{$tLabel:=""}}
+                        {{$tValue:=""}}
+                        {{range $li,$lc := $.table.LinkedTables}}
+                        {{if eq $lc.TableName $column.LinkTableName}}
+                        {{$tLabel = $lc.OptionsStruct.TreeName}}
+                        {{$tValue = $lc.OptionsStruct.TreeCode}}
+                        {{end}}
+                        {{end}}
+                        <el-cascader
+                                v-model="tableData.param.{{$column.HtmlField}}"
+                                placeholder="请选择"
+                                :options="{{$column.HtmlField}}Options"
+                                filterable
+                                clearable
+                                :props="{ label: '{{$tLabel}}',value: '{{$tValue}}',checkStrictly: true,emitPath: false }"
+                        />
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
                 {{else}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
@@ -231,6 +275,22 @@
                 fit="contain"></el-image>
             </template>
           </el-table-column>
+          {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+          {{if ne $column.LinkTableName ""}}
+          <el-table-column align="center" label="{{$column.ColumnComment}}" prop="linked{{$column.GoField}}"
+          {{if gt $column.MinWidth 0}}min-width="{{$column.MinWidth}}px"{{end}}
+          {{if $column.IsOverflowTooltip}}:show-overflow-tooltip="true"{{end}}
+          {{if $column.IsFixed}}fixed="left"{{end}}>
+            <template #default="scope">
+              <el-tag v-if="scope.row.linked{{$column.GoField}}" class="ml-2" type="success" v-for="(item,ik) in scope.row.linked{{$column.GoField}}" :key="ik">{{VueTag "{{"}}item.{{$column.LinkLabelName|CaseCamelLower}}{{VueTag "}}"}}</el-tag>
+             </template>
+          </el-table-column>
+          {{else if ne $column.DictType ""}}
+          <el-table-column label="{{$column.ColumnComment}}" align="center" prop="{{$column.HtmlField}}" :formatter="{{$column.HtmlField}}Format"
+          {{if gt $column.MinWidth 0}}min-width="{{$column.MinWidth}}px"{{end}}
+          {{if $column.IsOverflowTooltip}}:show-overflow-tooltip="true"{{end}}
+          {{if $column.IsFixed}}fixed="left"{{end}} />
+          {{end}}
           {{else if $column.IsStatus}}
           <el-table-column label="{{$column.ColumnComment}}" align="center"
             {{if gt $column.MinWidth 0}}min-width="{{$column.MinWidth}}px"{{end}}
@@ -269,7 +329,7 @@
                 type="primary"
                 link
                 @click="handleView(scope.row)"
-                v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/view'"
+                v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/get'"
               ><el-icon><ele-View /></el-icon>详情</el-button>
               {{end}}
               <el-button
@@ -296,23 +356,6 @@
             @pagination="{{$businessName}}List"
         />
     </el-card>
-    <{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add
-        ref="addRef"
-        {{range $index, $column := .table.Columns}}
-        {{if ne $column.DictType ""}}
-        :{{$column.HtmlField}}Options="{{$column.DictType}}"
-        {{else if ne $column.LinkTableName ""}}
-        {{if $column.IsCascade}}
-        {{/*级联处理*/}}
-        {{else}}
-        {{/*关联表处理*/}}
-        :{{$column.HtmlField}}Options="{{$column.HtmlField}}Options"
-        @get{{$column.LinkTableClass}}Items{{$column.GoField}}="get{{$column.LinkTableClass}}Items{{$column.GoField}}"
-        {{end}}
-        {{end}}
-        {{end}}
-        @{{$businessName}}List="{{$businessName}}List"
-    ></{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add>
     <{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit
        ref="editRef"
        {{range $index, $column := .table.Columns}}
@@ -324,7 +367,6 @@
        {{else}}
        {{/*关联表处理*/}}
        :{{$column.HtmlField}}Options="{{$column.HtmlField}}Options"
-       @get{{$column.LinkTableClass}}Items{{$column.GoField}}="get{{$column.LinkTableClass}}Items{{$column.GoField}}"
        {{end}}
        {{end}}
        {{end}}
@@ -341,7 +383,6 @@
       {{else}}
       {{/*关联表处理*/}}
       :{{$column.HtmlField}}Options="{{$column.HtmlField}}Options"
-      @get{{$column.LinkTableClass}}Items{{$column.GoField}}="get{{$column.LinkTableClass}}Items{{$column.GoField}}"
       {{end}}
       {{end}}
       {{end}}
@@ -387,15 +428,9 @@ import {
     {{if and $column.IsStatus $column.IsList}}
     change{{$.table.ClassName}}{{$column.GoField}},
     {{end}}
-    {{if ne $column.LinkTableName ""}}
-    {{if not (inArray $hasImports (concat "list" $column.LinkTableClass))}}
-    {{$hasImports = append $hasImports (concat "list" $column.LinkTableClass)}}
-    list{{$column.LinkTableClass}},
     {{end}}
-    {{end}}
-    {{end}}
-    {{if $getUserList}}
-    getUserList,
+    {{if gt (len .table.LinkedTables) 0}}
+    linkedDataSearch
     {{end}}
 } from "/@/api/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}";
 import {
@@ -406,13 +441,11 @@ import {
     Linked{{$.table.ClassName}}{{$linkedTable.ClassName}},
     {{end}}
 } from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
-import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/add.vue"
 import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/edit.vue"
 import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/detail.vue"
 export default defineComponent({
     name: "{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}List",
     components:{
-        {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Add,
         {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit,
         {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail
     },
@@ -420,7 +453,6 @@ export default defineComponent({
         const {proxy} = <any>getCurrentInstance()
         const loading = ref(false)
         const queryRef = ref()
-        const addRef = ref();
         const editRef = ref();
         const detailRef = ref();
         // 是否显示所有搜索选项
@@ -491,8 +523,31 @@ export default defineComponent({
         });
         // 初始化表格数据
         const initTableData = () => {
+            {{if gt (len .table.LinkedTables) 0}}
+            linkedData()
+            {{end}}
             {{$businessName}}List()
         };
+        {{if gt (len .table.LinkedTables) 0}}
+        const linkedData = ()=>{
+            linkedDataSearch().then((res:any)=>{
+                {{range $index, $column := .table.Columns}}
+                {{if ne $column.LinkTableName ""}}
+                //关联{{$column.LinkTableName}}表选项
+                {{range $li,$lc := $.table.LinkedTables}}
+                {{if eq $lc.TableName $column.LinkTableName}}
+                {{if eq $lc.TplCategory "tree"}}
+                {{$column.HtmlField}}Options.value = proxy.handleTree(res.data.linked{{$.table.ClassName}}{{$column.LinkTableClass}}, '{{$lc.OptionsStruct.TreeCode}}', '{{$lc.OptionsStruct.TreeParentCode}}')
+                {{else}}
+                {{$column.HtmlField}}Options.value = proxy.setItems(res, '{{$column.LinkLabelId | CaseCamelLower}}', '{{$column.LinkLabelName | CaseCamelLower}}','linked{{$.table.ClassName}}{{$column.LinkTableClass}}')
+                {{end}}
+                {{end}}
+                {{end}}
+                {{end}}
+                {{end}}
+            })
+        }
+        {{end}}
         /** 重置按钮操作 */
         const resetQuery = (formEl: FormInstance | undefined) => {
             if (!formEl) return
@@ -504,58 +559,19 @@ export default defineComponent({
           loading.value = true
           list{{.table.ClassName}}(state.tableData.param).then((res:any)=>{
             let list = res.data.list??[];
-            {{$hasCreatedBy := false}}
-            {{$hasUpdatedBy := false}}
             {{range $index,$column := .table.ListColumns}}
-            {{if eq $column.HtmlField "createdBy"}}
-            {{$hasCreatedBy = true}}
-            {{end}}
-            {{if eq $column.HtmlField "updatedBy"}}
-            {{$hasUpdatedBy = true}}
-            {{end}}
-            {{end}}
-            {{if or $hasCreatedBy $hasUpdatedBy}}
-            let listUid = [];
-            {{end}}
-            {{if and $hasCreatedBy $hasUpdatedBy}}
+            {{if eq $column.HtmlField "createdBy" "updatedBy"}}
             list.map((item:any)=>{
-                listUid.push(item.createdBy,item.updatedBy)
-            });
-            {{else if $hasCreatedBy}}
-            listUid = list.map((item:any)=>{
-                return item.createdBy
-            });
-            {{else if $hasUpdatedBy}}
-            listUid = list.map((item:any)=>{
-                return item.updatedBy
-            });
+                {{if eq $column.HtmlField "createdBy"}}
+                item.createdBy = item?.createdUser.userNickname
+                {{end}}
+                {{if eq $column.HtmlField "updatedBy"}}
+                item.updatedBy = item?.updatedUser.userNickname
+                {{end}}
+            })
             {{end}}
-            {{if or $hasCreatedBy $hasUpdatedBy}}
-            if(listUid.length>0){
-                getUserList(listUid).then((response:any) =>{
-                    let users = response.data.list||[]
-                    list.map((item:any)=>{
-                        users.forEach((user:any)=>{
-                            {{if $hasCreatedBy}}
-                            if(item.createdBy==user.id){
-                                item.createdBy = user.userNickname
-                            }
-                            {{end}}
-                            {{if $hasUpdatedBy}}
-                            if(item.updatedBy==user.id){
-                                item.updatedBy = user.userNickname
-                            }
-                            {{end}}
-                        })
-                    })
-                    state.tableData.data = list;
-                })
-            }else{
-                state.tableData.data = list;
-            }
-            {{else}}
+            {{end}}
             state.tableData.data = list;
-            {{end}}
             state.tableData.total = res.data.total;
             loading.value = false
           })
@@ -582,17 +598,6 @@ export default defineComponent({
         }
         {{end}}
         {{end}}
-        {{if ne $column.LinkTableName ""}}
-        //关联{{$column.LinkTableName}}表选项
-        const get{{$column.LinkTableClass}}Items{{$column.GoField}} = () => {
-          if ({{$column.HtmlField}}Options.value && {{$column.HtmlField}}Options.value.length > 0) {
-            return
-          }
-          proxy.getItems(list{{$column.LinkTableClass}}, {pageSize:10000}).then((res:any) => {
-            {{$column.HtmlField}}Options.value = proxy.setItems(res, '{{$column.LinkLabelId | CaseCamelLower}}', '{{$column.LinkLabelName | CaseCamelLower}}')
-          })
-        }
-        {{end}}
         {{end}}
         // 多选框选中数据
         const handleSelectionChange = (selection:Array<{{.table.ClassName}}InfoData>) => {
@@ -601,7 +606,7 @@ export default defineComponent({
             multiple.value = !selection.length
         }
         const handleAdd =  ()=>{
-            addRef.value.openDialog()
+            editRef.value.openDialog()
         }
         const handleUpdate = (row: {{$.table.ClassName}}TableColumns) => {
             if(!row){
@@ -642,7 +647,6 @@ export default defineComponent({
         }
         return {
             proxy,
-            addRef,
             editRef,
             detailRef,
             showAll,
@@ -665,8 +669,6 @@ export default defineComponent({
             {{else}}
             //关联表数据选项
             {{$column.HtmlField}}Options,
-            //关联{{$column.LinkTableName}}表选项获取数据方法
-            get{{$column.LinkTableClass}}Items{{$column.GoField}},
             {{end}}
             {{end}}
             {{end}}
@@ -689,4 +691,5 @@ export default defineComponent({
     .colNone {
         display: none;
     }
+    .ml-2{margin: 3px;}
 </style>

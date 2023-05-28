@@ -26,7 +26,7 @@ func init() {
 	service.RegisterToolsGenTableColumn(New())
 }
 
-func New() *sToolsGenTableColumn {
+func New() service.IToolsGenTableColumn {
 	return &sToolsGenTableColumn{
 		ColumnTypeStr:       []string{"char", "varchar", "narchar", "varchar2", "tinytext", "text", "mediumtext", "longtext"},
 		ColumnTypeTime:      []string{"datetime", "time", "date", "timestamp"},
@@ -115,15 +115,6 @@ func (s *sToolsGenTableColumn) InitColumnField(column *entity.ToolsGenTableColum
 	} else if dataType == "bit" {
 		column.GoType = "bool"
 		column.TsType = "boolean"
-	}
-
-	//新增字段
-	if s.IsNotEdit(columnName) {
-		column.IsInsert = false
-	} else if column.IsIncrement {
-		column.IsInsert = false
-	} else {
-		column.IsInsert = true
 	}
 
 	// 编辑字段

@@ -122,14 +122,3 @@ type UserDeleteReq struct {
 
 type UserDeleteRes struct {
 }
-
-type UserGetByIdsReq struct {
-	g.Meta `path:"/user/getUsers" tags:"用户管理" method:"get" summary:"同时获取多个用户"`
-	commonApi.Author
-	Ids []int `p:"ids" v:"required#ids不能为空"`
-}
-
-type UserGetByIdsRes struct {
-	g.Meta `mime:"application/json"`
-	List   []*model.SysUserSimpleRes `json:"list"`
-}

@@ -21,7 +21,7 @@ type sToken struct {
 	*gftoken.GfToken
 }
 
-func New() *sToken {
+func New() service.IGfToken {
 	var (
 		ctx = gctx.New()
 		opt *commonModel.TokenOptions

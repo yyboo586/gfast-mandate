@@ -30,7 +30,7 @@ func init() {
 	service.RegisterSysJob(New())
 }
 
-func New() *sSysJob {
+func New() service.ISysJob {
 	return &sSysJob{}
 }
 

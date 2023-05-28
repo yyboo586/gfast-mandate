@@ -43,7 +43,7 @@ func init() {
 	service.RegisterToolsGenTable(New())
 }
 
-func New() *sToolsGenTable {
+func New() service.IToolsGenTable {
 	return new(sToolsGenTable)
 }
 
@@ -184,7 +184,7 @@ func (s *sToolsGenTable) InitTable(ctx context.Context, table *entity.ToolsGenTa
 	table.PackageName = g.Cfg().MustGet(ctx, "gen.packageName").String()
 	table.ModuleName = g.Cfg().MustGet(ctx, "gen.moduleName").String()
 	table.BusinessName = s.GetBusinessName(ctx, table.TableName)
-	table.FunctionName = strings.ReplaceAll(table.TableComment, "表", "")
+	table.FunctionName = table.TableComment
 	table.FunctionAuthor = g.Cfg().MustGet(ctx, "gen.author").String()
 	table.TplCategory = "crud"
 	pkColumn, err := s.getPkColumn(columns)
@@ -403,7 +403,6 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 							dbColumn.QueryType = column.QueryType
 							dbColumn.GoField = column.GoField
 							dbColumn.DictType = column.DictType
-							dbColumn.IsInsert = column.IsInsert
 							dbColumn.IsEdit = column.IsEdit
 							dbColumn.IsList = column.IsList
 							dbColumn.IsDetail = column.IsDetail
@@ -473,10 +472,13 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 	}
 	service.ToolsGenTableColumn().SetPkColumn(extendData, extendData.Columns)
 	view := gview.New()
-	view.SetConfigWithMap(g.Map{
+	err = view.SetConfigWithMap(g.Map{
 		"Paths":      g.Cfg().MustGet(ctx, "gen.templatePath").String(),
 		"Delimiters": []string{"{{", "}}"},
 	})
+	if err != nil {
+		return
+	}
 	view.BindFuncMap(g.Map{
 		"UcFirst": func(str string) string {
 			return gstr.UcFirst(str)
@@ -663,16 +665,6 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		return
 	}
 
-	vueAddKey := "vueAdd"
-	vueAddValue := ""
-	var tmpVueAddModel string
-	if tmpVueAddModel, err = view.Parse(ctx, "vue/add-vue.template", tplData); err == nil {
-		vueAddValue = tmpVueAddModel
-		vueAddValue, err = s.trimBreak(vueAddValue)
-	} else {
-		return
-	}
-
 	vueEditKey := "vueEdit"
 	vueEditValue := ""
 	var tmpVueEditModel string
@@ -709,7 +701,6 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		tsApiKey:       tsApiValue,
 		tsModelKey:     tsModelValue,
 		vueKey:         vueValue,
-		vueAddKey:      vueAddValue,
 		vueEditKey:     vueEditValue,
 		vueDetailKey:   vueDetailValue,
 	}
@@ -723,7 +714,10 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 		return
 	}
 	m := gconv.Map(table)
-	gconv.Struct(m, &tableEx)
+	err = gconv.Struct(m, &tableEx)
+	if err != nil {
+		return
+	}
 	if tableEx.TplCategory == "tree" {
 		opt := gjson.New(tableEx.Options)
 		tableEx.TreeParentCode = opt.Get("treeParentCode").String()
@@ -746,7 +740,6 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 	allColumnExs := make([]*model.ToolsGenTableColumnEx, len(columns))
 
 	var (
-		insertColumns []*model.ToolsGenTableColumnEx
 		editColumns   []*model.ToolsGenTableColumnEx
 		listColumns   []*model.ToolsGenTableColumnEx
 		detailColumns []*model.ToolsGenTableColumnEx
@@ -763,12 +756,6 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 		allColumnExs[i] = columnEx
 		tableEx.IsPkInsertable = tableEx.IsPkInsertable || column.IsPk && !column.IsIncrement
 		tableEx.IsPkListable = tableEx.IsPkListable || column.IsPk && column.IsList
-		if column.IsInsert && !service.ToolsGenTableColumn().IsNotEdit(columnName) && !column.IsPk {
-			insertColumns = append(insertColumns, columnEx)
-			columnEx.IsInsert = true
-		} else {
-			columnEx.IsInsert = false
-		}
 		if column.IsEdit && !service.ToolsGenTableColumn().IsNotEdit(columnName) && !column.IsPk {
 			editColumns = append(editColumns, columnEx)
 			columnEx.IsEdit = true
@@ -861,9 +848,6 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 			break
 		}
 	}
-	sort.Slice(insertColumns, func(i, j int) bool {
-		return insertColumns[i].SortOrderEdit < insertColumns[j].SortOrderEdit
-	})
 	sort.Slice(editColumns, func(i, j int) bool {
 		return editColumns[i].SortOrderEdit < editColumns[j].SortOrderEdit
 	})
@@ -878,7 +862,6 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 	})
 
 	tableEx.Columns = allColumnExs
-	tableEx.InsertColumns = insertColumns
 	tableEx.EditColumns = editColumns
 	tableEx.DetailColumns = detailColumns
 	tableEx.ListColumns = listColumns
@@ -1068,10 +1051,6 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/detail", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
-				case "vueAdd":
-					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/add", ".vue"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
-					liberr.ErrIsNil(ctx, err)
 				case "vueEdit":
 					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/edit", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
@@ -1184,6 +1163,14 @@ func (s *sToolsGenTable) getLinkedTableInfo(ctx context.Context, tableName strin
 		m := gconv.Map(table)
 		err = gconv.Struct(m, &linkedTable)
 		liberr.ErrIsNil(ctx, err)
+		if linkedTable.Options != "" {
+			err = gconv.Struct(linkedTable.Options, &linkedTable.OptionsStruct)
+			liberr.ErrIsNil(ctx, err)
+			err = dao.ToolsGenTableColumn.Ctx(ctx).Where(dao.ToolsGenTableColumn.Columns().TableId, table.TableId).
+				Where(dao.ToolsGenTableColumn.Columns().ColumnName, gstr.CaseSnake(linkedTable.OptionsStruct.TreeParentCode)).
+				Scan(&linkedTable.OptionsStruct.ColumnAttr)
+			liberr.ErrIsNil(ctx, err)
+		}
 		linkedTable.RefColumns = gmap.NewListMap()
 	})
 	return
@@ -1260,5 +1247,68 @@ import (
 )
 `, moduleName)
 	err = s.createFile(path, code, true)
+	return
+}
+
+func (s *sToolsGenTable) SyncTable(ctx context.Context, tableId int64) (err error) {
+	var (
+		extendData      *model.ToolsGenTableEx
+		table           *entity.ToolsGenTable
+		genTableColumns []*entity.ToolsGenTableColumn
+	)
+	extendData, err = s.SelectRecordById(ctx, tableId)
+	if err != nil {
+		return
+	}
+	if extendData == nil {
+		err = gerror.New("表格数据不存在")
+		return
+	}
+	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		err = g.Try(ctx, func(ctx context.Context) {
+			table, err = s.GetTableInfoByTableId(ctx, tableId)
+			liberr.ErrIsNil(ctx, err)
+			if table == nil {
+				liberr.ErrIsNil(ctx, gerror.New("表格数据不存在"))
+			}
+			genTableColumns, err = service.ToolsGenTableColumn().SelectDbTableColumnsByName(ctx, extendData.TableName)
+			liberr.ErrIsNil(ctx, err, "获取列数据失败")
+			if len(genTableColumns) <= 0 {
+				liberr.ErrIsNil(ctx, gerror.New("获取列数据失败"))
+			}
+			for _, column := range genTableColumns {
+				alreadyExists := false //字段是否存在
+				for _, tableColumn := range extendData.Columns {
+					if column.ColumnName == tableColumn.ColumnName {
+						alreadyExists = true
+						break
+					}
+				}
+				//字段不存在则添加
+				if !alreadyExists {
+					service.ToolsGenTableColumn().InitColumnField(column, table)
+					_, err = tx.Model(dao.ToolsGenTableColumn.Table()).Insert(column)
+					liberr.ErrIsNil(ctx, err, fmt.Sprintf("保存列`%s`数据失败", column.ColumnName))
+				}
+			}
+			for _, tableColumn := range extendData.Columns {
+				alreadyDelete := true //数据表中字段是否已删除
+				for _, column := range genTableColumns {
+					if column.ColumnName == tableColumn.ColumnName {
+						alreadyDelete = false
+						break
+					}
+				}
+				if alreadyDelete {
+					//删除columns表中字段
+					_, err = dao.ToolsGenTableColumn.Ctx(ctx).
+						Where(dao.ToolsGenTableColumn.Columns().ColumnId, tableColumn.ColumnId).
+						Delete()
+					liberr.ErrIsNil(ctx, err)
+				}
+			}
+		})
+		return err
+	})
 	return
 }

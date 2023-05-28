@@ -18,7 +18,6 @@ type ToolsGenTableColumn struct {
 	IsPk                  bool   `json:"isPk"                  description:"是否主键（1是）"`
 	IsIncrement           bool   `json:"isIncrement"           description:"是否自增（1是）"`
 	IsRequired            bool   `json:"isRequired"            description:"是否必填（1是）"`
-	IsInsert              bool   `json:"isInsert"              description:"是否为插入字段（1是）"`
 	IsEdit                bool   `json:"isEdit"                description:"是否编辑字段（1是）"`
 	IsList                bool   `json:"isList"                description:"是否列表字段（1是）"`
 	IsDetail              bool   `json:"isDetail"              description:"是否详情字段"`

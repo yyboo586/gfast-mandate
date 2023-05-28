@@ -23,7 +23,6 @@ type ToolsGenTableColumn struct {
 	IsPk                  interface{} // 是否主键（1是）
 	IsIncrement           interface{} // 是否自增（1是）
 	IsRequired            interface{} // 是否必填（1是）
-	IsInsert              interface{} // 是否为插入字段（1是）
 	IsEdit                interface{} // 是否编辑字段（1是）
 	IsList                interface{} // 是否列表字段（1是）
 	IsDetail              interface{} // 是否详情字段

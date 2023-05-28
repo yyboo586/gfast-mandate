@@ -22,7 +22,6 @@ package service
 
 import (
 	"context"
-	"{{.goModName}}/api/v1/{{.table.ModuleName}}"
 	"{{.goModName}}/{{.table.PackageName}}/model"
 	{{if or .table.HasConversion (eq .table.TplCategory "tree")}}
 	{{end}}
@@ -30,11 +29,14 @@ import (
 
 ////
 type I{{.table.ClassName}} interface {
-	List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error)
+	List(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (res *model.{{.table.ClassName}}SearchRes, err error)
 	GetBy{{.table.PkColumn.GoField}}(ctx context.Context, {{.table.PkColumn.GoField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error)
-	Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (err error)
-	Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (err error)
+	Add(ctx context.Context, req *model.{{.table.ClassName}}AddReq) (err error)
+	Edit(ctx context.Context, req *model.{{.table.ClassName}}EditReq) (err error)
 	Delete(ctx context.Context, {{$.table.PkColumn.GoField}} []{{$.table.PkColumn.GoType}}) (err error)
+	{{if gt (len .table.LinkedTables) 0}}
+	Linked{{$.table.ClassName}}DataSearch(ctx context.Context)(res *model.Linked{{$.table.ClassName}}DataSearchRes,err error)
+	{{end}}
 }
 
 ////

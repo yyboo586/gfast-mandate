@@ -29,7 +29,7 @@ func init() {
 	service.RegisterSysAuthRule(New())
 }
 
-func New() *sSysAuthRule {
+func New() service.ISysAuthRule {
 	return &sSysAuthRule{}
 }
 

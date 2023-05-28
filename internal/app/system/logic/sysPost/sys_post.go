@@ -24,7 +24,7 @@ func init() {
 	service.RegisterSysPost(New())
 }
 
-func New() *sSysPost {
+func New() service.ISysPost {
 	return &sSysPost{}
 }
 

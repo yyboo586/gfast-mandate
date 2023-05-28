@@ -23,7 +23,6 @@ type ToolsGenTableColumnEx struct {
 	IsPk                   bool                   // 是否主键
 	IsIncrement            bool                   // 是否自增
 	IsRequired             bool                   // 是否必填
-	IsInsert               bool                   // 是否为插入字段
 	IsEdit                 bool                   // 是否编辑字段
 	IsList                 bool                   // 是否列表字段
 	IsDetail               bool                   // 是否详情字段

@@ -119,10 +119,3 @@ func (c *userController) Delete(ctx context.Context, req *system.UserDeleteReq) 
 	err = service.SysUser().Delete(ctx, req.Ids)
 	return
 }
-
-// GetUsers 通过用户id批量获取用户信息
-func (c *userController) GetUsers(ctx context.Context, req *system.UserGetByIdsReq) (res *system.UserGetByIdsRes, err error) {
-	res = new(system.UserGetByIdsRes)
-	res.List, err = service.SysUser().GetUsers(ctx, req.Ids)
-	return
-}

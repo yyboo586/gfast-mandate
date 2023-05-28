@@ -78,31 +78,18 @@ export function change{{$.table.ClassName}}{{$column.GoField}}({{$.table.PkColum
   })
 }
 {{end}}
-{{if ne $column.LinkTableName ""}}
-{{if not (inArray $hasMethods (concat "list" $column.LinkTableClass))}}
-{{$hasMethods = append $hasMethods (concat "list" $column.LinkTableClass)}}
-// 关联{{$column.LinkTableName}}表选项
-export function list{{$column.LinkTableClass}}(query:object){
-   return request({
-     url: '/{{$plugin}}{{$.apiVersion}}/{{$column.LinkTableModuleName}}/{{$column.LinkTableBusinessName | CaseCamelLower}}/list',
-     method: 'get',
-     params: query
-   })
-}
-{{end}}
-{{end}}
+
 {{if eq $column.HtmlField "createdBy" "updatedBy"}}
 {{$getUserList = true}}
 {{end}}
 {{end}}
 
-{{if $getUserList}}
-//获取用户信息列表
-export function getUserList(uIds:number[]){
-    return request({
-     url: '/{{.apiVersion|}}/system/user/getUsers',
-     method: 'get',
-     params: {ids:uIds}
-   })
+{{if gt (len .table.LinkedTables) 0}}
+//相关连表查询数据
+export function linkedDataSearch(){
+  return request({
+    url: '/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/linkedData',
+    method: 'get'
+  })
 }
 {{end}}

@@ -125,3 +125,13 @@ type ToolsGenTableBatchGenCodeReq struct {
 type ToolsGenTableBatchGenCodeRes struct {
 	commonApi.EmptyRes
 }
+
+type ToolsGenTableSyncTableReq struct {
+	g.Meta `path:"/tools/gen/syncTable" tags:"代码生成" method:"post" summary:"同步表结构"`
+	commonApi.Author
+	TableId int64 `p:"tableId" v:"required#表ID必须"`
+}
+
+type ToolsGenTableSyncTableRes struct {
+	commonApi.EmptyRes
+}

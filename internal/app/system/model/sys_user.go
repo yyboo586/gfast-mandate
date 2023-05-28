@@ -51,3 +51,9 @@ type SysUserSimpleRes struct {
 	UserName     string `orm:"user_name" json:"userName"`            // 用户名
 	UserNickname string `orm:"user_nickname"    json:"userNickname"` // 用户昵称
 }
+
+type LinkUserRes struct {
+	gmeta.Meta   `orm:"table:sys_user"`
+	Id           uint64 `orm:"id"       json:"id"`
+	UserNickname string `orm:"user_nickname"    json:"userNickname"`
+}

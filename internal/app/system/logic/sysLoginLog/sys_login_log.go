@@ -24,7 +24,7 @@ func init() {
 	service.RegisterSysLoginLog(New())
 }
 
-func New() *sSysLoginLog {
+func New() service.ISysLoginLog {
 	return &sSysLoginLog{
 		Pool: grpool.New(100),
 	}

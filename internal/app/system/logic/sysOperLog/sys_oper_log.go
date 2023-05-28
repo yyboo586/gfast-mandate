@@ -33,7 +33,7 @@ func init() {
 	service.RegisterOperateLog(New())
 }
 
-func New() *sOperateLog {
+func New() service.IOperateLog {
 	return &sOperateLog{
 		Pool: grpool.New(100),
 	}

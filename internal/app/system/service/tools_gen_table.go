@@ -31,6 +31,7 @@ type (
 		GenData(ctx context.Context, tableId int64) (data g.MapStrStr, extendData *model.ToolsGenTableEx, err error)
 		SelectRecordById(ctx context.Context, tableId int64) (tableEx *model.ToolsGenTableEx, err error)
 		GenCode(ctx context.Context, ids []int) (err error)
+		SyncTable(ctx context.Context, tableId int64) (err error)
 	}
 )
 
