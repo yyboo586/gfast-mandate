@@ -16,8 +16,9 @@ package logic
 {{$usedSystemModule:=false}}
 {{$gstr:=false}}
 {{range $index, $column := .table.Columns}}
-{{if eq $column.HtmlType "images" "file" "files"}}
+{{if and $column.IsList (eq $column.HtmlType "images" "file" "files")}}
 {{$gjson = true}}
+{{$gstr = true}}
 {{end}}
 {{if and (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy") (ne $.table.ModuleName "system")}}
 {{$usedSystemModule = true}}
@@ -34,6 +35,9 @@ package logic
 import (
     "context"
     "github.com/gogf/gf/v2/frame/g"
+    {{if $gjson}}
+    "github.com/gogf/gf/v2/encoding/gjson"
+    {{end}}
     {{if $gstr}}
     "github.com/gogf/gf/v2/text/gstr"
     {{end}}
@@ -265,11 +269,7 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
         err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
         liberr.ErrIsNil(ctx,err,"获取信息失败")
         {{range $index, $column := .table.Columns}}
-        {{if and $column.IsList (eq $column.HtmlType "images" "file" "files")}}
-            {{$column.HtmlField}}:= ([]*comModel.UpFile)(nil)
-            err = gjson.DecodeTo(v.{{$column.GoField}},&{{$column.HtmlField}})
-            liberr.ErrIsNil(ctx,err)
-        {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+        {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
         {{range $ti, $linkedTable := $.table.LinkedTables}}
         {{if eq $column.LinkTableClass $linkedTable.ClassName}}
             err = g.Model("{{$linkedTable.TableName}}").
