@@ -372,8 +372,8 @@ func (s *s{{.table.ClassName}})Delete(ctx context.Context, {{$.table.PkColumn.Ht
 func (s *s{{.table.ClassName}})GetChildrenIds(ctx context.Context,ids []{{$.table.PkColumn.GoType}}) (returnIds []{{$.table.PkColumn.GoType}},err error) {
     err = g.Try(ctx,func(ctx context.Context){
         //获取所有
-        var all *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes
-        all.{{.table.ClassName}}SearchRes, err = s.List(ctx, &model.{{.table.ClassName}}SearchReq{})
+        var all *model.{{.table.ClassName}}SearchRes
+        all, err = s.List(ctx, &model.{{.table.ClassName}}SearchReq{})
         liberr.ErrIsNil(ctx,err)
         list := make(g.List, len(all.List))
         for k, info := range all.List {

@@ -90,12 +90,6 @@ type {{.table.ClassName}}ListRes struct{
     {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
     {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files"}}[]*comModel.UpFile{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
-    {{if eq $column.HtmlField "createdBy"}}
-    CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
-    {{end}}
-    {{if eq $column.HtmlField "updatedBy"}}
-    UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedBy"`
-    {{end}}
     {{end}}
     {{range $index, $column := .table.Columns}}
     {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
@@ -104,6 +98,12 @@ type {{.table.ClassName}}ListRes struct{
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
     Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
+    {{end}}
+    {{if eq $column.HtmlField "createdBy"}}
+    CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
+    {{end}}
+    {{if eq $column.HtmlField "updatedBy"}}
+    UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
     {{end}}
     {{end}}
     {{end}}

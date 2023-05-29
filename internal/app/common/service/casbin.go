@@ -2,14 +2,13 @@ package service
 
 import (
 	"context"
-	"sync"
-
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/tiger1103/gfast/v3/internal/app/common/dao"
 	"github.com/tiger1103/gfast/v3/internal/app/common/model/entity"
+	"sync"
 )
 
 type cabinImpl struct{}
@@ -21,16 +20,15 @@ type adapterCasbin struct {
 }
 
 var (
-	cb   = cabinImpl{}
-	once sync.Once
-	ac   *adapterCasbin
+	cb    = cabinImpl{}
+	once  sync.Once
+	en    *casbin.SyncedEnforcer
+	enErr error
 )
 
 // CasbinEnforcer 获取adapter单例对象
 func CasbinEnforcer(ctx context.Context) (enforcer *casbin.SyncedEnforcer, err error) {
-	once.Do(func() {
-		ac = cb.newAdapter(ctx)
-	})
+	ac := cb.newAdapter(ctx)
 	enforcer = ac.Enforcer
 	err = ac.EnforcerErr
 	return
@@ -39,20 +37,19 @@ func CasbinEnforcer(ctx context.Context) (enforcer *casbin.SyncedEnforcer, err e
 // 初始化adapter操作
 func (s *cabinImpl) newAdapter(ctx context.Context) (a *adapterCasbin) {
 	a = new(adapterCasbin)
-	a.initPolicy(ctx)
+	once.Do(func() {
+		en, enErr = initPolicy(ctx, a)
+	})
+	a.Enforcer, a.EnforcerErr = en, enErr
 	a.ctx = ctx
 	return
 }
 
-func (a *adapterCasbin) initPolicy(ctx context.Context) {
+func initPolicy(ctx context.Context, a *adapterCasbin) (e *casbin.SyncedEnforcer, err error) {
 	// Because the DB is empty at first,
 	// so we need to load the policy from the file adapter (.CSV) first.
-	e, err := casbin.NewSyncedEnforcer(g.Cfg().MustGet(ctx, "casbin.modelFile").String(), a)
-	if err != nil {
-		a.EnforcerErr = err
-		return
-	}
-	a.Enforcer = e
+	e, err = casbin.NewSyncedEnforcer(g.Cfg().MustGet(ctx, "casbin.modelFile").String(), a)
+	return
 }
 
 // SavePolicy saves policy to database.
