@@ -65,7 +65,7 @@ import (
     {{$hasMethods = append $hasMethods (concat "list" $column.ClassName)}}
     {{/*关联{{$column.LinkTableName}}表选项*/}}
     {{if ne $column.PackageName $.table.PackageName}}
-    linked{{$column.ClassName}}Dao {{$.goModName}}/{{$column.PackageName}}/dao
+    linked{{$column.ClassName}}Dao "{{$.goModName}}/{{$column.PackageName}}/dao"
     {{end}}
     {{end}}
     {{end}}
