@@ -13,12 +13,12 @@
 package logic
 ////
 {{$gjson:=false}}
+{{$libUtils:=false}}
 {{$usedSystemModule:=false}}
 {{$gstr:=false}}
 {{range $index, $column := .table.Columns}}
-{{if and $column.IsList (eq $column.HtmlType "images" "file" "files")}}
-{{$gjson = true}}
-{{$gstr = true}}
+{{if eq $column.HtmlType "images" "file" "files"}}
+{{$libUtils = true}}
 {{end}}
 {{if and (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy") (ne $.table.ModuleName "system")}}
 {{$usedSystemModule = true}}
@@ -35,9 +35,6 @@ package logic
 import (
     "context"
     "github.com/gogf/gf/v2/frame/g"
-    {{if $gjson}}
-    "github.com/gogf/gf/v2/encoding/gjson"
-    {{end}}
     {{if $gstr}}
     "github.com/gogf/gf/v2/text/gstr"
     {{end}}
@@ -54,7 +51,7 @@ import (
     {{if $usedSystemModule}}
     systemService "{{.goModName}}/internal/app/system/service"
     {{end}}
-    {{if or (eq .table.TplCategory "tree") $gjson}}
+    {{if or (eq .table.TplCategory "tree") $libUtils}}
     "{{.goModName}}/library/libUtils"
     {{end}}
     "{{.goModName}}/library/liberr"
@@ -171,11 +168,7 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
         listRes.List = make([]*model.{{.table.ClassName}}ListRes,len(res))
         for k,v:=range res{
             {{range $index, $column := .table.Columns}}
-            {{if and $column.IsList (eq $column.HtmlType "images" "file" "files")}}
-            {{$column.HtmlField}}:= ([]*comModel.UpFile)(nil)
-            err = gjson.DecodeTo(v.{{$column.GoField}},&{{$column.HtmlField}})
-            liberr.ErrIsNil(ctx,err)
-            {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+            {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
             {{range $ti, $linkedTable := $.table.LinkedTables}}
             {{if eq $column.LinkTableClass $linkedTable.ClassName}}
             err = g.Model("{{$linkedTable.TableName}}").
@@ -203,7 +196,7 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                   {{range $index, $column := .table.Columns}}
                     {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
                       {{if eq $column.HtmlType "images" "file" "files"}}
-                {{$column.GoField}} : {{$column.HtmlField}},
+                {{$column.GoField}} : v.{{$column.GoField}},
                       {{else}}
                 {{$column.GoField}} : v.{{$column.GoField}},
                         {{range $ti, $linkedTable := $.table.LinkedTables}}
@@ -226,7 +219,7 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                 UpdatedUser:v.UpdatedUser,
                   {{end}}
                     {{if eq $column.HtmlType "images" "file" "files"}}
-                {{$column.GoField}} : {{$column.HtmlField}},
+                {{$column.GoField}} : v.{{$column.GoField}},
                     {{else}}
                 {{$column.GoField}} : v.{{$column.GoField}},
                     {{range $ti, $linkedTable := $.table.LinkedTables}}

@@ -425,7 +425,7 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 							if tc, e := options["treeParentCode"]; options != nil && e && tc != "" && tc == dbColumn.HtmlField {
 								dbColumn.IsQuery = false
 								dbColumn.IsList = false
-								dbColumn.HtmlType = "select"
+								dbColumn.HtmlType = "treeSelect"
 							}
 							//获取字段关联表信息
 							if column.LinkLabelName != "" {
