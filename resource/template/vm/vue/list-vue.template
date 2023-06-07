@@ -563,10 +563,10 @@ export default defineComponent({
             {{if eq $column.HtmlField "createdBy" "updatedBy"}}
             list.map((item:any)=>{
                 {{if eq $column.HtmlField "createdBy"}}
-                item.createdBy = item?.createdUser.userNickname
+                item.createdBy = item.createdUser?.userNickname
                 {{end}}
                 {{if eq $column.HtmlField "updatedBy"}}
-                item.updatedBy = item?.updatedUser.userNickname
+                item.updatedBy = item.updatedUser?.userNickname
                 {{end}}
             })
             {{end}}
