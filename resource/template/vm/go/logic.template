@@ -267,7 +267,7 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
         {{if eq $column.LinkTableClass $linkedTable.ClassName}}
             err = g.Model("{{$linkedTable.TableName}}").
             Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
-            Where("id", gstr.Split(res.{{$column.GoField}}, ",")).
+            Where("{{$column.LinkLabelId}}", gstr.Split(res.{{$column.GoField}}, ",")).
             Scan(&res.Linked{{$column.GoField}})
             liberr.ErrIsNil(ctx, err)
         {{end}}
