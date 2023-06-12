@@ -289,10 +289,10 @@
               data.{{$column.HtmlField}} =data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : []
               {{end}}
               {{if eq $column.HtmlField "createdBy"}}
-              data.createdBy = data?.createdUser.userNickname
+              data.createdBy = data.createdUser?.userNickname
               {{end}}
               {{if eq $column.HtmlField "updatedBy"}}
-              data.updatedBy = data?.updatedUser.userNickname
+              data.updatedBy = data.updatedUser?.userNickname
               {{end}}
               {{end}}
               state.formData = data;
