@@ -39,7 +39,7 @@ import (
     {{if $hasArr}}
     "github.com/gogf/gf/v2/container/garray"
     {{end}}
-    {{if and .table.HasTimeColumn $hasGtime}}
+    {{if or .table.HasTimeColumn $hasGtime}}
     "github.com/gogf/gf/v2/os/gtime"
     {{end}}
     "github.com/gogf/gf/v2/util/gmeta"

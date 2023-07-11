@@ -385,6 +385,26 @@ export default defineComponent({
           {{end}}
           {{else if and (eq $column.HtmlType "radio" "select") (ne $column.DictType "")}}
           data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+          {{else if eq $column.HtmlType "radio" "select" }}
+          {{if eq $column.TsType "number"}}
+          data.{{$column.HtmlField}} = parseInt(data.{{$column.HtmlField}})
+          {{else if eq $column.TsType "string"}}
+          data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+          {{else}}
+          data.{{$column.HtmlField}} = data.{{$column.HtmlField}}
+          {{end}}
+          {{else if eq $column.HtmlType "treeSelect"}}
+          {{$isNumber := false}}
+          {{range $li,$lc := $.table.LinkedTables}}
+          {{if and (eq $lc.TableName $column.LinkTableName) (ne $lc.OptionsStruct.ColumnAttr.GoType "string")}}
+          {{$isNumber = true}}
+          {{end}}
+          {{end}}
+          {{if $isNumber}}
+          data.{{$column.HtmlField}} = parseInt(data.{{$column.HtmlField}})
+          {{else}}
+          data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+          {{end}}
           {{else if eq $column.HtmlType "imagefile"}}
           //单图地址赋值
           imageUrl{{$column.GoField}}.value = data.{{$column.HtmlField}} ? proxy.getUpFileUrl(data.{{$column.HtmlField}}) : ''
