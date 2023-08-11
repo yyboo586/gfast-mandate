@@ -18,7 +18,7 @@ func init() {
 	service.RegisterCaptcha(New())
 }
 
-func New() *sCaptcha {
+func New() service.ICaptcha {
 	return &sCaptcha{
 		driver: &base64Captcha.DriverString{
 			Height:          80,
@@ -37,21 +37,6 @@ type sCaptcha struct {
 	driver *base64Captcha.DriverString
 	store  base64Captcha.Store
 }
-
-var (
-	captcha = sCaptcha{
-		driver: &base64Captcha.DriverString{
-			Height:          80,
-			Width:           240,
-			NoiseCount:      50,
-			ShowLineOptions: 20,
-			Length:          4,
-			Source:          "abcdefghjkmnpqrstuvwxyz23456789",
-			Fonts:           []string{"chromohv.ttf"},
-		},
-		store: base64Captcha.DefaultMemStore,
-	}
-)
 
 // GetVerifyImgString 获取字母数字混合验证码
 func (s *sCaptcha) GetVerifyImgString(ctx context.Context) (idKeyC string, base64stringC string, err error) {

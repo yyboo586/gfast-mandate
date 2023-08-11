@@ -453,6 +453,11 @@ export default defineComponent({
         },
         {{end}}
       }
+      {{range $index, $column := .table.Columns}}
+      {{if eq $column.HtmlType "imagefile"}}
+      imageUrl{{$column.GoField}}.value = ''
+      {{end}}
+      {{end}}
     };
     {{$setUpData:=true}}
     {{range $index, $column := .table.Columns}}
