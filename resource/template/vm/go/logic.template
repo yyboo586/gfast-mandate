@@ -16,6 +16,7 @@ package logic
 {{$libUtils:=false}}
 {{$usedSystemModule:=false}}
 {{$gstr:=false}}
+{{$hasLinkTable:=false}}
 {{range $index, $column := .table.Columns}}
 {{if eq $column.HtmlType "images" "file" "files"}}
 {{$libUtils = true}}
@@ -27,6 +28,7 @@ package logic
 {{range $ti, $linkedTable := $.table.LinkedTables}}
 {{if eq $column.LinkTableClass $linkedTable.ClassName}}
 {{$gstr = true}}
+{{$hasLinkTable = true}}
 {{end}}
 {{end}}
 {{end}}
@@ -235,6 +237,82 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
     })
     return
 }
+
+{{if .table.ExcelPort }}
+////
+func (s *s{{.table.ClassName}})GetExportData(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes []*model.{{.table.ClassName}}InfoRes, err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        m := dao.{{.table.ClassName}}.Ctx(ctx).WithAll()
+        {{range $index, $column := .table.QueryColumns}}
+        {{if eq $column.QueryType "LIKE"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" like ?", "%"+req.{{$column.GoField}}+"%")
+        }
+        {{else if eq $column.QueryType "EQ"}}
+          {{if eq $column.GoType "string"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{else if eq $column.GoType "Time"}}
+            {{if eq $column.ColumnName "created_at"}}
+        if len(req.DateRange) != 0 {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >=? AND "+dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" <=?", req.DateRange[0], req.DateRange[1])
+        }
+            {{else}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+            {{end}}
+          {{else if or (eq $column.GoType "int") (eq $column.GoType "int64") (eq $column.GoType "uint") (eq $column.GoType "uint64") (eq $column.GoType "bool")}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{end}}
+        {{else if eq $column.QueryType "BETWEEN" }}
+        if req.{{$column.GoField}} != nil && len(req.{{$column.GoField}}) > 0 {
+          if req.{{$column.GoField}}[0] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >= ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[0]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+          if len(req.{{$column.GoField}}) > 1 && req.{{$column.GoField}}[1] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" < ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[1]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+        }
+        {{end}}
+        {{end}}
+        if req.PageNum == 0 {
+            req.PageNum = 1
+        }
+        if req.PageSize == 0 {
+            req.PageSize = consts.PageSize
+        }
+        order:= "{{.table.SortColumn}} {{.table.SortType}}"
+        if req.OrderBy!=""{
+            order = req.OrderBy
+        }
+        err = m.Page(req.PageNum, req.PageSize).Order(order).Scan(&listRes)
+        liberr.ErrIsNil(ctx, err, "获取数据失败")
+        {{if $hasLinkTable}}
+        for _,v:=range listRes{
+            {{range $index, $column := .table.Columns}}
+            {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+            {{range $ti, $linkedTable := $.table.LinkedTables}}
+            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            err = g.Model("{{$linkedTable.TableName}}").
+            Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
+            Where("{{$column.LinkLabelId}}", gstr.Split(v.{{$column.GoField}}, ",")).
+            Scan(&v.Linked{{$column.GoField}})
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            {{end}}
+            {{end}}
+            {{end}}
+        }
+        {{end}}
+    })
+    return
+}
+{{end}}
+
 ////
 {{if gt (len .table.LinkedTables) 0}}
 // LinkedDataSearch 相关连表查询数据

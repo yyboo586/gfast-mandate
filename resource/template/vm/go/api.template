@@ -30,6 +30,19 @@ type {{.table.ClassName}}SearchRes struct {
     *model.{{.table.ClassName}}SearchRes
 }
 
+{{if .table.ExcelPort }}
+// {{.table.ClassName}}ExportReq 导出请求
+type {{.table.ClassName}}ExportReq struct {
+    g.Meta   `path:"/export" tags:"{{$.table.FunctionName}}" method:"get" summary:"{{$.table.FunctionName}}导出"`
+    commonApi.Author
+    model.{{.table.ClassName}}SearchReq
+}
+// {{.table.ClassName}}ExportRes 导出响应
+type {{.table.ClassName}}ExportRes struct {
+    commonApi.EmptyRes
+}
+
+{{end}}
 
 {{if gt (len .table.LinkedTables) 0}}
 //相关连表查询数据

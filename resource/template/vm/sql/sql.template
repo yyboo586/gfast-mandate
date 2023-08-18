@@ -20,6 +20,7 @@ DELETE FROM `sys_auth_rule` WHERE `name` = '{{$plugin}}{{.apiVersion}}/{{.table.
 DELETE FROM `sys_auth_rule` WHERE `name` = '{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.BusinessName | CaseCamelLower}}/add';
 DELETE FROM `sys_auth_rule` WHERE `name` = '{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.BusinessName | CaseCamelLower}}/edit';
 DELETE FROM `sys_auth_rule` WHERE `name` = '{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.BusinessName | CaseCamelLower}}/delete';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.BusinessName | CaseCamelLower}}/export';
 {{range $index,$column:= .table.Columns}}
 {{if and $column.IsStatus $column.IsList}}
 DELETE FROM `sys_auth_rule` WHERE `name` = '{{$plugin}}{{.apiVersion}}/{{$.table.ModuleName}}/{{$.table.BusinessName | CaseCamelLower}}/change{{$column.GoField}}';
@@ -55,6 +56,11 @@ VALUES(@parentId,'{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.Busi
 
 INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
 VALUES(@parentId,'{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.BusinessName | CaseCamelLower}}/delete','{{.table.FunctionName}}删除','','','{{.table.FunctionName}}删除',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+
+{{if .table.ExcelPort}}
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{.table.BusinessName | CaseCamelLower}}/export','{{.table.FunctionName}}导出','','','{{.table.FunctionName}}导出',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+{{end}}
 
 {{range $index,$column:= .table.Columns}}
 {{if and $column.IsStatus $column.IsList}}

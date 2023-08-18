@@ -100,7 +100,7 @@ type ToolsGenTableColumnsEditReq struct {
 	TreeCode       string                        `p:"tree_code"`
 	TreeParentCode string                        `p:"tree_parent_code"`
 	TreeName       string                        `p:"tree_name"`
-	UserName       string
+	ExcelPort      string                        `p:"excelPort"`
 }
 
 type ToolsGenTableColumnsEditRes struct {

@@ -224,6 +224,15 @@
                   v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/delete'"
                 ><el-icon><ele-Delete /></el-icon>删除</el-button>
               </el-col>
+             {{if .table.ExcelPort }}
+             <el-col :span="1.5">
+                <el-button
+                        type="warning"
+                        @click="handleExport()"
+                        v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/export'"
+                ><el-icon><ele-Download /></el-icon>导出Excel</el-button>
+             </el-col>
+            {{end}}
             </el-row>
         </div>
         <el-table v-loading="loading" :data="tableData.data" @selection-change="handleSelectionChange">
@@ -443,6 +452,9 @@ import {
 } from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
 import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/edit.vue"
 import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/detail.vue"
+{{if .table.ExcelPort }}
+import {downLoadXml} from "/@/utils/zipdownload";
+{{end}}
 export default defineComponent({
     name: "{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}List",
     components:{
@@ -645,6 +657,12 @@ export default defineComponent({
         const handleView = (row:{{$.table.ClassName}}TableColumns)=>{
             detailRef.value.openDialog(toRaw(row));
         }
+        {{if .table.ExcelPort }}
+        //导出excel
+        const handleExport = ()=>{
+            downLoadXml('/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/export',state.tableData.param,'get')
+        }
+        {{end}}
         return {
             proxy,
             editRef,
@@ -678,6 +696,9 @@ export default defineComponent({
             handleDelete,
             {{if eq .table.ShowDetail "true"}}
             handleView,
+            {{end}}
+            {{if .table.ExcelPort }}
+            handleExport,
             {{end}}
             ...toRefs(state),
         }

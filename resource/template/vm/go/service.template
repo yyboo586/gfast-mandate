@@ -30,6 +30,9 @@ import (
 ////
 type I{{.table.ClassName}} interface {
 	List(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (res *model.{{.table.ClassName}}SearchRes, err error)
+	{{if .table.ExcelPort }}
+	GetExportData(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes []*model.{{.table.ClassName}}InfoRes, err error)
+	{{end}}
 	GetBy{{.table.PkColumn.GoField}}(ctx context.Context, {{.table.PkColumn.GoField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error)
 	Add(ctx context.Context, req *model.{{.table.ClassName}}AddReq) (err error)
 	Edit(ctx context.Context, req *model.{{.table.ClassName}}EditReq) (err error)

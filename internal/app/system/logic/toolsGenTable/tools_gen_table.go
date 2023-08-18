@@ -364,6 +364,9 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 	if req.ShowDetail != "" {
 		table.ShowDetail = gconv.Bool(req.ShowDetail)
 	}
+	if req.ExcelPort != "" {
+		table.ExcelPort = gconv.Bool(req.ExcelPort)
+	}
 	if req.TplCategory != "" {
 		table.TplCategory = req.TplCategory
 	}
