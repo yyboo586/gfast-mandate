@@ -21,7 +21,8 @@ package controller
 {{$hasGconv:=false}}
 {{$hasSystemApi:=false}}
 {{$hasCommonService:=false}}
-{{range $index, $column := .table.DetailColumns}}
+{{if .table.ExcelPort}}
+{{range $index, $column := .table.Columns}}
     {{if ne $column.DictType ""}}
         {{$hasGmap = true}}
         {{$hasGconv = true}}
@@ -35,6 +36,7 @@ package controller
             {{$hasGstr = true}}
         {{end}}
     {{end}}
+{{end}}
 {{end}}
 import (
     "context"
@@ -101,7 +103,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
         listData []*model.{{.table.ClassName}}InfoRes
         //表头
         {{$tableHeader := ""}}
-        {{range $index, $column := .table.DetailColumns}}
+        {{range $index, $column := .table.Columns}}
             {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
                 {{$tableHeader = concat $tableHeader `"` $column.ColumnComment `"` "," }}
             {{end}}
@@ -149,7 +151,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
         }
         for _,v:=range listData{
             var (
-                {{range $index, $column := .table.DetailColumns}}
+                {{range $index, $column := .table.Columns}}
                 {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
                 {{if or (ne $column.DictType "") (ne $column.LinkTableName "")}}
                 {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
@@ -173,7 +175,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
                 {{end}}
                 {{end}}
             )
-            {{range $index, $column := .table.DetailColumns}}
+            {{range $index, $column := .table.Columns}}
             {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
             {{if ne $column.DictType ""}}
             {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
@@ -213,7 +215,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
             {{end}}
             {{end}}
             dt := []interface{}{
-                {{range $index, $column := .table.DetailColumns}}
+                {{range $index, $column := .table.Columns}}
                 {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
                 {{if ne $column.DictType ""}}
                 {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}

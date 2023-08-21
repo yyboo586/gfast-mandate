@@ -32,6 +32,7 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 	"github.com/tiger1103/gfast/v3/library/liberr"
+	"golang.org/x/tools/imports"
 	"io"
 	"os"
 	"reflect"
@@ -1154,6 +1155,7 @@ func (s *sToolsGenTable) createFile(fileName, data string, cover bool) (err erro
 			f.WriteString(data)
 		}
 		f.Close()
+		err = s.goFmt(fileName)
 	}
 	return
 }
@@ -1313,5 +1315,31 @@ func (s *sToolsGenTable) SyncTable(ctx context.Context, tableId int64) (err erro
 		})
 		return err
 	})
+	return
+}
+
+// goFmt formats the source file and adds or removes import statements as necessary.
+func (s *sToolsGenTable) goFmt(path string)(err error) {
+	replaceFunc := func(path, content string) string {
+		res, err := imports.Process(path, []byte(content), nil)
+		if err != nil {
+			g.Log().Printf(context.Background(),`error format "%s" go files: %v`, path, err)
+			return content
+		}
+		return string(res)
+	}
+	if gfile.IsFile(path) {
+		// File format.
+		if gfile.ExtName(path) != "go" {
+			return
+		}
+		err = gfile.ReplaceFileFunc(replaceFunc, path)
+	} else {
+		// Folder format.
+		err = gfile.ReplaceDirFunc(replaceFunc, path, "*.go", true)
+	}
+	if err != nil {
+		err  =  fmt.Errorf(`error format "%s" go files: %v`, path, err)
+	}
 	return
 }
