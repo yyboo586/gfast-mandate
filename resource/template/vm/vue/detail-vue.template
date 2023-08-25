@@ -101,6 +101,12 @@
               </div>
             </el-form-item>
           </el-col>
+        {{else if eq $column.HtmlType "keyValue"}}
+          <el-form-item label="{{$column.ColumnComment}}">
+            <el-tag class="ml-2" v-for="(item,key) in formData.{{$column.HtmlField}}" :key="'{{$column.HtmlField}}-'+key">
+              {{"{{"}} item.key {{"}}"}} : {{"{{"}} item.value {{"}}"}}
+            </el-tag>
+          </el-form-item>
         {{end}}
       {{end}}
       {{if not $hasRowEnd}}
@@ -152,9 +158,6 @@
     {{if and $column.IsStatus $column.IsList}}
     change{{$.table.ClassName}}{{$column.GoField}},
     {{end}}
-    {{end}}
-    {{if $getUserList}}
-    getUserList,
     {{end}}
   } from "/@/api/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}";
 
@@ -237,7 +240,7 @@
           {{range $index, $column := .table.Columns}}
           {{if eq $column.HtmlType "radio"}}
           {{$column.HtmlField}}: false ,
-          {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
+          {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "keyValue"}}
           {{$column.HtmlField}}: [] ,
           {{else}}
           {{$column.HtmlField}}: undefined,
@@ -285,7 +288,7 @@
               {{else if eq $column.HtmlType "imagefile"}}
               //单图地址赋值
               imageUrl{{$column.GoField}}.value = data.{{$column.HtmlField}} ? proxy.getUpFileUrl(data.{{$column.HtmlField}}) : ''
-              {{else if eq $column.HtmlType "images" "file" "files"}}
+              {{else if eq $column.HtmlType "images" "file" "files" "keyValue"}}
               data.{{$column.HtmlField}} =data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : []
               {{end}}
               {{if eq $column.HtmlField "createdBy"}}
@@ -313,7 +316,7 @@
             {{range $index, $column := .table.Columns}}
             {{if eq $column.HtmlType "radio"}}
             {{$column.HtmlField}}: false ,
-            {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
+            {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "keyValue"}}
             {{$column.HtmlField}}: [] ,
             {{else}}
             {{$column.HtmlField}}: undefined,

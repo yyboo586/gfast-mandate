@@ -10,6 +10,7 @@ const (
 	SourceLocal   UploaderType = iota //  上传到本地
 	SourceTencent                     //  上传至腾讯云
 	SourceQiniu                       //  上传到七牛云
+	SourceOss                       //  上传到oss
 )
 
 type UploaderType int
@@ -40,8 +41,8 @@ func GetUploader(key UploaderType) IUpload {
 }
 
 func Register() {
-
 	RegisterUploader(SourceLocal, &Local{})
 	RegisterUploader(SourceTencent, &Tencent{})
 	RegisterUploader(SourceQiniu, &Qiniou{})
+	RegisterUploader(SourceOss, &OSS{})
 }

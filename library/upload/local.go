@@ -21,11 +21,11 @@ func (s *Local) Upload(ctx context.Context, file *ghttp.UploadFile) (result syst
 		return
 	}
 	r := g.RequestFromCtx(ctx)
-	urlPerfix := fmt.Sprintf("http://%s/", r.Host)
+	urlPerfix := fmt.Sprintf("//%s/", r.Host)
 	p := strings.Trim(consts.UploadPath, "/")
 	sp := s.getStaticPath(ctx)
 	if sp != "" {
-		sp = strings.Trim(sp, "/")
+		sp = strings.TrimRight(sp, "/")
 	}
 	nowData := time.Now().Format("2006-01-02")
 	// 包含静态文件夹的路径

@@ -7,7 +7,7 @@ export interface {{.table.ClassName}}TableColumns {
     {{end}}
     {{range $index, $column := .table.Columns}}
     {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
-    {{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else}}{{$column.TsType}}{{end}};  // {{$column.ColumnComment}}
+    {{$column.HtmlField}}:{{if and (eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects") (eq $column.DictType "")}}any[]{{else}}{{$column.TsType}}{{end}};  // {{$column.ColumnComment}}
     {{end}}
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
@@ -23,7 +23,7 @@ export interface {{.table.ClassName}}TableColumns {
     {{if  eq $column.HtmlField "createdBy" "updatedBy"}}
     {{$column.HtmlField}}:string;  // {{$column.ColumnComment}}
     {{else}}
-    {{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else}}{{$column.TsType}}{{end}};  // {{$column.ColumnComment}}
+    {{$column.HtmlField}}:{{if and (eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects") (eq $column.DictType "")}}any[]{{else}}{{$column.TsType}}{{end}};  // {{$column.ColumnComment}}
     {{end}}
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
@@ -40,7 +40,7 @@ export interface {{.table.ClassName}}TableColumns {
 ////
 export interface {{.table.ClassName}}InfoData {
     {{range $index, $column := .table.Columns}}
-    {{if $column.IsPk}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else}}{{$column.TsType}}|undefined{{end}};        // {{$column.ColumnComment}} {{else}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else}}{{$column.TsType}}|undefined{{end}}; // {{$column.ColumnComment}} {{end}}
+    {{if $column.IsPk}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else if eq $column.HtmlType "keyValue"}}{key:string,value:any}[]{{else}}{{$column.TsType}}|undefined{{end}};        // {{$column.ColumnComment}} {{else}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else if eq $column.HtmlType "keyValue"}}{key:string,value:any}[]{{else}}{{$column.TsType}}|undefined{{end}}; // {{$column.ColumnComment}} {{end}}
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
     linked{{$column.GoField}}?:Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}[]{{end}}; // {{$column.ColumnComment}}

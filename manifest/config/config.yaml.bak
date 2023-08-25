@@ -90,12 +90,23 @@ gfcli:
 
 # 上传配置
 upload:
-  default: 0   # 默认上传至本地
-  tencentCOS:
+  default: 0   # 默认上传至本地 0 - 本地 1 - 腾讯云 2 - 七牛云 3- 阿里oss
+  tencentCOS:     # 腾讯云
     upPath : "/gfast/"
-    rawUrl :    "https://xxxxxx.ap-xxxxx.myqcloud.com"
-    secretID :  "xxxxxxxxxx"
-    secretKey : "xxxxxxxxxx"
+    rawUrl :    "https://xxx-xxxx.cos.ap-chongqing.myqcloud.com"
+    secretID :  "xxxxxxxxxxxxxxxxxxxx"
+    secretKey : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  qiniou: # 七牛云
+    accessKey : "xxxxxxxxxxxxxxxxxxxxxx"
+    sercetKey: "xxxxxxxxxxxxxxxxxxxxx"
+    bucket : "gfast-test"
+    qiniuServer : "http://xxxxxxxxxxx.hn-bkt.clouddn.com"
+  oss: #阿里云oss
+    accessKeyID: "xxxxxxxxxxxxxxxxxxx"
+    accessKeySecret: "xxxxxxxxxxxxxxxxxxxx"
+    endPoint: "xxx.xxxx.com" #自定域名
+    bucketName: "xxx" #使用的存储桶
+    isHttps: true #是否开启https访问
 
 # 代码生成配置
 gen:

@@ -193,6 +193,39 @@
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}" >
           <upload-file :action="baseURL+'{{$.apiVersion}}/system/upload/singleFile'" v-model="formData.{{$column.HtmlField}}" @upFileData="setUpFileList{{$column.GoField}}" :limit="10"></upload-file>
         </el-form-item>
+        {{else if eq $column.HtmlType "keyValue"}}
+        <p class="kv-label" >{{$column.ColumnComment}}</p>
+        <el-row class="kv-row" :gutter="20" v-for="(v, k) in formData.{{$column.HtmlField}}" :key="k">
+          <el-col :span="12" class="colBlock">
+            <el-form-item>
+              <template #label>
+                <el-button class="mini-btn" type="primary" circle size="small" @click="onAddRow{{$column.GoField}}" v-if="k === 0">
+                  <el-icon>
+                    <ele-Plus />
+                  </el-icon>
+                </el-button>
+                <el-button class="mini-btn" type="danger" circle size="small" @click="onDelRow{{$column.GoField}}(k)" v-else>
+                  <el-icon>
+                    <ele-Delete />
+                  </el-icon>
+                </el-button>
+                <span class="ml10">键名</span>
+              </template>
+              <el-input
+                      v-model="formData.{{$column.HtmlField}}[k].key"
+                      placeholder="请输入{{$column.ColumnComment}}键名"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" class="colBlock">
+            <el-form-item label="键值">
+              <el-input
+                      v-model="formData.{{$column.HtmlField}}[k].value"
+                      placeholder="请输入{{$column.ColumnComment}}键值"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
         {{end}} {{/* $column.HtmlType */}}
       {{end}} {{/* range */}}
       </el-form>
@@ -235,7 +268,6 @@
 import { reactive, toRefs, defineComponent,ref,unref,getCurrentInstance } from 'vue';
 import {ElMessageBox, ElMessage, FormInstance,UploadProps} from 'element-plus';
 {{/*去重处理*/}}
-{{$hasImports:=newArray}}
 import {
   list{{.table.ClassName}},
   get{{.table.ClassName}},
@@ -246,15 +278,6 @@ import {
   {{if and $column.IsStatus $column.IsList}}
   change{{$.table.ClassName}}{{$column.GoField}},
   {{end}}
-  {{if ne $column.LinkTableName ""}}
-  {{if not (inArray $hasImports (concat "list" $column.LinkTableClass))}}
-  {{$hasImports = append $hasImports (concat "list" $column.LinkTableClass)}}
-  list{{$column.LinkTableClass}},
-  {{end}}
-  {{end}}
-  {{end}}
-  {{if $getUserList}}
-  getUserList,
   {{end}}
 } from "/@/api/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}";
 
@@ -339,6 +362,8 @@ export default defineComponent({
         {{$column.HtmlField}}: false ,
         {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}}: [] ,
+        {{else if eq $column.HtmlType "keyValue"}}
+        {{$column.HtmlField}}:[{key:"",value:""}],
         {{else}}
         {{$column.HtmlField}}: undefined,
         {{end}}
@@ -410,6 +435,8 @@ export default defineComponent({
           imageUrl{{$column.GoField}}.value = data.{{$column.HtmlField}} ? proxy.getUpFileUrl(data.{{$column.HtmlField}}) : ''
           {{else if eq $column.HtmlType "images" "file" "files"}}
           data.{{$column.HtmlField}} =data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : []
+          {{else if eq $column.HtmlType "keyValue"}}
+          data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : [{key:'',value:''}]
           {{end}}
           {{end}}
           state.formData = data;
@@ -461,6 +488,8 @@ export default defineComponent({
         {{$column.HtmlField}}: false ,
         {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}}: [] ,
+        {{else if eq $column.HtmlType "keyValue"}}
+        {{$column.HtmlField}}:[{key:"",value:""}],
         {{else}}
         {{$column.HtmlField}}: undefined,
         {{end}}
@@ -515,6 +544,18 @@ export default defineComponent({
     const setUpFileList{{$column.GoField}} = (data:any)=>{
       state.formData.{{$column.HtmlField}} = data
     }
+    {{else if eq $column.HtmlType "keyValue"}}
+    // 新增{{$column.ColumnComment}}行
+    const onAddRow{{$column.GoField}} = () => {
+      state.formData.{{$column.HtmlField}}.push({
+        key: '',
+        value: '',
+      });
+    };
+    // 删除{{$column.ColumnComment}}行
+    const onDelRow{{$column.GoField}} = (k: number) => {
+      state.formData.{{$column.HtmlField}}.splice(k, 1);
+    };
     {{end}}
     {{end}}
     {{$setUpDataR:=true}}
@@ -545,6 +586,9 @@ export default defineComponent({
       setUpImgList{{$column.GoField}},
       {{else if eq $column.HtmlType "file" "files"}}
       setUpFileList{{$column.GoField}},
+      {{else if eq $column.HtmlType "keyValue"}}
+      onAddRow{{$column.GoField}},
+      onDelRow{{$column.GoField}},
       {{end}}
       {{end}}
       {{if or $imgsImp $tokenImp $fileImp}}
@@ -584,4 +628,7 @@ export default defineComponent({
     text-align: center;
   }
   {{end}}
+  .kv-label{margin-bottom: 15px;font-size: 14px;}
+  .mini-btn i.el-icon{margin: unset;}
+  .kv-row{margin-bottom: 12px;}
 </style>
