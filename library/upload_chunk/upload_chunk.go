@@ -3,6 +3,8 @@ package upload_chunk
 import (
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"io"
 	"log"
 	"mime/multipart"
@@ -207,7 +209,7 @@ func (u *UploadChunk) Upload(uploadReq UploadReq) (result *UpLoadRes, err error)
 }
 
 func (u *UploadChunk) Tmp() string {
-	return Tmp
+	return g.Cfg().MustGet(gctx.New(), "server.serverRoot").String() + "/big_file/" // 文件保存目录
 }
 
 // 合并文件
