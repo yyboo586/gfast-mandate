@@ -14,6 +14,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcron"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
@@ -179,7 +180,7 @@ func (s *sSysJob) jobRun(ctx context.Context, job *model.SysJobInfoRes) error {
 	//传参
 	paramArr := strings.Split(job.JobParams, "|")
 	service.TaskList().EditParams(f.FuncName, paramArr)
-	task, err := gcron.AddOnce(ctx, "@every 1s", f.Run)
+	task, err := gcron.AddOnce(gctx.New(), "@every 1s", f.Run)
 	if err != nil || task == nil {
 		return gerror.New("启动执行失败")
 	}
@@ -205,7 +206,7 @@ func (s *sSysJob) JobStart(ctx context.Context, job *model.SysJobInfoRes) error 
 	rs := gcron.Search(job.InvokeTarget)
 	if rs == nil {
 		if job.MisfirePolicy == 1 {
-			t, err := gcron.AddSingleton(ctx, job.CronExpression, f.Run, job.InvokeTarget)
+			t, err := gcron.AddSingleton(gctx.New(), job.CronExpression, f.Run, job.InvokeTarget)
 			if err != nil {
 				return err
 			}
@@ -213,7 +214,7 @@ func (s *sSysJob) JobStart(ctx context.Context, job *model.SysJobInfoRes) error 
 				return gerror.New("启动任务失败")
 			}
 		} else {
-			t, err := gcron.AddOnce(ctx, job.CronExpression, f.Run, job.InvokeTarget)
+			t, err := gcron.AddOnce(gctx.New(), job.CronExpression, f.Run, job.InvokeTarget)
 			if err != nil {
 				return err
 			}

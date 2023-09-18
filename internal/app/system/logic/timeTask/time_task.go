@@ -8,9 +8,9 @@
 package timeTask
 
 import (
-	"github.com/gogf/gf/v2/os/gmutex"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
+	"sync"
 )
 
 func init() {
@@ -19,13 +19,13 @@ func init() {
 
 func New() service.ITaskList {
 	return &sTaskList{
-		mu: gmutex.New(),
+		mu: new(sync.RWMutex),
 	}
 }
 
 type sTaskList struct {
 	taskList []*model.TimeTask
-	mu       *gmutex.Mutex
+	mu       *sync.RWMutex
 }
 
 // AddTask 添加任务
