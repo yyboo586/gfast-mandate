@@ -118,6 +118,27 @@ func (a *adapterCasbin) RemovePolicy(sec string, ptype string, rule []string) er
 	return err
 }
 
+func (a *adapterCasbin) AddPolicies(sec string, ptype string, rules [][]string) error {
+	lines := make([]*entity.CasbinRule, len(rules))
+	for k, rule := range rules {
+		lines[k] = savePolicyLine(ptype, rule)
+	}
+	_, err := dao.CasbinRule.Ctx(a.ctx).Data(lines).Insert()
+	return err
+}
+
+// RemovePolicies removes policy rules from the storage.
+// This is part of the Auto-Save feature.
+func (a *adapterCasbin) RemovePolicies(sec string, ptype string, rules [][]string) error {
+	for _, rule := range rules {
+		err := a.RemovePolicy(sec, ptype, rule)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 func (a *adapterCasbin) RemoveFilteredPolicy(sec string, ptype string,
 	fieldIndex int, fieldValues ...string) error {
