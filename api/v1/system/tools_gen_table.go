@@ -101,6 +101,7 @@ type ToolsGenTableColumnsEditReq struct {
 	TreeParentCode string                        `p:"tree_parent_code"`
 	TreeName       string                        `p:"tree_name"`
 	ExcelPort      string                        `p:"excelPort"`
+	UseSnowId      string                        `p:"useSnowId"`
 }
 
 type ToolsGenTableColumnsEditRes struct {

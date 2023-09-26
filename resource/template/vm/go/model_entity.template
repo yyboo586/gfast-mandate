@@ -23,7 +23,7 @@ import (
 type {{.table.ClassName}} struct {
     gmeta.Meta   `orm:"table:{{.table.TableName}}"`
     {{range $index, $column := .table.Columns}}
-    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}"`    // {{$column.ColumnComment}} {{end}}
+    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}{{if $.table.UseSnowId}},string{{end}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}"`    // {{$column.ColumnComment}} {{end}}
     {{if ne $column.LinkTableName ""}}
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}

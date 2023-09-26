@@ -64,6 +64,7 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.0 // indirect
+	github.com/sony/sonyflake v1.2.0 // indirect
 	github.com/stathat/consistent v1.0.0 // indirect
 	github.com/tidwall/gjson v1.13.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

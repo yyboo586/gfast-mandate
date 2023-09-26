@@ -23,11 +23,12 @@ import (
 )
 
 type OSS struct {
-	AccessKeyID string `json:"accessKeyId"`
+	AccessKeyID     string `json:"accessKeyId"`
 	AccessKeySecret string `json:"accessKeySecret"`
-	EndPoint string `json:"endPoint"`
-	BucketName string `json:"bucketName"`
-	IsHttps bool `json:"isHttps"`
+	EndPoint        string `json:"endPoint"`
+	BucketName      string `json:"bucketName"`
+	IsHttps         bool   `json:"isHttps"`
+	Path            string `json:"path"`
 }
 
 func (s *OSS) Upload(ctx context.Context, file *ghttp.UploadFile) (result system.UploadResponse, err error) {
@@ -35,27 +36,27 @@ func (s *OSS) Upload(ctx context.Context, file *ghttp.UploadFile) (result system
 		var (
 			client *oss.Client
 			bucket *oss.Bucket
-			fp multipart.File
+			fp     multipart.File
 		)
-		err = g.Cfg().MustGet(ctx,"upload.oss").Scan(&s)
-		liberr.ErrIsNil(ctx,err)
-		client,err = s.getClient()
-		liberr.ErrIsNil(ctx,err)
+		err = g.Cfg().MustGet(ctx, "upload.oss").Scan(&s)
+		liberr.ErrIsNil(ctx, err)
+		client, err = s.getClient()
+		liberr.ErrIsNil(ctx, err)
 		// 获取存储空间。
 		bucket, err = client.Bucket(s.BucketName)
-		liberr.ErrIsNil(ctx,err)
+		liberr.ErrIsNil(ctx, err)
 		name := gfile.Basename(file.Filename)
 		name = strings.ToLower(strconv.FormatInt(gtime.TimestampNano(), 36) + grand.S(6))
-		name = name + gfile.Ext(file.Filename)
-		fp,err = file.Open()
-		liberr.ErrIsNil(ctx,err)
-		err = bucket.PutObject(name,fp)
-		liberr.ErrIsNil(ctx,err)
+		name = s.Path + "/" + name + gfile.Ext(file.Filename)
+		fp, err = file.Open()
+		liberr.ErrIsNil(ctx, err)
+		err = bucket.PutObject(name, fp)
+		liberr.ErrIsNil(ctx, err)
 		schema := "http"
 		if s.IsHttps {
 			schema = "https"
 		}
-		url :=schema+"://"+s.EndPoint+"/"+name
+		url := schema + "://" + s.EndPoint + "/" + name
 		result = system.UploadResponse{
 			Size:     file.Size,
 			Path:     url,
@@ -67,12 +68,11 @@ func (s *OSS) Upload(ctx context.Context, file *ghttp.UploadFile) (result system
 	return
 }
 
-
 func (s *OSS) getClient() (client *oss.Client, err error) {
 	// 设置连接数为10，每个主机的最大闲置连接数为20，每个主机的最大连接数为20。
-	conn := oss.MaxConns(10,20,20)
+	conn := oss.MaxConns(10, 20, 20)
 	// 设置HTTP连接超时时间为20秒，HTTP读取或写入超时时间为60秒。
-	time := oss.Timeout(20,60)
+	time := oss.Timeout(20, 60)
 	// 设置是否支持将自定义域名作为Endpoint，默认不支持。
 	cname := oss.UseCname(true)
 	// 设置HTTP的User-Agent头，默认为aliyun-sdk-go。
@@ -88,6 +88,6 @@ func (s *OSS) getClient() (client *oss.Client, err error) {
 	client, err = oss.New(s.EndPoint,
 		s.AccessKeyID,
 		s.AccessKeySecret,
-		conn,time,cname,userAgent,verifySsl,redirect,crc,logLevel)
+		conn, time, cname, userAgent, verifySsl, redirect, crc, logLevel)
 	return
 }

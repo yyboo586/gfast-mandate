@@ -97,7 +97,7 @@ func (s *sSysUserOnline) CheckUserOnline(ctx context.Context) {
 			},
 		},
 	}
-	var total int
+
 	for {
 		var (
 			res *system.SysUserOnlineSearchRes
@@ -113,11 +113,11 @@ func (s *sSysUserOnline) CheckUserOnline(ctx context.Context) {
 		}
 		for _, v := range res.List {
 			if b := s.UserIsOnline(ctx, v.Token); !b {
-				s.DeleteOnlineByToken(ctx, v.Token)
+				err = s.DeleteOnlineByToken(ctx, v.Token)
+				if err != nil {
+					g.Log().Error(ctx, err)
+				}
 			}
-		}
-		if param.PageNum*param.PageSize >= total {
-			break
 		}
 		param.PageNum++
 	}

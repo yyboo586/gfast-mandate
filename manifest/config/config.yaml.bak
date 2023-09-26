@@ -107,6 +107,7 @@ upload:
     endPoint: "xxx.xxxx.com" #自定域名
     bucketName: "xxx" #使用的存储桶
     isHttps: true #是否开启https访问
+    path:"gfast" #上传文件保存路径
 
 # 代码生成配置
 gen:

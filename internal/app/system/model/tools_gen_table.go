@@ -36,6 +36,7 @@ type ToolsGenTableEx struct {
 	SortType       string                   // 缺省排序方式 (asc顺序 desc倒序)
 	ShowDetail     bool                     // 是否有查看详情功能
 	ExcelPort      bool                     // 是否有导入导出excel功能
+	UseSnowId      bool                     // 主键是否使用雪花ID
 	TreeCode       string                   // 树编码字段
 	TreeParentCode string                   // 树父编码字段
 	TreeName       string                   // 树名称字段

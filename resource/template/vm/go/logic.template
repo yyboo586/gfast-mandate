@@ -17,6 +17,7 @@ package logic
 {{$usedSystemModule:=false}}
 {{$gstr:=false}}
 {{$hasLinkTable:=false}}
+{{$useCommonService:=false}}
 {{range $index, $column := .table.Columns}}
 {{if eq $column.HtmlType "images" "file" "files"}}
 {{$libUtils = true}}
@@ -33,7 +34,9 @@ package logic
 {{end}}
 {{end}}
 {{end}}
-
+{{if and .table.UseSnowId (not .table.IsPkInsertable)}}
+{{$useCommonService = true}}
+{{end}}
 import (
     "context"
     "github.com/gogf/gf/v2/frame/g"
@@ -42,6 +45,9 @@ import (
     {{end}}
     {{if or .table.HasConversion (eq .table.TplCategory "tree")}}
     "github.com/gogf/gf/v2/util/gconv"
+    {{end}}
+    {{if $useCommonService}}
+    commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
     {{end}}
     "{{.goModName}}/{{.table.PackageName}}/dao"
     "{{.goModName}}/{{.table.PackageName}}/model"
@@ -358,6 +364,11 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
 ////
 func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.ClassName}}AddReq) (err error){
     err = g.Try(ctx, func(ctx context.Context) {
+        {{if and .table.UseSnowId (not .table.IsPkInsertable)}}
+        var {{.table.PkColumn.HtmlField}} uint64
+        {{.table.PkColumn.HtmlField}}, err = commonService.SnowID().GenID()
+        liberr.ErrIsNil(ctx, err)
+        {{end}}
         {{range $index, $column := .table.EditColumns}}
         {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
         {{$column.HtmlField}} := ""
@@ -375,6 +386,8 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.Clas
         _, err = dao.{{.table.ClassName}}.Ctx(ctx).Insert(do.{{.table.ClassName}}{
             {{if .table.IsPkInsertable}}
             {{.table.PkColumn.GoField}}:req.{{.table.PkColumn.GoField}},
+            {{else if .table.UseSnowId}}
+            {{.table.PkColumn.GoField}}:{{.table.PkColumn.HtmlField}},
             {{end}}
             {{range $index, $column := .table.EditColumns}}
             {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}

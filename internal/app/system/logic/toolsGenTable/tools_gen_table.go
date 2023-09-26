@@ -368,6 +368,9 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 	if req.ExcelPort != "" {
 		table.ExcelPort = gconv.Bool(req.ExcelPort)
 	}
+	if req.UseSnowId != "" {
+		table.UseSnowId = gconv.Bool(req.UseSnowId)
+	}
 	if req.TplCategory != "" {
 		table.TplCategory = req.TplCategory
 	}
@@ -758,7 +761,7 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 		err = gconv.Struct(m1, columnEx)
 		columnMap[columnName] = columnEx
 		allColumnExs[i] = columnEx
-		tableEx.IsPkInsertable = tableEx.IsPkInsertable || column.IsPk && !column.IsIncrement
+		tableEx.IsPkInsertable = tableEx.IsPkInsertable || column.IsPk && !column.IsIncrement && !tableEx.UseSnowId
 		tableEx.IsPkListable = tableEx.IsPkListable || column.IsPk && column.IsList
 		if column.IsEdit && !service.ToolsGenTableColumn().IsNotEdit(columnName) && !column.IsPk {
 			editColumns = append(editColumns, columnEx)
@@ -1319,11 +1322,11 @@ func (s *sToolsGenTable) SyncTable(ctx context.Context, tableId int64) (err erro
 }
 
 // goFmt formats the source file and adds or removes import statements as necessary.
-func (s *sToolsGenTable) goFmt(path string)(err error) {
+func (s *sToolsGenTable) goFmt(path string) (err error) {
 	replaceFunc := func(path, content string) string {
 		res, err := imports.Process(path, []byte(content), nil)
 		if err != nil {
-			g.Log().Printf(context.Background(),`error format "%s" go files: %v`, path, err)
+			g.Log().Printf(context.Background(), `error format "%s" go files: %v`, path, err)
 			return content
 		}
 		return string(res)
@@ -1339,7 +1342,7 @@ func (s *sToolsGenTable) goFmt(path string)(err error) {
 		err = gfile.ReplaceDirFunc(replaceFunc, path, "*.go", true)
 	}
 	if err != nil {
-		err  =  fmt.Errorf(`error format "%s" go files: %v`, path, err)
+		err = fmt.Errorf(`error format "%s" go files: %v`, path, err)
 	}
 	return
 }
