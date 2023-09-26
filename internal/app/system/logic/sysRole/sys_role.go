@@ -105,10 +105,12 @@ func (s *sSysRole) AddRoleRule(ctx context.Context, ruleIds []uint, roleId int64
 		enforcer, e := commonService.CasbinEnforcer(ctx)
 		liberr.ErrIsNil(ctx, e)
 		ruleIdsStr := gconv.Strings(ruleIds)
-		for _, v := range ruleIdsStr {
-			_, err = enforcer.AddPolicy(gconv.String(roleId), v, "All")
-			liberr.ErrIsNil(ctx, err)
+		rules := make([][]string, len(ruleIdsStr))
+		for k, v := range ruleIdsStr {
+			rules[k] = []string{gconv.String(roleId), v, "All"}
 		}
+		_, err = enforcer.AddPolicies(rules)
+		liberr.ErrIsNil(ctx, err)
 	})
 	return
 }
