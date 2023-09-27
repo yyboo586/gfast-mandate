@@ -11,8 +11,6 @@ import (
 	"sync"
 )
 
-type cabinImpl struct{}
-
 type adapterCasbin struct {
 	Enforcer    *casbin.SyncedEnforcer
 	EnforcerErr error
@@ -20,7 +18,6 @@ type adapterCasbin struct {
 }
 
 var (
-	cb    = cabinImpl{}
 	once  sync.Once
 	en    *casbin.SyncedEnforcer
 	enErr error
@@ -28,20 +25,23 @@ var (
 
 // CasbinEnforcer 获取adapter单例对象
 func CasbinEnforcer(ctx context.Context) (enforcer *casbin.SyncedEnforcer, err error) {
-	ac := cb.newAdapter(ctx)
+	ac := newAdapter(ctx)
 	enforcer = ac.Enforcer
 	err = ac.EnforcerErr
 	return
 }
 
 // 初始化adapter操作
-func (s *cabinImpl) newAdapter(ctx context.Context) (a *adapterCasbin) {
+func newAdapter(ctx context.Context) (a *adapterCasbin) {
 	a = new(adapterCasbin)
+	a.ctx = ctx
 	once.Do(func() {
 		en, enErr = initPolicy(ctx, a)
 	})
+	if enErr == nil && en != nil {
+		en.SetAdapter(a)
+	}
 	a.Enforcer, a.EnforcerErr = en, enErr
-	a.ctx = ctx
 	return
 }
 
