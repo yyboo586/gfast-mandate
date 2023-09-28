@@ -40,6 +40,9 @@ func (c *demo) Subscribe(r *ghttp.Request) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	var err error
+
+	// 创建一个互斥锁
+	var wsLock sync.Mutex
 	go func() {
 		topic := r.Get("topic").String()
 		channel := r.Get("channel").String()
@@ -51,7 +54,12 @@ func (c *demo) Subscribe(r *ghttp.Request) {
 		err = service.MQueue().Subscribe(topic, channel, func(m *model.MQMessage) error {
 			fmt.Println(m)
 			fmt.Println(string(m.Body))
+
+			// 使用互斥锁保护写入操作
+			wsLock.Lock()
 			ws.WriteMessage(websocket.TextMessage, m.Body)
+			wsLock.Unlock()
+
 			return nil
 		})
 		if err != nil {
