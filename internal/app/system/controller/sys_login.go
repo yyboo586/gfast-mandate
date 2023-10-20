@@ -77,7 +77,6 @@ func (c *loginController) Login(ctx context.Context, req *system.UserLoginReq) (
 	if g.Cfg().MustGet(ctx, "gfToken.multiLogin").Bool() {
 		key = gconv.String(user.Id) + "-" + gmd5.MustEncryptString(user.UserName) + gmd5.MustEncryptString(user.UserPassword+ip+userAgent)
 	}
-	user.UserPassword = ""
 	token, err = service.GfToken().GenerateToken(ctx, key, user)
 	if err != nil {
 		g.Log().Error(ctx, err)
