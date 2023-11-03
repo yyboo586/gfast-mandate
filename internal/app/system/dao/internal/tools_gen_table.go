@@ -40,6 +40,7 @@ type ToolsGenTableColumns struct {
 	ShowDetail     string // 是否有查看详情功能
 	ExcelPort      string // 是否有导入导出excel功能
 	UseSnowId      string //主键是否使用雪花ID
+	UseVirtual     string // 树表是否使用虚拟表
 }
 
 // toolsGenTableColumns holds the columns for table tools_gen_table.
@@ -64,6 +65,7 @@ var toolsGenTableColumns = ToolsGenTableColumns{
 	ShowDetail:     "show_detail",
 	ExcelPort:      "excel_port",
 	UseSnowId:      "use_snow_id",
+	UseVirtual:     "use_virtual",
 }
 
 // NewToolsGenTableDao creates and returns a new DAO object for table data access.

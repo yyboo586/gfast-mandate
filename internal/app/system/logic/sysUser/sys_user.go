@@ -96,6 +96,15 @@ func (s *sSysUser) GetUserByUsername(ctx context.Context, userName string) (user
 	return
 }
 
+func (s *sSysUser) GetUserByPhone(ctx context.Context, phone string) (user *model.LoginUserRes, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		err = dao.SysUser.Ctx(ctx).Fields(user).Where(dao.SysUser.Columns().Mobile, phone).
+			Scan(&user)
+		liberr.ErrIsNil(ctx, err, "登录失败，用户信息不存在")
+	})
+	return
+}
+
 // GetUserById 通过用户名获取用户信息
 func (s *sSysUser) GetUserById(ctx context.Context, id uint64) (user *model.LoginUserRes, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
@@ -127,12 +136,16 @@ func (s *sSysUser) LoginLog(ctx context.Context, params *model.LoginLogParams) {
 	}
 }
 
-func (s *sSysUser) UpdateLoginInfo(ctx context.Context, id uint64, ip string) (err error) {
+func (s *sSysUser) UpdateLoginInfo(ctx context.Context, id uint64, ip string, openId ...string) (err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
-		_, err = dao.SysUser.Ctx(ctx).WherePri(id).Unscoped().Update(g.Map{
+		data := g.Map{
 			dao.SysUser.Columns().LastLoginIp:   ip,
 			dao.SysUser.Columns().LastLoginTime: gtime.Now(),
-		})
+		}
+		if len(openId) > 0 && openId[0] != "" {
+			data[dao.SysUser.Columns().OpenId] = openId[0]
+		}
+		_, err = dao.SysUser.Ctx(ctx).WherePri(id).Unscoped().Update(data)
 		liberr.ErrIsNil(ctx, err, "更新用户登录信息失败")
 	})
 	return

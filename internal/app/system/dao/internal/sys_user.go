@@ -40,6 +40,7 @@ type SysUserColumns struct {
 	CreatedAt     string // 创建时间
 	UpdatedAt     string // 更新时间
 	DeletedAt     string // 删除时间
+	OpenId        string // 微信open id
 }
 
 // sysUserColumns holds the columns for table sys_user.
@@ -65,6 +66,7 @@ var sysUserColumns = SysUserColumns{
 	CreatedAt:     "created_at",
 	UpdatedAt:     "updated_at",
 	DeletedAt:     "deleted_at",
+	OpenId:        "open_id",
 }
 
 // NewSysUserDao creates and returns a new DAO object for table data access.

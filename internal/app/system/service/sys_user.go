@@ -24,9 +24,10 @@ type (
 		NotCheckAuthAdminIds(ctx context.Context) *gset.Set
 		GetAdminUserByUsernamePassword(ctx context.Context, req *system.UserLoginReq) (user *model.LoginUserRes, err error)
 		GetUserByUsername(ctx context.Context, userName string) (user *model.LoginUserRes, err error)
+		GetUserByPhone(ctx context.Context, phone string) (user *model.LoginUserRes, err error)
 		GetUserById(ctx context.Context, id uint64) (user *model.LoginUserRes, err error)
 		LoginLog(ctx context.Context, params *model.LoginLogParams)
-		UpdateLoginInfo(ctx context.Context, id uint64, ip string) (err error)
+		UpdateLoginInfo(ctx context.Context, id uint64, ip string,openId ...string) (err error)
 		GetAdminRules(ctx context.Context, userId uint64) (menuList []*model.UserMenus, permissions []string, err error)
 		GetAdminRole(ctx context.Context, userId uint64, allRoleList []*entity.SysRole) (roles []*entity.SysRole, err error)
 		GetAdminRoleIds(ctx context.Context, userId uint64) (roleIds []uint, err error)

@@ -30,4 +30,5 @@ type ToolsGenTable struct {
 	ShowDetail     bool        `json:"showDetail"     description:"是否有查看详情功能"`
 	ExcelPort      bool        `json:"excelPort" description:"是否有excel导入导出功能"`
 	UseSnowId      bool        `json:"useSnowId" description:"主键是否使用雪花ID"`
+	UseVirtual     bool        `json:"useVirtual" orm:"use_virtual" description:"树表是否使用虚拟表"`
 }

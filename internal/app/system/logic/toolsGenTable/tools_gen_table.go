@@ -371,6 +371,9 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 	if req.UseSnowId != "" {
 		table.UseSnowId = gconv.Bool(req.UseSnowId)
 	}
+	if req.UseVirtual != ""{
+		table.UseVirtual = gconv.Bool(req.UseVirtual)
+	}
 	if req.TplCategory != "" {
 		table.TplCategory = req.TplCategory
 	}
@@ -662,8 +665,13 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 	var tmpVue string
 	tmpFile := "vue/list-vue.template"
 	if extendData.TplCategory == "tree" {
-		//树表
-		tmpFile = "vue/tree-vue.template"
+		if extendData.UseVirtual{
+			//使用虚拟表树表
+			tmpFile = "vue/tree-virtual-vue.template"
+		}else{
+			//树表
+			tmpFile = "vue/tree-vue.template"
+		}
 	}
 	if tmpVue, err = view.Parse(ctx, tmpFile, tplData); err == nil {
 		vueValue = tmpVue

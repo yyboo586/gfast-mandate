@@ -33,4 +33,5 @@ type SysUser struct {
 	CreatedAt     *gtime.Time // 创建时间
 	UpdatedAt     *gtime.Time // 更新时间
 	DeletedAt     *gtime.Time // 删除时间
+	OpenId        interface{} // 微信小程序open id
 }

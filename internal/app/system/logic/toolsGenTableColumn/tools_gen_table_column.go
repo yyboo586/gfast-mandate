@@ -170,7 +170,7 @@ func (s *sToolsGenTableColumn) InitColumnField(column *entity.ToolsGenTableColum
 	column.ColSpan = 12
 	column.RowSpan = 1
 	column.IsRowStart = false
-	column.MinWidth = 100
+	column.MinWidth = 150
 	column.IsFixed = false
 	column.IsOverflowTooltip = false
 	column.IsCascade = false

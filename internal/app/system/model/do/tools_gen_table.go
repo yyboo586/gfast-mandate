@@ -32,4 +32,5 @@ type ToolsGenTable struct {
 	ShowDetail     interface{} // 是否有查看详情功能
 	ExcelPort      interface{} // 是否有导入导出excel功能
 	UseSnowId      interface{} //主键是否使用雪花ID
+	UseVirtual     interface{} //树表是否使用虚拟表
 }

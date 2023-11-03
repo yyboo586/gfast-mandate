@@ -10,7 +10,7 @@
       <template #header>
         <div v-drag="['.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog', '.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog__header']">{{"{{"}}(!formData.{{.table.PkColumn.HtmlField}} || formData.{{.table.PkColumn.HtmlField}}==0?'添加':'修改')+'{{.table.FunctionName}}'{{"}}"}}</div>
       </template>
-      <el-form ref="formRef" :model="formData" :rules="rules">
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">
       {{if .table.IsPkInsertable}}
         <el-form-item label="{{.table.PkColumn.ColumnComment}}" prop="{{.table.PkColumn.HtmlField}}">
           <el-input v-model="formData.{{.table.PkColumn.HtmlField}}" placeholder="请输入{{.table.PkColumn.ColumnComment}}" v-bind:disabled="this.currentOp === 'edit'" />
