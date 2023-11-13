@@ -49,7 +49,7 @@ type ToolsGenTableImportTableReq struct {
 type ToolsGenTableDeleteReq struct {
 	g.Meta `path:"/tools/gen/tableDelete" tags:"代码生成" method:"delete" summary:"删除已导入的表"`
 	commonApi.Author
-	Ids []int `p:"ids" v:required#删除的id必须`
+	Ids []int `p:"ids" v:"required#删除的id必须"`
 }
 
 type ToolsGenTableEditReq struct {

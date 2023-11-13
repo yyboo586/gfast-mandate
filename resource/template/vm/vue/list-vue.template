@@ -1,10 +1,6 @@
 <template>
 {{$lens := .table.Columns|len}}
 {{$businessName := .table.BusinessName | CaseCamelLower}}
-{{$plugin:=""}}
-{{if ContainsI $.table.PackageName "plugins"}}
-{{$plugin = "plugins/"}}
-{{end}}
   <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-container">
     <el-card shadow="hover">
         <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-search mb15">
@@ -365,7 +361,7 @@
             @pagination="{{$businessName}}List"
         />
     </el-card>
-    <{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit
+    <{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit
        ref="editRef"
        {{range $index, $column := .table.Columns}}
        {{if ne $column.DictType ""}}
@@ -380,8 +376,8 @@
        {{end}}
        {{end}}
        @{{$businessName}}List="{{$businessName}}List"
-    ></{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit>
-    <{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail
+    ></{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit>
+    <{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail
       ref="detailRef"
       {{range $index, $column := .table.Columns}}
       {{if ne $column.DictType ""}}
@@ -396,7 +392,7 @@
       {{end}}
       {{end}}
       @{{$businessName}}List="{{$businessName}}List"
-    ></{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail>
+    ></{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail>
   </div>
 </template>
 
@@ -441,7 +437,7 @@ import {
     {{if gt (len .table.LinkedTables) 0}}
     linkedDataSearch
     {{end}}
-} from "/@/api/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}";
+} from "/@/api/{{.modulePath}}/{{$businessName}}";
 import {
     {{.table.ClassName}}TableColumns,
     {{.table.ClassName}}InfoData,
@@ -449,17 +445,17 @@ import {
     {{range $ti, $linkedTable := .table.LinkedTables}}
     Linked{{$.table.ClassName}}{{$linkedTable.ClassName}},
     {{end}}
-} from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
-import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/edit.vue"
-import {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/detail.vue"
+} from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/model"
+import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/edit.vue"
+import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/detail.vue"
 {{if .table.ExcelPort }}
 import {downLoadXml} from "/@/utils/zipdownload";
 {{end}}
 export default defineComponent({
-    name: "{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}List",
+    name: "{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List",
     components:{
-        {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit,
-        {{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Detail
+        {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit,
+        {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail
     },
     setup() {
         const {proxy} = <any>getCurrentInstance()
@@ -660,7 +656,7 @@ export default defineComponent({
         {{if .table.ExcelPort }}
         //导出excel
         const handleExport = ()=>{
-            downLoadXml('/{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/export',state.tableData.param,'get')
+            downLoadXml('/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/export',state.tableData.param,'get')
         }
         {{end}}
         return {

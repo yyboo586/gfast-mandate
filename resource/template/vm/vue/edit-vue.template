@@ -260,10 +260,6 @@
   {{end}}
 {{end}}
 
-{{$plugin:=""}}
-{{if ContainsI $.table.PackageName "plugins"}}
-  {{$plugin = "plugins/"}}
-{{end}}
 <script lang="ts">
 import { reactive, toRefs, defineComponent,ref,unref,getCurrentInstance } from 'vue';
 import {ElMessageBox, ElMessage, FormInstance,UploadProps} from 'element-plus';
@@ -279,7 +275,7 @@ import {
   change{{$.table.ClassName}}{{$column.GoField}},
   {{end}}
   {{end}}
-} from "/@/api/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}";
+} from "/@/api/{{.modulePath}}/{{$businessName}}";
 
 {{if $editImp}}
 import GfUeditor from "/@/components/ueditor/index.vue"
@@ -298,9 +294,9 @@ import {
   {{.table.ClassName}}InfoData,
   {{.table.ClassName}}TableDataState,
   {{.table.ClassName}}EditState
-} from "/@/views/{{$plugin}}{{.table.ModuleName}}/{{$businessName}}/list/component/model"
+} from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/model"
 export default defineComponent({
-  name:"{{$plugin}}{{if ne $plugin ""}}{{.apiVersion|replace "/" "_"|CaseCamel}}{{else}}{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{end}}{{.table.ModuleName|CaseCamel}}{{.table.ClassName}}Edit",
+  name:"{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit",
   components:{
     {{if $editImp}}
     GfUeditor,

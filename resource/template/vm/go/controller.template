@@ -10,10 +10,7 @@
 
 {{$structName := .table.BusinessName | CaseCamelLower}}
 {{$businessName := .table.BusinessName | CaseCamelLower}}
-{{$plugin:=""}}
-{{if ContainsI $.table.PackageName "plugins"}}
-    {{$plugin = "plugins/"}}
-{{end}}
+
 package controller
 ////
 {{$hasGmap:=false}}
@@ -40,7 +37,7 @@ package controller
 {{end}}
 import (
     "context"
-    "{{.goModName}}/api/v1/{{.table.ModuleName}}"
+    "{{.goModName}}/api/v1/{{.modulePath}}"
     "{{.goModName}}/{{.table.PackageName}}/service"
     {{if ne $.table.ModuleName "system"}}
     systemController "{{.goModName}}/internal/app/system/controller"
@@ -280,7 +277,7 @@ func(c *{{$structName}}Controller) Linked{{$.table.ClassName}}DataSearch(ctx con
     {{if ne $.table.ModuleName "system"}}
         {{$serviceVal = "systemService"}}
     {{end}}
-    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{$plugin}}{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/list") {
+    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{.apiVersion}}/{{.table.PackageName}}/{{$businessName}}/list") {
         err = errors.New("没有访问权限")
         return
     }

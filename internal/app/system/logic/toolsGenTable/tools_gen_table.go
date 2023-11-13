@@ -518,6 +518,14 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		"newArray": func() []interface{} {
 			return []interface{}{}
 		},
+		"strTrim":func(str interface{},trimStr interface{}) string {
+			strCon:=gconv.String(str)
+			strSub:=gconv.String(trimStr)
+			if len(strCon)>len(strSub){
+				strCon = gstr.StrEx(strCon,strSub)
+			}
+			return strCon
+		},
 	})
 
 	//树形菜单选项
@@ -525,6 +533,7 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		"table":      extendData,
 		"goModName":  g.Cfg().MustGet(ctx, "gen.goModName").String(),
 		"apiVersion": g.Cfg().MustGet(ctx, "gen.apiName").String(),
+		"modulePath":gstr.StrEx(extendData.PackageName,"internal/app/"),
 	}
 	apiKey := "api"
 	apiValue := ""
@@ -985,15 +994,12 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 			genData, extendData, err = s.GenData(ctx, gconv.Int64(id))
 			liberr.ErrIsNil(ctx, err)
 			packageName := extendData.PackageName
-			pluginName := ""
-			if gstr.ContainsI(extendData.PackageName, "plugins") {
-				pluginName = "plugins/"
-			}
 			businessName := gstr.CaseCamelLower(extendData.BusinessName)
+			modulePath := gstr.StrEx(extendData.PackageName,"internal/app/")
 			for key, code := range genData {
 				switch key {
 				case "api":
-					path := strings.Join([]string{curDir, "/", apiName, "/", pluginName, extendData.ModuleName, "/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", apiName, "/", modulePath, "/", extendData.TableName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "controller":
@@ -1039,7 +1045,7 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "sql":
-					path := strings.Join([]string{curDir, "/resource/data/gen_sql/", extendData.ModuleName, "/", extendData.TableName, ".sql"}, "")
+					path := strings.Join([]string{curDir, "/resource/data/gen_sql/", modulePath, "/", extendData.TableName, ".sql"}, "")
 					hasSql := gfile.Exists(path)
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
@@ -1051,32 +1057,32 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 						commonService.Cache().Remove(ctx, consts.CacheSysAuthMenu)
 					}
 				case "tsApi":
-					path := strings.Join([]string{frontDir, "/src/api/" + pluginName, extendData.ModuleName, "/", businessName, ".ts"}, "")
+					path := strings.Join([]string{frontDir, "/src/api/", modulePath, "/", businessName, ".ts"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "tsModel":
-					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/model", ".ts"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/",modulePath, "/", businessName + "/list/component/model", ".ts"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vue":
-					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName, "/list/index.vue"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/",modulePath, "/", businessName, "/list/index.vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vueDetail":
-					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/detail", ".vue"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/" ,modulePath, "/", businessName + "/list/component/detail", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vueEdit":
-					path := strings.Join([]string{frontDir, "/src/views/" + pluginName, extendData.ModuleName, "/", businessName + "/list/component/edit", ".vue"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/" ,modulePath, "/", businessName + "/list/component/edit", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				}
 			}
 			//生成模块路由
-			err = s.genModuleRouter(curDir, goModName, extendData.ModuleName)
+			err = s.genModuleRouter(curDir, goModName, extendData.ModuleName,modulePath)
 			liberr.ErrIsNil(ctx, err)
 			//生成模块boot logic
-			err = s.genModuleBootLogic(curDir, extendData.ModuleName)
+			err = s.genModuleBootLogic(curDir, extendData.ModuleName,modulePath)
 			liberr.ErrIsNil(ctx, err)
 			//生成对应模块的业务logic
 			err = s.genModuleLogic(curDir, goModName, extendData.PackageName)
@@ -1232,12 +1238,13 @@ func (s *sToolsGenTable) genModuleLogic(curDir, goModName, packageName string) (
 	return
 }
 
-func (s *sToolsGenTable) genModuleRouter(curDir, goModName, moduleName string) (err error) {
-	path := strings.Join([]string{curDir, "/internal/router/" + moduleName + ".go"}, "")
+func (s *sToolsGenTable) genModuleRouter(curDir, goModName, moduleName,modulePath string) (err error) {
+	modulePathName :=gstr.CaseCamelLower(gstr.Replace(modulePath,"/","_"))
+	path := strings.Join([]string{curDir, "/internal/router/" + modulePathName + ".go"}, "")
 	if gfile.IsFile(path) || moduleName == "system" {
 		return
 	}
-	moduleNameUpper := gstr.CaseCamel(moduleName)
+	moduleNameUpper := gstr.CaseCamel(modulePathName)
 	code := fmt.Sprintf(`package router
 import (
 	"context"
@@ -1247,13 +1254,14 @@ import (
 
 func (router *Router) Bind%sModuleController(ctx context.Context, group *ghttp.RouterGroup) {
 	%sRouter.R.BindController(ctx, group)
-}`, moduleName, goModName, moduleName, moduleNameUpper, moduleName)
+}`, moduleName, goModName, modulePath, moduleNameUpper, moduleName)
 	err = s.createFile(path, code, true)
 	return
 }
 
-func (s *sToolsGenTable) genModuleBootLogic(curDir, moduleName string) (err error) {
-	path := strings.Join([]string{curDir, "/internal/app/boot/" + moduleName + ".go"}, "")
+func (s *sToolsGenTable) genModuleBootLogic(curDir, moduleName,modulePath string) (err error) {
+	modulePathName :=gstr.CaseCamelLower(gstr.Replace(modulePath,"/","_"))
+	path := strings.Join([]string{curDir, "/internal/app/boot/" + modulePathName + ".go"}, "")
 	if gfile.IsFile(path) || moduleName == "system" {
 		return
 	}
@@ -1261,7 +1269,7 @@ func (s *sToolsGenTable) genModuleBootLogic(curDir, moduleName string) (err erro
 import (
 	_ "github.com/tiger1103/gfast/v3/internal/app/%s/logic"
 )
-`, moduleName)
+`, modulePath)
 	err = s.createFile(path, code, true)
 	return
 }
