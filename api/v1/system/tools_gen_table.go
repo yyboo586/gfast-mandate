@@ -68,11 +68,16 @@ type ToolsGenTableEditRes struct {
 // ToolsGenRelationTableReq 获取关联表数据
 type ToolsGenRelationTableReq struct {
 	g.Meta `path:"/tools/gen/relationTable" tags:"代码生成" method:"get" summary:"获取关联表数据"`
+	TableName    string `p:"tableName"`    //表名称
+	TableComment string `p:"tableComment"` //表描述
+	commonApi.PageReq
+	commonApi.Author
 }
 
 // ToolsGenRelationTableRes 关联表返回数据
 type ToolsGenRelationTableRes struct {
 	g.Meta `mime:"application/json"`
+	commonApi.ListRes
 	Data   []*model.ToolsGenTableColumnsData `json:"data"`
 }
 

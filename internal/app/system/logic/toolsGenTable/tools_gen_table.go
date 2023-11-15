@@ -294,19 +294,36 @@ func (s *sToolsGenTable) GetTableInfoByTableId(ctx context.Context, tableId int6
 }
 
 // GetRelationTable 获取关联表数据
-func (s *sToolsGenTable) GetRelationTable(ctx context.Context) (res []*model.ToolsGenTableColumnsData, err error) {
+func (s *sToolsGenTable) GetRelationTable(ctx context.Context, req *system.ToolsGenRelationTableReq) (res *system.ToolsGenRelationTableRes, err error) {
 	var tableColumnsAll []*entity.ToolsGenTableColumn
+	res = new(system.ToolsGenRelationTableRes)
 	err = g.Try(ctx, func(ctx context.Context) {
+		m := dao.ToolsGenTable.Ctx(ctx)
+		if req.TableName != "" {
+			m = m.WhereLike(dao.ToolsGenTable.Columns().TableName, "%"+req.TableName+"%")
+		}
+		if req.TableComment != "" {
+			m = m.WhereLike(dao.ToolsGenTable.Columns().TableComment, "%"+req.TableComment+"%")
+		}
+		res.Total, err = m.Count()
+		liberr.ErrIsNil(ctx, err, "获取表数据总数失败")
+		if req.PageNum == 0 {
+			req.PageNum = 1
+		}
+		if req.PageSize == 0 {
+			req.PageSize = consts.PageSize
+		}
+		res.CurrentPage = req.PageNum
 		//获取表数据
-		err = dao.ToolsGenTable.Ctx(ctx).Order(dao.ToolsGenTable.Columns().TableId + " ASC ").Scan(&res)
+		err = m.Page(req.PageNum, req.PageSize).Order(dao.ToolsGenTable.Columns().TableId + " ASC ").Scan(&res.Data)
 		liberr.ErrIsNil(ctx, err, "获取表数据失败")
 		//获取表字段数据
 		tableColumnsAll, err = service.ToolsGenTableColumn().GetAllTableColumns(ctx)
 		liberr.ErrIsNil(ctx, err)
-		for k, v := range res {
+		for k, v := range res.Data {
 			for _, cv := range tableColumnsAll {
 				if cv.TableId == v.TableId {
-					res[k].Columns = append(res[k].Columns, cv)
+					res.Data[k].Columns = append(res.Data[k].Columns, cv)
 				}
 			}
 		}
@@ -371,7 +388,7 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 	if req.UseSnowId != "" {
 		table.UseSnowId = gconv.Bool(req.UseSnowId)
 	}
-	if req.UseVirtual != ""{
+	if req.UseVirtual != "" {
 		table.UseVirtual = gconv.Bool(req.UseVirtual)
 	}
 	if req.TplCategory != "" {
@@ -518,11 +535,11 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		"newArray": func() []interface{} {
 			return []interface{}{}
 		},
-		"strTrim":func(str interface{},trimStr interface{}) string {
-			strCon:=gconv.String(str)
-			strSub:=gconv.String(trimStr)
-			if len(strCon)>len(strSub){
-				strCon = gstr.StrEx(strCon,strSub)
+		"strTrim": func(str interface{}, trimStr interface{}) string {
+			strCon := gconv.String(str)
+			strSub := gconv.String(trimStr)
+			if len(strCon) > len(strSub) {
+				strCon = gstr.StrEx(strCon, strSub)
 			}
 			return strCon
 		},
@@ -533,7 +550,7 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 		"table":      extendData,
 		"goModName":  g.Cfg().MustGet(ctx, "gen.goModName").String(),
 		"apiVersion": g.Cfg().MustGet(ctx, "gen.apiName").String(),
-		"modulePath":gstr.StrEx(extendData.PackageName,"internal/app/"),
+		"modulePath": gstr.StrEx(extendData.PackageName, "internal/app/"),
 	}
 	apiKey := "api"
 	apiValue := ""
@@ -674,10 +691,10 @@ func (s *sToolsGenTable) GenData(ctx context.Context, tableId int64) (data g.Map
 	var tmpVue string
 	tmpFile := "vue/list-vue.template"
 	if extendData.TplCategory == "tree" {
-		if extendData.UseVirtual{
+		if extendData.UseVirtual {
 			//使用虚拟表树表
 			tmpFile = "vue/tree-virtual-vue.template"
-		}else{
+		} else {
 			//树表
 			tmpFile = "vue/tree-vue.template"
 		}
@@ -995,7 +1012,7 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 			liberr.ErrIsNil(ctx, err)
 			packageName := extendData.PackageName
 			businessName := gstr.CaseCamelLower(extendData.BusinessName)
-			modulePath := gstr.StrEx(extendData.PackageName,"internal/app/")
+			modulePath := gstr.StrEx(extendData.PackageName, "internal/app/")
 			for key, code := range genData {
 				switch key {
 				case "api":
@@ -1033,7 +1050,7 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 				case "router":
 					if !gstr.ContainsI(packageName, "system") { // system 模块不生成router文件
 						path := strings.Join([]string{curDir, "/", packageName, "/router/router", ".go"}, "")
-						err = s.createFile(path, code, extendData.Overwrite)
+						err = s.createFile(path, code, false)
 						liberr.ErrIsNil(ctx, err)
 					}
 				case "router_func":
@@ -1061,28 +1078,28 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "tsModel":
-					path := strings.Join([]string{frontDir, "/src/views/",modulePath, "/", businessName + "/list/component/model", ".ts"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName + "/list/component/model", ".ts"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vue":
-					path := strings.Join([]string{frontDir, "/src/views/",modulePath, "/", businessName, "/list/index.vue"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName, "/list/index.vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vueDetail":
-					path := strings.Join([]string{frontDir, "/src/views/" ,modulePath, "/", businessName + "/list/component/detail", ".vue"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName + "/list/component/detail", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "vueEdit":
-					path := strings.Join([]string{frontDir, "/src/views/" ,modulePath, "/", businessName + "/list/component/edit", ".vue"}, "")
+					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName + "/list/component/edit", ".vue"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				}
 			}
 			//生成模块路由
-			err = s.genModuleRouter(curDir, goModName, extendData.ModuleName,modulePath)
+			err = s.genModuleRouter(curDir, goModName, extendData.ModuleName, modulePath)
 			liberr.ErrIsNil(ctx, err)
 			//生成模块boot logic
-			err = s.genModuleBootLogic(curDir, extendData.ModuleName,modulePath)
+			err = s.genModuleBootLogic(curDir, extendData.ModuleName, modulePath)
 			liberr.ErrIsNil(ctx, err)
 			//生成对应模块的业务logic
 			err = s.genModuleLogic(curDir, goModName, extendData.PackageName)
@@ -1238,8 +1255,8 @@ func (s *sToolsGenTable) genModuleLogic(curDir, goModName, packageName string) (
 	return
 }
 
-func (s *sToolsGenTable) genModuleRouter(curDir, goModName, moduleName,modulePath string) (err error) {
-	modulePathName :=gstr.CaseCamelLower(gstr.Replace(modulePath,"/","_"))
+func (s *sToolsGenTable) genModuleRouter(curDir, goModName, moduleName, modulePath string) (err error) {
+	modulePathName := gstr.CaseCamelLower(gstr.Replace(modulePath, "/", "_"))
 	path := strings.Join([]string{curDir, "/internal/router/" + modulePathName + ".go"}, "")
 	if gfile.IsFile(path) || moduleName == "system" {
 		return
@@ -1259,8 +1276,8 @@ func (router *Router) Bind%sModuleController(ctx context.Context, group *ghttp.R
 	return
 }
 
-func (s *sToolsGenTable) genModuleBootLogic(curDir, moduleName,modulePath string) (err error) {
-	modulePathName :=gstr.CaseCamelLower(gstr.Replace(modulePath,"/","_"))
+func (s *sToolsGenTable) genModuleBootLogic(curDir, moduleName, modulePath string) (err error) {
+	modulePathName := gstr.CaseCamelLower(gstr.Replace(modulePath, "/", "_"))
 	path := strings.Join([]string{curDir, "/internal/app/boot/" + modulePathName + ".go"}, "")
 	if gfile.IsFile(path) || moduleName == "system" {
 		return

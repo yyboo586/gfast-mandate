@@ -63,8 +63,7 @@ func (c *toolsGenTableController) GenColumnList(ctx context.Context, req *system
 
 // RelationTable 获取关联表数据
 func (c *toolsGenTableController) RelationTable(ctx context.Context, req *system.ToolsGenRelationTableReq) (res *system.ToolsGenRelationTableRes, err error) {
-	res = new(system.ToolsGenRelationTableRes)
-	res.Data, err = service.ToolsGenTable().GetRelationTable(ctx)
+	res, err = service.ToolsGenTable().GetRelationTable(ctx,req)
 	return
 }
 

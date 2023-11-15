@@ -26,7 +26,7 @@ type (
 		DeleteTable(ctx context.Context, req *system.ToolsGenTableDeleteReq) error
 		ColumnList(ctx context.Context, req *system.ToolsGenTableEditReq) (res *system.ToolsGenTableEditRes, err error)
 		GetTableInfoByTableId(ctx context.Context, tableId int64) (data *entity.ToolsGenTable, err error)
-		GetRelationTable(ctx context.Context) (res []*model.ToolsGenTableColumnsData, err error)
+		GetRelationTable(ctx context.Context,req *system.ToolsGenRelationTableReq) (res *system.ToolsGenRelationTableRes, err error)
 		SaveEdit(ctx context.Context, req *system.ToolsGenTableColumnsEditReq) (err error)
 		GenData(ctx context.Context, tableId int64) (data g.MapStrStr, extendData *model.ToolsGenTableEx, err error)
 		SelectRecordById(ctx context.Context, tableId int64) (tableEx *model.ToolsGenTableEx, err error)
