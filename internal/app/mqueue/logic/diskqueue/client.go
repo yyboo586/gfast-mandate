@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/util/grand"
 	"github.com/tiger1103/gfast/v3/internal/app/mqueue/consts"
 	disk "github.com/tiger1103/gfast/v3/internal/app/mqueue/driver"
@@ -169,16 +170,16 @@ func (c *client) Publish(body []byte) error {
 // start 开始投递消息给消费者
 func (c *client) start() {
 	for {
-		if len(c.channelConsumers) > 0 {
-			select {
-			case m := <-c.diskQueue.ReadChan():
-				if len(m) <= 0 {
-					break
-				}
-				message, err := c.decodeMessage(m)
-				if err != nil {
-					c.logger(disk.ERROR, err.Error())
-				}
+		select {
+		case m := <-c.diskQueue.ReadChan():
+			if len(m) <= 0 {
+				break
+			}
+			message, err := c.decodeMessage(m)
+			if err != nil {
+				c.logger(disk.ERROR, err.Error())
+			}
+			if len(c.channelConsumers) > 0 {
 				// 消息广播到所有频道
 				for _, channel := range c.channelConsumers {
 					// 广播到当前频道下的所有消费者
@@ -189,9 +190,10 @@ func (c *client) start() {
 						}
 					}
 				}
-			case <-c.exitChan:
-				return
 			}
+		case <-c.exitChan:
+			g.Log().Debug(gctx.New(), "退出消息队列")
+			return
 		}
 	}
 }
