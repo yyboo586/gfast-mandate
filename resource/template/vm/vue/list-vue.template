@@ -229,6 +229,15 @@
                 ><el-icon><ele-Download /></el-icon>导出Excel</el-button>
              </el-col>
             {{end}}
+            {{if .table.ExcelImp }}
+                <el-col :span="1.5">
+                    <el-button
+                            type="success"
+                            @click="handleImport()"
+                            v-auth="'{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/import'"
+                    ><el-icon><ele-Upload /></el-icon>导入Excel</el-button>
+                </el-col>
+            {{end}}
             </el-row>
         </div>
         <el-table v-loading="loading" :data="tableData.data" @selection-change="handleSelectionChange">
@@ -393,6 +402,11 @@
       {{end}}
       @{{$businessName}}List="{{$businessName}}List"
     ></{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail>
+    {{if .table.ExcelImp}}
+    <loadExcel ref="loadExcel{{.table.ClassName}}Ref" @getList="{{$businessName}}List"
+               upUrl="{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/import"
+               tplUrl="/{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/excelTemplate"></loadExcel>
+    {{end}}
   </div>
 </template>
 
@@ -451,9 +465,15 @@ import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|Ca
 {{if .table.ExcelPort }}
 import {downLoadXml} from "/@/utils/zipdownload";
 {{end}}
+{{if .table.ExcelImp}}
+import loadExcel from "/@/components/loadExcel/index.vue"
+{{end}}
 export default defineComponent({
     name: "{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List",
     components:{
+        {{if .table.ExcelImp}}
+        loadExcel,
+        {{end}}
         {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit,
         {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail
     },
@@ -463,6 +483,9 @@ export default defineComponent({
         const queryRef = ref()
         const editRef = ref();
         const detailRef = ref();
+        {{if .table.ExcelImp}}
+        const loadExcel{{.table.ClassName}}Ref = ref();
+        {{end}}
         // 是否显示所有搜索选项
         const showAll =  ref(false)
         // 非单个禁用
@@ -659,6 +682,11 @@ export default defineComponent({
             downLoadXml('/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/export',state.tableData.param,'get')
         }
         {{end}}
+        {{if .table.ExcelImp}}
+        const handleImport=()=>{
+            loadExcel{{$.table.ClassName}}Ref.value.open()
+        }
+        {{end}}
         return {
             proxy,
             editRef,
@@ -695,6 +723,10 @@ export default defineComponent({
             {{end}}
             {{if .table.ExcelPort }}
             handleExport,
+            {{end}}
+            {{if .table.ExcelPort }}
+            handleImport,
+            loadExcel{{.table.ClassName}}Ref,
             {{end}}
             ...toRefs(state),
         }

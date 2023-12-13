@@ -35,7 +35,8 @@ type ToolsGenTableEx struct {
 	SortColumn     string                   // 缺省排序字段
 	SortType       string                   // 缺省排序方式 (asc顺序 desc倒序)
 	ShowDetail     bool                     // 是否有查看详情功能
-	ExcelPort      bool                     // 是否有导入导出excel功能
+	ExcelPort      bool                     // 是否有导出excel功能
+	ExcelImp      bool                      // 是否有导入excel功能
 	UseSnowId      bool                     // 主键是否使用雪花ID
 	UseVirtual     bool                     // 树表是否使用虚拟表
 	TreeCode       string                   // 树编码字段

@@ -30,7 +30,8 @@ type ToolsGenTable struct {
 	SortColumn     interface{} // 排序字段名
 	SortType       interface{} // 排序方式 (asc顺序 desc倒序)
 	ShowDetail     interface{} // 是否有查看详情功能
-	ExcelPort      interface{} // 是否有导入导出excel功能
+	ExcelPort      interface{} // 是否有导出excel功能
+	ExcelImp      interface{} // 是否有导入excel功能
 	UseSnowId      interface{} //主键是否使用雪花ID
 	UseVirtual     interface{} //树表是否使用虚拟表
 }

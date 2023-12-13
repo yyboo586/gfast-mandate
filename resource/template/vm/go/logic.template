@@ -37,9 +37,15 @@ package logic
 {{if and .table.UseSnowId (not .table.IsPkInsertable)}}
 {{$useCommonService = true}}
 {{end}}
+
 import (
     "context"
     "github.com/gogf/gf/v2/frame/g"
+    {{if .table.ExcelImp}}
+    "github.com/gogf/gf/v2/net/ghttp"
+    "github.com/gogf/gf/v2/database/gdb"
+    "github.com/xuri/excelize/v2"
+    {{end}}
     {{if $gstr}}
     "github.com/gogf/gf/v2/text/gstr"
     {{end}}
@@ -319,6 +325,77 @@ func (s *s{{.table.ClassName}})GetExportData(ctx context.Context, req *model.{{.
 }
 {{end}}
 
+{{if .table.ExcelImp}}
+////
+func(s *s{{.table.ClassName}})Import(ctx context.Context,file *ghttp.UploadFile)(err error){
+    if file == nil {
+        err = errors.New("请上传数据文件")
+        return
+    }
+    var data []do.{{.table.ClassName}}
+    err = g.Try(ctx, func(ctx context.Context) {
+        f,err:=file.Open()
+        liberr.ErrIsNil(ctx,err)
+        defer f.Close()
+        exFile,err := excelize.OpenReader(f)
+        liberr.ErrIsNil(ctx,err)
+        defer exFile.Close()
+        rows, err := exFile.GetRows("Sheet1")
+        liberr.ErrIsNil(ctx,err)
+        if len(rows)==0{
+            liberr.ErrIsNil(ctx,errors.New("表格内容不能为空"))
+        }
+        d:=make([]interface{}, len(rows[0]))
+        data=make([]do.{{.table.ClassName}},len(rows)-1)
+        for k,v:=range rows{
+            if k==0{
+                continue
+            }
+            for kv,vv:=range v{
+                d[kv] = vv
+            }
+            data[k-1] = do.{{.table.ClassName}}{
+                {{$i:=0}}
+                {{range $index, $column := .table.Columns}}
+                {{$add:=false}}
+                {{if $.table.IsPkInsertable}}
+                {{$.table.PkColumn.GoField}}:d[{{$i}}],
+                {{$add = true}}
+                {{else if $.table.UseSnowId}}
+                var {{$.table.PkColumn.HtmlField}} uint64
+                {{$.table.PkColumn.HtmlField}}, err = commonService.SnowID().GenID()
+                liberr.ErrIsNil(ctx, err)
+                {{$.table.PkColumn.GoField}}:{{$.table.PkColumn.HtmlField}},
+                {{else if and (ne $column.IsPk true) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+                {{$add = true}}
+                {{if eq $column.GoType "int" "uint" "int64" "uint64" "bool" }}
+                {{$column.GoField}}:gconv.Int64(d[{{$i}}]),
+                {{else if eq $column.GoType "float64"}}
+                {{$column.GoField}}:gconv.Float64(d[{{$i}}]),
+                {{else if eq $column.GoType "Time"}}
+                {{$column.GoField}}:gconv.GTime(d[{{$i}}]),
+                {{else}}
+                {{$column.GoField}}:d[{{$i}}],
+                {{end}}
+                {{end}}
+                {{if $add}}
+                {{$i = plus $i 1}}
+                {{end}}
+                {{end}}
+            }
+        }
+        if len(data)>0{
+            err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+                _,err = dao.{{.table.ClassName}}.Ctx(ctx).Batch(500).Insert(data)
+                return err
+            })
+            liberr.ErrIsNil(ctx,err)
+        }
+    })
+    return
+}
+{{end}}
+
 ////
 {{if gt (len .table.LinkedTables) 0}}
 // LinkedDataSearch 相关连表查询数据
@@ -397,7 +474,11 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.Clas
             {{end}}
             {{end}}
             {{if .table.HasCreatedBy}}
+            {{if $usedSystemModule}}
             CreatedBy:systemService.Context().GetUserId(ctx),
+            {{else}}
+            CreatedBy:service.Context().GetUserId(ctx),
+            {{end}}
             {{end}}
         })
         liberr.ErrIsNil(ctx, err, "添加失败")
@@ -430,7 +511,11 @@ func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *model.{{.table.Cla
             {{end}}
             {{end}}
             {{if .table.HasUpdatedBy}}
+            {{if $usedSystemModule}}
             UpdatedBy:systemService.Context().GetUserId(ctx),
+            {{else}}
+            UpdatedBy:service.Context().GetUserId(ctx),
+            {{end}}
             {{end}}
         })
         liberr.ErrIsNil(ctx, err, "修改失败")

@@ -18,6 +18,10 @@ package controller
 {{$hasGconv:=false}}
 {{$hasSystemApi:=false}}
 {{$hasCommonService:=false}}
+{{$excel :=false}}
+{{if or .table.ExcelPort .table.ExcelImp}}
+{{$excel = true}}
+{{end}}
 {{if .table.ExcelPort}}
 {{range $index, $column := .table.Columns}}
     {{if ne $column.DictType ""}}
@@ -69,6 +73,8 @@ import (
     commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
     {{end}}
     "{{$.goModName}}/{{$.table.PackageName}}/model"
+    {{end}}
+    {{if $excel}}
     "{{$.goModName}}/library/libUtils"
     "github.com/xuri/excelize/v2"
     {{end}}
@@ -269,6 +275,45 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
 }
 {{end}}
 
+{{if .table.ExcelImp}}
+func (c *{{$structName}}Controller) ExcelTemplate(ctx context.Context,req *{{.table.ModuleName}}.{{.table.ClassName}}ExcelTemplateReq)(res *{{.table.ModuleName}}.{{.table.ClassName}}ExcelTemplateRes,err error){
+    var(
+        r        = ghttp.RequestFromCtx(ctx)
+        //表头
+        {{$tableHeader := ""}}
+        {{range $index, $column := .table.Columns}}
+        {{if and (or (ne $column.IsPk true) $.table.IsPkInsertable) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+        {{$tableHeader = concat $tableHeader `"` $column.ColumnComment `"` "," }}
+        {{end}}
+        {{end}}
+        tableHead = []interface{}{ {{$tableHeader}} }
+        excelData = [][]interface{}{tableHead}
+    )
+    //创建excel处理对象
+    excel := new(libUtils.ExcelHelper).CreateFile()
+    excel.ArrToExcel("Sheet1", "A1", excelData)
+    col, _ := excelize.ColumnNumberToName(len(tableHead))
+    row := len(excelData)
+    cr, _ := excelize.JoinCellName(col, row)
+    excel.SetCellBorder("Sheet1", "A1", cr)
+    _, err = excel.WriteTo(r.Response.Writer)
+    if err != nil {
+        return
+    }
+    r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    r.Response.Header().Set("Accept-Ranges", "bytes")
+    r.Response.Header().Set("Access-Control-Expose-Headers", "*")
+    r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("代码生成测试表模板")+".xlsx")
+    r.Response.Buffer()
+    r.Exit()
+    return
+}
+
+func(c *{{$structName}}Controller)Import(ctx context.Context,req *{{.table.ModuleName}}.{{.table.ClassName}}ImportReq)(res *{{.table.ModuleName}}.{{.table.ClassName}}ImportRes,err error){
+    err = service.DemoGen().Import(ctx,req.File)
+    return
+}
+{{end}}
 
 {{if gt (len .table.LinkedTables) 0}}
 // Linked{{$.table.ClassName}}DataSearch 相关连表查询数据
@@ -315,3 +360,4 @@ func (c *{{$structName}}Controller) Delete(ctx context.Context, req *{{.table.Mo
 	err = service.{{.table.ClassName}}().Delete(ctx, req.{{$.table.PkColumn.GoField}}s)
 	return
 }
+

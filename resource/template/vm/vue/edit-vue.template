@@ -32,6 +32,10 @@
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
           <el-input v-model="formData.{{$column.HtmlField}}" placeholder="请输入{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}}/>
         </el-form-item>
+        {{else if eq $column.HtmlType "inputNumber"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-input-number v-model="formData.{{$column.HtmlField}}" placeholder="请输入{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}} />
+        </el-form-item>
         {{else if eq $column.HtmlType "select" "selects"}}
           {{if ne $column.LinkTableName ""}}
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
@@ -405,7 +409,11 @@ export default defineComponent({
           data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",")
           {{end}}
           {{else if and (eq $column.HtmlType "radio" "select") (ne $column.DictType "")}}
+          {{if eq $column.TsType "boolean"}}
+          data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?'1':'0'
+          {{else}}
           data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+          {{end}}
           {{else if eq $column.HtmlType "radio" "select" }}
           {{if eq $column.TsType "number"}}
           data.{{$column.HtmlField}} = parseInt(data.{{$column.HtmlField}})

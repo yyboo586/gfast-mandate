@@ -67,7 +67,7 @@ type ToolsGenTableEditRes struct {
 
 // ToolsGenRelationTableReq 获取关联表数据
 type ToolsGenRelationTableReq struct {
-	g.Meta `path:"/tools/gen/relationTable" tags:"代码生成" method:"get" summary:"获取关联表数据"`
+	g.Meta       `path:"/tools/gen/relationTable" tags:"代码生成" method:"get" summary:"获取关联表数据"`
 	TableName    string `p:"tableName"`    //表名称
 	TableComment string `p:"tableComment"` //表描述
 	commonApi.PageReq
@@ -78,7 +78,7 @@ type ToolsGenRelationTableReq struct {
 type ToolsGenRelationTableRes struct {
 	g.Meta `mime:"application/json"`
 	commonApi.ListRes
-	Data   []*model.ToolsGenTableColumnsData `json:"data"`
+	Data []*model.ToolsGenTableColumnsData `json:"data"`
 }
 
 // ToolsGenTableColumnsEditReq 生成信息修改参数
@@ -106,6 +106,7 @@ type ToolsGenTableColumnsEditReq struct {
 	TreeParentCode string                        `p:"tree_parent_code"`
 	TreeName       string                        `p:"tree_name"`
 	ExcelPort      string                        `p:"excelPort"`
+	ExcelImp       string                        `p:"excelImp"`
 	UseSnowId      string                        `p:"useSnowId"`
 	UseVirtual     string                        `p:"useVirtual"`
 }

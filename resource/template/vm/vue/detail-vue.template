@@ -41,7 +41,7 @@
             </el-tag>
           </el-form-item>
           {{else}}
-          <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.getOptionValue(formData.{{$column.HtmlField}}, {{$column.HtmlField}}Options,'value','label') {{"}}"}}</el-form-item>
+          <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} proxy.getOptionValue({{if eq $column.TsType "boolean"}}formData.{{$column.HtmlField}}?'1':'0'{{else}}formData.{{$column.HtmlField}}{{end}}, {{$column.HtmlField}}Options,'value','label') {{"}}"}}</el-form-item>
           {{end}}
           {{else}}
             <el-form-item label="{{$column.ColumnComment}}">{{"{{"}} formData.{{$column.HtmlField}} {{"}}"}}</el-form-item>

@@ -32,6 +32,8 @@ type (
 		SelectRecordById(ctx context.Context, tableId int64) (tableEx *model.ToolsGenTableEx, err error)
 		GenCode(ctx context.Context, ids []int) (err error)
 		SyncTable(ctx context.Context, tableId int64) (err error)
+		IsPg()bool
+		IsMysql()bool
 	}
 )
 

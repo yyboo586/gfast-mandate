@@ -66,8 +66,8 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 		if req.PageSize == 0 {
 			req.PageSize = consts.PageSize
 		}
-		model = model.LeftJoin("casbin_rule", "b", "b.v1 = a.id ")
-		model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id) =  b.v0")
+		model = model.LeftJoin("casbin_rule", "b", "b.v1 = cast(a.id AS char) ")
+		model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id) =  cast(b.v0 AS char)")
 		model = model.Group("a.id")
 		err = model.Page(res.CurrentPage, req.PageSize).Order("id asc").Fields("a.*, count(u.id) user_cnt").Scan(&res.List)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")

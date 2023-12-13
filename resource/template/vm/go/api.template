@@ -11,6 +11,9 @@ package {{.table.ModuleName }}
 ////
 import (
     "github.com/gogf/gf/v2/frame/g"
+    {{if .table.ExcelImp}}
+    "github.com/gogf/gf/v2/net/ghttp"
+    {{end}}
     commonApi "{{.goModName}}/api/v1/common"
     "{{.goModName}}/{{.table.PackageName}}/model"
 )
@@ -42,6 +45,27 @@ type {{.table.ClassName}}ExportRes struct {
     commonApi.EmptyRes
 }
 
+{{end}}
+
+{{if .table.ExcelImp}}
+type {{.table.ClassName}}ExcelTemplateReq struct {
+    g.Meta `path:"/excelTemplate" tags:"{{$.table.FunctionName}}" method:"get" summary:"导出模板文件"`
+    commonApi.Author
+}
+
+type {{.table.ClassName}}ExcelTemplateRes struct {
+    commonApi.EmptyRes
+}
+
+type {{.table.ClassName}}ImportReq struct {
+    g.Meta `path:"/import" tags:"{{$.table.FunctionName}}" method:"post" summary:"{{$.table.FunctionName}}导入"`
+    commonApi.Author
+    File   *ghttp.UploadFile `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
+}
+
+type {{.table.ClassName}}ImportRes struct {
+    commonApi.EmptyRes
+}
 {{end}}
 
 {{if gt (len .table.LinkedTables) 0}}

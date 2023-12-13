@@ -9,6 +9,7 @@ package toolsGenTableColumn
 
 import (
 	"context"
+	"fmt"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gregex"
@@ -48,16 +49,40 @@ type sToolsGenTableColumn struct {
 	ColumnNameNotQuery  []string //页面不需要查询字段
 }
 
+// 自定义错误类型
+type MyError struct {
+	Code    int
+	Message string
+}
+
+// 实现 error 接口的 Error() 方法
+func (e MyError) Error() string {
+	return fmt.Sprintf("错误代码：%d，错误信息：%s", e.Code, e.Message)
+}
+
 // SelectDbTableColumnsByName 根据表名称查询列信息
 func (s *sToolsGenTableColumn) SelectDbTableColumnsByName(ctx context.Context, tableName string) ([]*entity.ToolsGenTableColumn, error) {
 	var res []*entity.ToolsGenTableColumn
 	err := g.Try(ctx, func(ctx context.Context) {
 		db := g.DB()
-		sql := " select column_name, (case when (is_nullable = 'YES' || is_nullable = 'NO' && column_default is not null) then '0' else '1' end) as is_required, " +
+		var sql string
+		if service.ToolsGenTable().IsPg() {
+			sql = " select c.column_name,(case when c.is_nullable='YES' || k.column_name is not null  then '1' else '0' end) as is_required," +
+				"(case when k.column_name is not null then '1' else '0' end) as is_pk,c.ordinal_position as sort_order_edit,d.description column_comment," +
+				"(case when c.column_default like 'nextval%' then '1' else '0' end) as is_increment,c.udt_name as column_type " +
+				"from information_schema.columns c " +
+				"left join pg_description d on d.objsubid=c.ordinal_position and d.objoid=c.table_name :: regclass " +
+				"left join information_schema.key_column_usage k on c.table_name=k.table_name and c.column_name=k.column_name and c.table_catalog=k.table_catalog and c.table_schema=k.table_schema "
+			sql += "where " + gdb.FormatSqlWithArgs(" c.table_name=? ", []interface{}{tableName}) + " order by c.ordinal_position"
+		} else {
+			sql = " select column_name, (case when (is_nullable = 'YES' || is_nullable = 'NO' && column_default is not null) then '0' else '1' end) as is_required, " +
 			"(case when column_key = 'PRI' then '1' else '0' end) as is_pk, ordinal_position as sort_order_edit, column_comment," +
 			" (case when extra = 'auto_increment' then '1' else '0' end) as is_increment, column_type from information_schema.columns" +
 			" where table_schema = (select database()) "
 		sql += " and " + gdb.FormatSqlWithArgs(" table_name=? ", []interface{}{tableName}) + " order by ordinal_position ASC "
+
+		}
+
 		err := db.GetScan(ctx, &res, sql)
 		liberr.ErrIsNil(ctx, err, "查询列信息失败")
 	})
