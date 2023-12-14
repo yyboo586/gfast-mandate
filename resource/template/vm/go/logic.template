@@ -42,6 +42,7 @@ import (
     "context"
     "github.com/gogf/gf/v2/frame/g"
     {{if .table.ExcelImp}}
+    "errors"
     "github.com/gogf/gf/v2/net/ghttp"
     "github.com/gogf/gf/v2/database/gdb"
     "github.com/xuri/excelize/v2"
@@ -347,6 +348,7 @@ func(s *s{{.table.ClassName}})Import(ctx context.Context,file *ghttp.UploadFile)
         }
         d:=make([]interface{}, len(rows[0]))
         data=make([]do.{{.table.ClassName}},len(rows)-1)
+
         for k,v:=range rows{
             if k==0{
                 continue
@@ -354,17 +356,19 @@ func(s *s{{.table.ClassName}})Import(ctx context.Context,file *ghttp.UploadFile)
             for kv,vv:=range v{
                 d[kv] = vv
             }
+            {{if $.table.UseSnowId}}
+            var {{$.table.PkColumn.HtmlField}} uint64
+            {{$.table.PkColumn.HtmlField}}, err = commonService.SnowID().GenID()
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
             data[k-1] = do.{{.table.ClassName}}{
                 {{$i:=0}}
                 {{range $index, $column := .table.Columns}}
                 {{$add:=false}}
-                {{if $.table.IsPkInsertable}}
+                {{if and $column.IsPk $.table.IsPkInsertable}}
                 {{$.table.PkColumn.GoField}}:d[{{$i}}],
                 {{$add = true}}
-                {{else if $.table.UseSnowId}}
-                var {{$.table.PkColumn.HtmlField}} uint64
-                {{$.table.PkColumn.HtmlField}}, err = commonService.SnowID().GenID()
-                liberr.ErrIsNil(ctx, err)
+                {{else if and $column.IsPk $.table.UseSnowId}}
                 {{$.table.PkColumn.GoField}}:{{$.table.PkColumn.HtmlField}},
                 {{else if and (ne $column.IsPk true) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
                 {{$add = true}}

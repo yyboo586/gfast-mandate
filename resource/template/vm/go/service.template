@@ -36,7 +36,7 @@ type I{{.table.ClassName}} interface {
 	{{if .table.ExcelPort }}
 	GetExportData(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes []*model.{{.table.ClassName}}InfoRes, err error)
 	{{end}}
-	{{if .table.ExcelPort }}
+	{{if .table.ExcelImp }}
 	Import(ctx context.Context,file *ghttp.UploadFile)(err error)
 	{{end}}
 	GetBy{{.table.PkColumn.GoField}}(ctx context.Context, {{.table.PkColumn.GoField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error)

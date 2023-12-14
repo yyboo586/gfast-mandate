@@ -91,7 +91,7 @@ func (s *sToolsGenTable) SelectDbTableList(ctx context.Context, req *system.Tool
 		var sqlStr string
 		if s.IsMysql() {
 			sqlStr = " from information_schema.tables where table_schema = (select database())" +
-				" and table_name table_name NOT LIKE 'tools_gen_%' and table_name NOT IN (select table_name from " + dao.ToolsGenTable.Table() + ") "
+				" and table_name NOT LIKE 'tools_gen_%' and table_name NOT IN (select table_name from " + dao.ToolsGenTable.Table() + ") "
 			if req != nil {
 				if req.TableName != "" {
 					sqlStr += gdb.FormatSqlWithArgs(" and lower(table_name) like lower(?)", []interface{}{"%" + req.TableName + "%"})

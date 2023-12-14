@@ -724,7 +724,7 @@ export default defineComponent({
             {{if .table.ExcelPort }}
             handleExport,
             {{end}}
-            {{if .table.ExcelPort }}
+            {{if .table.ExcelImp }}
             handleImport,
             loadExcel{{.table.ClassName}}Ref,
             {{end}}

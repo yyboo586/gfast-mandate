@@ -10,6 +10,7 @@ package controller
 import (
 	"context"
 	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/tiger1103/gfast/v3/api/v1/common"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
@@ -63,7 +64,7 @@ func (c *toolsGenTableController) GenColumnList(ctx context.Context, req *system
 
 // RelationTable 获取关联表数据
 func (c *toolsGenTableController) RelationTable(ctx context.Context, req *system.ToolsGenRelationTableReq) (res *system.ToolsGenRelationTableRes, err error) {
-	res, err = service.ToolsGenTable().GetRelationTable(ctx,req)
+	res, err = service.ToolsGenTable().GetRelationTable(ctx, req)
 	return
 }
 
@@ -82,7 +83,7 @@ func (c *toolsGenTableController) Preview(ctx context.Context, req *system.Tools
 
 // BatchGenCode 代码生成
 func (c *toolsGenTableController) BatchGenCode(ctx context.Context, req *system.ToolsGenTableBatchGenCodeReq) (res *system.ToolsGenTableBatchGenCodeRes, err error) {
-	err = service.ToolsGenTable().GenCode(ctx, req.Ids)
+	err = service.ToolsGenTable().GenCode(gctx.New(), req.Ids)
 	return
 }
 
