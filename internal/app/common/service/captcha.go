@@ -7,11 +7,14 @@ package service
 
 import (
 	"context"
+	"github.com/wenlng/go-captcha/captcha"
 )
 
 type ICaptcha interface {
 	GetVerifyImgString(ctx context.Context) (idKeyC string, base64stringC string, err error)
 	VerifyString(id, answer string) bool
+	GetCaptchaV2(ctx context.Context) (dots map[int]captcha.CharDot,img,thumb,key string,err error)
+	CheckCaptchaV2(ctx context.Context,key string,dots string,removeKey... bool) (err error)
 }
 
 var localCaptcha ICaptcha

@@ -194,3 +194,17 @@ func GetFilesPath(ctx context.Context, fileUrl string) (path string, err error) 
 	}
 	return
 }
+
+// SliceUnique 数字元素去重
+func SliceUnique[T comparable](slice []T) []T {
+	encountered := map[T]bool{}
+	result := []T{}
+
+	for _, v := range slice {
+		if !encountered[v] {
+			encountered[v] = true
+			result = append(result, v)
+		}
+	}
+	return result
+}

@@ -13,6 +13,7 @@ import (
 type SysRole struct {
 	g.Meta    `orm:"table:sys_role, do:true"`
 	Id        interface{} //
+	Pid       interface{} //
 	Status    interface{} // 状态;0:禁用;1:正常
 	ListOrder interface{} // 排序
 	Name      interface{} // 角色名称

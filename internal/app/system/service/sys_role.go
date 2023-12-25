@@ -26,6 +26,8 @@ type (
 		RoleDeptTreeSelect(ctx context.Context, roleId int64) (res *system.RoleDeptTreeSelectRes, err error)
 		GetRoleDepts(ctx context.Context, roleId int64) ([]int64, error)
 		RoleDataScope(ctx context.Context, req *system.DataScopeReq) error
+		FindSonByParentId(roleList []*entity.SysRole, id uint) []*entity.SysRole
+		FindSonIdsByParentId(roleList []*entity.SysRole, id uint) []uint
 	}
 )
 

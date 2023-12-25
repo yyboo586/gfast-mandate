@@ -20,6 +20,7 @@ type SysRoleDao struct {
 // SysRoleColumns defines and stores column names for table sys_role.
 type SysRoleColumns struct {
 	Id        string //
+	Pid       string //
 	Status    string // 状态;0:禁用;1:正常
 	ListOrder string // 排序
 	Name      string // 角色名称
@@ -33,6 +34,7 @@ type SysRoleColumns struct {
 // sysRoleColumns holds the columns for table sys_role.
 var sysRoleColumns = SysRoleColumns{
 	Id:        "id",
+	Pid:       "pid",
 	Status:    "status",
 	ListOrder: "list_order",
 	Name:      "name",

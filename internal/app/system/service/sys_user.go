@@ -30,7 +30,7 @@ type (
 		UpdateLoginInfo(ctx context.Context, id uint64, ip string,openId ...string) (err error)
 		GetAdminRules(ctx context.Context, userId uint64) (menuList []*model.UserMenus, permissions []string, err error)
 		GetAdminRole(ctx context.Context, userId uint64, allRoleList []*entity.SysRole) (roles []*entity.SysRole, err error)
-		GetAdminRoleIds(ctx context.Context, userId uint64) (roleIds []uint, err error)
+		GetAdminRoleIds(ctx context.Context, userId uint64,includeChildren ...bool) (roleIds []uint, err error)
 		GetAllMenus(ctx context.Context) (menus []*model.UserMenus, err error)
 		GetAdminMenusIdsByRoleIds(ctx context.Context, roleIds []uint) (menuIds *garray.Array, err error)
 		GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (menus []*model.UserMenus, err error)

@@ -205,7 +205,7 @@ func (s *sSysUser) GetAdminRole(ctx context.Context, userId uint64, allRoleList 
 }
 
 // GetAdminRoleIds 获取用户角色ids
-func (s *sSysUser) GetAdminRoleIds(ctx context.Context, userId uint64) (roleIds []uint, err error) {
+func (s *sSysUser) GetAdminRoleIds(ctx context.Context, userId uint64, includeChildren ...bool) (roleIds []uint, err error) {
 	enforcer, e := commonService.CasbinEnforcer(ctx)
 	if e != nil {
 		err = e
@@ -220,6 +220,21 @@ func (s *sSysUser) GetAdminRoleIds(ctx context.Context, userId uint64) (roleIds 
 			roleIds[k] = gconv.Uint(v[1])
 		}
 	}
+	if len(includeChildren) > 0 && includeChildren[0] {
+		//获取子级
+		var allRoles []*entity.SysRole
+		allRoles, err = service.SysRole().GetRoleList(ctx)
+		if err != nil {
+			return
+		}
+		childrenIds := make([]uint, 0, 100)
+		for _, roleId := range roleIds {
+			childrenIds = append(childrenIds, service.SysRole().FindSonIdsByParentId(allRoles, roleId)...)
+		}
+		//合并去重
+		roleIds = append(roleIds, childrenIds...)
+	}
+	roleIds = libUtils.SliceUnique(roleIds)
 	return
 }
 
@@ -484,13 +499,13 @@ func (s *sSysUser) getSearchDeptIds(ctx context.Context, deptId uint64) (deptIds
 }
 
 // 过滤用户可操作的角色
-func (s *sSysUser) filterRoleIds(ctx context.Context, roleIds []uint, userId uint64) (newRoleIds []uint, err error) {
+func (s *sSysUser) filterRoleIds(ctx context.Context, roleIds []uint, userId uint64, includeChildren ...bool) (newRoleIds []uint, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		var (
 			accessRoleList []uint
 			roleList       []*entity.SysRole
 		)
-		accessRoleList, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+		accessRoleList, err = service.SysUser().GetAdminRoleIds(ctx, userId, includeChildren...)
 		liberr.ErrIsNil(ctx, err)
 		roleList, err = service.SysRole().GetRoleList(ctx)
 		liberr.ErrIsNil(ctx, err)

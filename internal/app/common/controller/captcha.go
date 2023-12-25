@@ -9,8 +9,10 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"github.com/tiger1103/gfast/v3/api/v1/common"
 	"github.com/tiger1103/gfast/v3/internal/app/common/service"
+	"time"
 )
 
 var Captcha = captchaController{}
@@ -20,13 +22,31 @@ type captchaController struct {
 
 // Get 获取验证码
 func (c *captchaController) Get(ctx context.Context, req *common.CaptchaReq) (res *common.CaptchaRes, err error) {
-	var (
-		idKeyC, base64stringC string
-	)
-	idKeyC, base64stringC, err = service.Captcha().GetVerifyImgString(ctx)
+	idKeyC, base64stringC, err := service.Captcha().GetVerifyImgString(ctx)
 	res = &common.CaptchaRes{
 		Key: idKeyC,
 		Img: base64stringC,
 	}
+	return
+}
+
+// V2 验证码
+func (c *captchaController) V2(ctx context.Context, req *common.CaptchaV2Req) (res *common.CaptchaV2Res, err error) {
+	dots, img, thumb, key, err := service.Captcha().GetCaptchaV2(ctx)
+	// 写入缓存
+	service.Cache().Set(ctx, "captchaV2_"+key, dots, 10*60*time.Second)
+	res = &common.CaptchaV2Res{
+		Key:   key,
+		Img:   img,
+		Thumb: thumb,
+	}
+	return
+}
+
+func (c *captchaController) V2Check(ctx context.Context, req *common.CheckCaptchaV2Req) (res *common.CheckCaptchaV2Res, err error) {
+	if req.Key == "" || req.Dots == "" {
+		return nil, errors.New("验证码无效")
+	}
+	err = service.Captcha().CheckCaptchaV2(ctx, req.Key, req.Dots)
 	return
 }

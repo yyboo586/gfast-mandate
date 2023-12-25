@@ -59,10 +59,6 @@ func (c *userController) GetParams(ctx context.Context, req *system.UserGetParam
 		return
 	}
 	userId := service.Context().GetUserId(ctx)
-	res.RoleAccess, err = service.SysUser().GetAdminRoleIds(ctx, userId)
-	if err != nil {
-		return
-	}
 	//判断是否超管
 	if service.SysUser().IsSupperAdmin(ctx, userId) {
 		//自己创建的角色可以被授权
@@ -70,7 +66,7 @@ func (c *userController) GetParams(ctx context.Context, req *system.UserGetParam
 			res.RoleAccess = append(res.RoleAccess, v.Id)
 		}
 	} else {
-		res.RoleAccess, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+		res.RoleAccess, err = service.SysUser().GetAdminRoleIds(ctx, userId, true)
 		if err != nil {
 			return
 		}

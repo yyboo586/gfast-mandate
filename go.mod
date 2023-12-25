@@ -21,6 +21,7 @@ require (
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.34
 	github.com/tiger1103/gfast-cache v1.0.2
 	github.com/tiger1103/gfast-token v1.0.4
+	github.com/wenlng/go-captcha v1.2.5
 	github.com/xuri/excelize/v2 v2.7.1
 	golang.org/x/tools v0.6.0
 )

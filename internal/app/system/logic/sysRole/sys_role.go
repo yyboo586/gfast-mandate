@@ -49,7 +49,7 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 		//获取当前用户所属角色ids
 		if !service.SysUser().IsSupperAdmin(ctx, userId) {
 			var roleIds []uint
-			roleIds, err = service.SysUser().GetAdminRoleIds(ctx, userId)
+			roleIds, err = service.SysUser().GetAdminRoleIds(ctx, userId, true)
 			liberr.ErrIsNil(ctx, err)
 			if len(roleIds) == 0 {
 				return
@@ -57,19 +57,15 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 			model = model.Where("a."+dao.SysRole.Columns().Id+" in(?) OR a.created_by = ?", roleIds, userId)
 		}
 		model = model.As("a")
-		res.Total, err = model.Count()
-		liberr.ErrIsNil(ctx, err, "获取角色数据失败")
-		if req.PageNum == 0 {
-			req.PageNum = 1
+		if service.ToolsGenTable().IsMysql() {
+			model = model.LeftJoin("casbin_rule", "b", "b.v1  = a.id ")
+			model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id) = b.v0 ")
+		} else {
+			model = model.LeftJoin("casbin_rule", "b", "b.v1  = cast(a.id AS VARCHAR) ")
+			model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id)  =  b.v0")
 		}
-		res.CurrentPage = req.PageNum
-		if req.PageSize == 0 {
-			req.PageSize = consts.PageSize
-		}
-		model = model.LeftJoin("casbin_rule", "b", "b.v1 = cast(a.id AS char) ")
-		model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id) =  cast(b.v0 AS char)")
 		model = model.Group("a.id")
-		err = model.Page(res.CurrentPage, req.PageSize).Order("id asc").Fields("a.*, count(u.id) user_cnt").Scan(&res.List)
+		err = model.Order("id asc").Fields("a.*, count(u.id) user_cnt").Scan(&res.List)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
 	})
 	return
@@ -110,8 +106,10 @@ func (s *sSysRole) AddRoleRule(ctx context.Context, ruleIds []uint, roleId int64
 		for k, v := range ruleIdsStr {
 			rules[k] = []string{gconv.String(roleId), v, "All"}
 		}
-		_, err = enforcer.AddPolicies(rules)
-		liberr.ErrIsNil(ctx, err)
+		if len(rules) > 0 {
+			_, err = enforcer.AddPolicies(rules)
+			liberr.ErrIsNil(ctx, err)
+		}
 	})
 	return
 }
@@ -150,7 +148,7 @@ func (s *sSysRole) AddRole(ctx context.Context, req *system.RoleAddReq) (err err
 func (s *sSysRole) Get(ctx context.Context, id uint) (res *entity.SysRole, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		//判断是否具有此角色的权限
-		if !s.hasManageAccess(ctx, id) {
+		if !s.hasManageAccess(ctx, id, true) {
 			liberr.ErrIsNil(ctx, errors.New("没有查看这个角色的权限"))
 		}
 		err = dao.SysRole.Ctx(ctx).WherePri(id).Scan(&res)
@@ -173,7 +171,7 @@ func (s *sSysRole) GetFilteredNamedPolicy(ctx context.Context, id uint) (gpSlice
 	return
 }
 
-func (s *sSysRole) hasManageAccess(ctx context.Context, roleId uint) bool {
+func (s *sSysRole) hasManageAccess(ctx context.Context, roleId uint, includeChildren ...bool) bool {
 	currentUserId := service.Context().GetUserId(ctx)
 	if !service.SysUser().IsSupperAdmin(ctx, currentUserId) {
 		var (
@@ -193,7 +191,7 @@ func (s *sSysRole) hasManageAccess(ctx context.Context, roleId uint) bool {
 				return true
 			}
 		}
-		roleIds, err = service.SysUser().GetAdminRoleIds(ctx, service.Context().GetUserId(ctx))
+		roleIds, err = service.SysUser().GetAdminRoleIds(ctx, service.Context().GetUserId(ctx), includeChildren...)
 		if err != nil {
 			g.Log().Error(ctx, err)
 			return false
@@ -216,10 +214,11 @@ func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err e
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
 			//判断是否具有修改此角色的权限
-			if !s.hasManageAccess(ctx, gconv.Uint(req.Id)) {
+			if !s.hasManageAccess(ctx, gconv.Uint(req.Id), true) {
 				liberr.ErrIsNil(ctx, errors.New("没有修改这个角色的权限"))
 			}
 			_, e := dao.SysRole.Ctx(ctx).TX(tx).WherePri(req.Id).Data(&do.SysRole{
+				Pid:       req.Pid,
 				Status:    req.Status,
 				ListOrder: req.ListOrder,
 				Name:      req.Name,
@@ -345,4 +344,28 @@ func (s *sSysRole) RoleDataScope(ctx context.Context, req *system.DataScopeReq) 
 		return err
 	})
 	return err
+}
+
+func (s *sSysRole) FindSonByParentId(roleList []*entity.SysRole, id uint) []*entity.SysRole {
+	children := make([]*entity.SysRole, 0, len(roleList))
+	for _, v := range roleList {
+		if v.Pid == id {
+			children = append(children, v)
+			fChildren := s.FindSonByParentId(roleList, v.Id)
+			children = append(children, fChildren...)
+		}
+	}
+	return children
+}
+
+func (s *sSysRole) FindSonIdsByParentId(roleList []*entity.SysRole, id uint) []uint {
+	children := make([]uint, 0, len(roleList))
+	for _, v := range roleList {
+		if v.Pid == id {
+			children = append(children, v.Id)
+			fChildren := s.FindSonIdsByParentId(roleList, v.Id)
+			children = append(children, fChildren...)
+		}
+	}
+	return children
 }

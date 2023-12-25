@@ -322,7 +322,7 @@ func(c *{{$structName}}Controller) Linked{{$.table.ClassName}}DataSearch(ctx con
     {{if ne $.table.ModuleName "system"}}
         {{$serviceVal = "systemService"}}
     {{end}}
-    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{.apiVersion}}/{{.table.PackageName}}/{{$businessName}}/list") {
+    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list") {
         err = errors.New("没有访问权限")
         return
     }

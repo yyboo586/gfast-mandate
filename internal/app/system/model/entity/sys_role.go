@@ -11,6 +11,7 @@ import (
 // SysRole is the golang structure for table sys_role.
 type SysRole struct {
 	Id        uint        `json:"id"        description:""`
+	Pid        uint        `json:"pid"        description:""`
 	Status    uint        `json:"status"    description:"状态;0:禁用;1:正常"`
 	ListOrder uint        `json:"listOrder" description:"排序"`
 	Name      string      `json:"name"      description:"角色名称"`

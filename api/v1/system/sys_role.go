@@ -40,6 +40,7 @@ type RoleGetParamsRes struct {
 
 type RoleAddReq struct {
 	g.Meta    `path:"/role/add" tags:"角色管理" method:"post" summary:"添加角色"`
+	Pid       uint   `p:"pid"`
 	Name      string `p:"name" v:"required#角色名称不能为空"`
 	Status    uint   `p:"status"    `
 	ListOrder uint   `p:"listOrder" `
@@ -67,6 +68,7 @@ type RoleEditReq struct {
 	g.Meta `path:"/role/edit" tags:"角色管理" method:"put" summary:"修改角色"`
 	commonApi.Author
 	Id        int64  `p:"id" v:"required#角色id必须"`
+	Pid       uint   `p:"pid"`
 	Name      string `p:"name" v:"required#角色名称不能为空"`
 	Status    uint   `p:"status"    `
 	ListOrder uint   `p:"listOrder" `

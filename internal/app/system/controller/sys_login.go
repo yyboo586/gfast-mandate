@@ -40,8 +40,15 @@ func (c *loginController) Login(ctx context.Context, req *system.UserLoginReq) (
 	//判断验证码是否正确
 	debug := gmode.IsDevelop()
 	if !debug {
-		if !commonService.Captcha().VerifyString(req.VerifyKey, req.VerifyCode) {
-			err = gerror.New("验证码输入错误")
+		// 验证码v1版
+		//if !commonService.Captcha().VerifyString(req.VerifyKey, req.VerifyCode) {
+		//	err = gerror.New("验证码输入错误")
+		//	return
+		//}
+
+		// 验证码v2版
+		err = commonService.Captcha().CheckCaptchaV2(ctx, req.VerifyKey, req.VerifyCode, true)
+		if err != nil {
 			return
 		}
 	}
@@ -77,7 +84,6 @@ func (c *loginController) Login(ctx context.Context, req *system.UserLoginReq) (
 	if g.Cfg().MustGet(ctx, "gfToken.multiLogin").Bool() {
 		key = gconv.String(user.Id) + "-" + gmd5.MustEncryptString(user.UserName) + gmd5.MustEncryptString(user.UserPassword+ip+userAgent)
 	}
-	user.UserPassword = ""
 	token, err = service.GfToken().GenerateToken(ctx, key, user)
 	if err != nil {
 		g.Log().Error(ctx, err)

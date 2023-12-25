@@ -7,13 +7,37 @@
 
 package common
 
-import "github.com/gogf/gf/v2/frame/g"
+import (
+	"github.com/gogf/gf/v2/frame/g"
+)
 
 type CaptchaReq struct {
 	g.Meta `path:"/get" tags:"验证码" method:"get" summary:"获取验证码"`
 }
+
+type CaptchaV2Req struct {
+	g.Meta `path:"/v2" tags:"验证码" method:"get" summary:"获取v2验证码"`
+}
+
+type CheckCaptchaV2Req struct {
+	g.Meta `path:"/v2Check" tags:"验证码" method:"post" summary:"检查v2验证码"`
+	Key    string `json:"key"`
+	Dots   string `json:"dots"`
+}
+
 type CaptchaRes struct {
 	g.Meta `mime:"application/json"`
 	Key    string `json:"key"`
 	Img    string `json:"img"`
+}
+
+type CaptchaV2Res struct {
+	g.Meta `mime:"application/json"`
+	Key    string `json:"key"`
+	Img    string `json:"img"`
+	Thumb  string `json:"thumb"`
+}
+
+type CheckCaptchaV2Res struct {
+	g.Meta `mime:"application/json"`
 }
