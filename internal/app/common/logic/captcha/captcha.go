@@ -24,7 +24,7 @@ func init() {
 	service.RegisterCaptcha(New())
 }
 
-func New() *sCaptcha {
+func New() service.ICaptcha {
 	return &sCaptcha{
 		driver: &base64Captcha.DriverString{
 			Height:          80,

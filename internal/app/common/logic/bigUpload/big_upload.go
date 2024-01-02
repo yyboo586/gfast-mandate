@@ -18,7 +18,7 @@ func init() {
 	service.RegisterBigUpload(New())
 }
 
-func New() *sBigUpload {
+func New() service.IBigUpload {
 	return &sBigUpload{}
 }
 

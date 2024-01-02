@@ -16,7 +16,7 @@ func init() {
 	service.RegisterMiddleware(New())
 }
 
-func New() *sMiddleware {
+func New() service.IMiddleware {
 	return &sMiddleware{}
 }
 

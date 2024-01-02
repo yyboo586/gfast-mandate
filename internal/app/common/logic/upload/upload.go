@@ -28,7 +28,7 @@ func init() {
 	service.RegisterUpload(New())
 }
 
-func New() *sUpload {
+func New() service.IUpload {
 	return &sUpload{}
 }
 

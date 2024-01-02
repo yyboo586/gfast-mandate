@@ -19,7 +19,7 @@ func init() {
 	service.RegisterCache(New())
 }
 
-func New() *sCache {
+func New() service.ICache {
 	var (
 		ctx            = gctx.New()
 		cacheContainer *cache.GfCache

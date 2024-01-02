@@ -26,7 +26,7 @@ func init() {
 	service.RegisterSysDictData(New())
 }
 
-func New() *sSysDictData {
+func New() service.ISysDictData {
 	return &sSysDictData{}
 }
 
@@ -47,7 +47,7 @@ func (s *sSysDictData) GetDictWithDataByType(ctx context.Context, dictType, defa
 			err = dao.SysDictType.Ctx(ctx).Where(dao.SysDictType.Columns().DictType, dictType).
 				Where(dao.SysDictType.Columns().Status, 1).Fields(model.DictTypeRes{}).Scan(&dict.Info)
 			liberr.ErrIsNil(ctx, err, "获取字典类型失败")
-			if dict.Info==nil{
+			if dict.Info == nil {
 				return
 			}
 			err = dao.SysDictData.Ctx(ctx).Fields(model.DictDataRes{}).

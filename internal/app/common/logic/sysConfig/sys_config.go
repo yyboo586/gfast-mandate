@@ -27,7 +27,7 @@ func init() {
 	service.RegisterSysConfig(New())
 }
 
-func New() *sSysConfig {
+func New() service.ISysConfig {
 	return &sSysConfig{}
 }
 
