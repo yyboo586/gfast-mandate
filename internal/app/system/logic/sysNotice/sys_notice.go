@@ -253,7 +253,7 @@ func (s *sSysNotice) Delete(ctx context.Context, ids []int64) (err error) {
 //未读消息列表
 func (s *sSysNotice) UnReadList(ctx context.Context) (res *model.SysNoticeListRes, err error) {
 	//TODO implement me
-	panic("implement me")
+	return
 }
 
 func (s *sSysNotice) UnReadCount(ctx context.Context, currentUserId uint64) (sysNoticeUnreadCount *model.SysNoticeUnreadCount, err error) {

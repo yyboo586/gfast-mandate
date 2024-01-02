@@ -12,7 +12,7 @@
  Target Server Version : 140010
  File Encoding         : 65001
 
- Date: 21/12/2023 16:12:38
+ Date: 02/01/2024 17:52:50
 */
 
 
@@ -169,6 +169,30 @@ MINVALUE  1
 MAXVALUE 9223372036854775807
 START 1
 CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for sys_notice_id_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "sys_notice_id_seq";
+CREATE SEQUENCE "sys_notice_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+COMMENT ON SEQUENCE "sys_notice_id_seq" IS '通知公告ID序列';
+
+-- ----------------------------
+-- Sequence structure for sys_notice_read_id_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "sys_notice_read_id_seq";
+CREATE SEQUENCE "sys_notice_read_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+COMMENT ON SEQUENCE "sys_notice_read_id_seq" IS '已读记录ID序列';
 
 -- ----------------------------
 -- Sequence structure for sys_oper_log_oper_id_seq
@@ -4429,6 +4453,13 @@ INSERT INTO "sys_auth_rule" VALUES (55, 53, 'api/v1/system/sysJob/add', '定时�
 INSERT INTO "sys_auth_rule" VALUES (56, 53, 'api/v1/system/sysJob/edit', '定时任务修改', '', '', '定时任务修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO "sys_auth_rule" VALUES (57, 53, 'api/v1/system/sysJob/delete', '定时任务删除', '', '', '定时任务删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO "sys_auth_rule" VALUES (58, 53, 'api/v1/system/sysJob/run', '执行一次', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2023-01-12 18:20:13', '2023-01-12 18:20:13');
+INSERT INTO "sys_auth_rule" VALUES (86, 0, 'api/v1/system/sysNotice', '通知公告', 'iconfont icon-fuwenbenkuang', '', '', 0, 0, 0, '/system/sysNotice', 'layout/routerView/parent', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, '2023-11-09 15:40:55');
+INSERT INTO "sys_auth_rule" VALUES (87, 86, 'api/v1/system/sysNotice/list', '通知公告管理', 'ele-Fold', '', '', 1, 0, 0, '/system/sysNotice/list', 'system/sysNotice/list/index', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, '2023-11-09 15:41:13');
+INSERT INTO "sys_auth_rule" VALUES (88, 87, 'api/v1/system/sysNotice/get', '通知公告查询', '', '', '通知公告查询', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO "sys_auth_rule" VALUES (89, 87, 'api/v1/system/sysNotice/add', '通知公告添加', '', '', '通知公告添加', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO "sys_auth_rule" VALUES (90, 87, 'api/v1/system/sysNotice/edit', '通知公告修改', '', '', '通知公告修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO "sys_auth_rule" VALUES (91, 87, 'api/v1/system/sysNotice/delete', '通知公告删除', '', '', '通知公告删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
+INSERT INTO "sys_auth_rule" VALUES (92, 86, 'api/v1/system/sysNotice/show', '通知公告扎展示', 'iconfont icon-tongzhi', '', '', 0, 0, 0, '/system/sysNotice/show', 'system/sysNotice/show/index', 0, '', 0, 0, 1, '', 0, '', '2023-12-25 10:34:32', '2023-12-25 10:34:32');
 
 -- ----------------------------
 -- Table structure for sys_config
@@ -4633,6 +4664,12 @@ INSERT INTO "sys_dict_data" VALUES (102, 0, '读取', 'GET', 'sys_oper_log_type'
 INSERT INTO "sys_dict_data" VALUES (103, 0, '新增', 'POST', 'sys_oper_log_type', '', '', 0, 1, 31, 31, '', '2022-12-21 11:59:22', '2022-12-23 19:03:10');
 INSERT INTO "sys_dict_data" VALUES (104, 0, '修改', 'PUT', 'sys_oper_log_type', '', '', 0, 1, 31, 31, '', '2022-12-21 11:59:32', '2022-12-23 19:03:19');
 INSERT INTO "sys_dict_data" VALUES (105, 0, '删除', 'DELETE', 'sys_oper_log_type', '', '', 0, 1, 31, 31, '', '2022-12-21 11:59:44', '2022-12-23 19:03:27');
+INSERT INTO "sys_dict_data" VALUES (106, 0, '无标签', '0', 'notice_tag', '', '', 0, 1, 31, 31, '', '2023-12-28 15:48:45', '2023-12-28 15:52:14');
+INSERT INTO "sys_dict_data" VALUES (107, 0, '提醒', '1', 'notice_tag', '', '', 0, 1, 31, 31, '', '2023-12-28 15:48:54', '2023-12-28 15:52:24');
+INSERT INTO "sys_dict_data" VALUES (108, 0, '一般', '2', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:52:35', '2023-12-28 15:52:35');
+INSERT INTO "sys_dict_data" VALUES (109, 0, '次要', '3', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:52:44', '2023-12-28 15:52:44');
+INSERT INTO "sys_dict_data" VALUES (110, 0, '重要', '4', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:52:53', '2023-12-28 15:52:53');
+INSERT INTO "sys_dict_data" VALUES (111, 0, '紧急', '5', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:53:01', '2023-12-28 15:53:01');
 
 -- ----------------------------
 -- Table structure for sys_dict_type
@@ -4688,6 +4725,7 @@ INSERT INTO "sys_dict_type" VALUES (35, '工作流紧急状态', 'flow_level', 1
 INSERT INTO "sys_dict_type" VALUES (48, '插件商城折扣', 'plugin_store_discount', 1, 31, 0, '', '2021-08-14 11:59:26', '2021-08-14 11:59:26');
 INSERT INTO "sys_dict_type" VALUES (49, 'CMS栏目导航位置', 'cms_nav_position', 1, 22, 0, '', '2021-08-31 15:37:04', '2021-08-31 15:37:04');
 INSERT INTO "sys_dict_type" VALUES (50, '操作日志类型', 'sys_oper_log_type', 1, 31, 0, '', '2022-12-21 11:55:02', '2022-12-21 11:55:02');
+INSERT INTO "sys_dict_type" VALUES (52, '系统公告标签', 'notice_tag', 1, 31, 0, '', '2023-12-28 15:48:03', '2023-12-28 15:48:03');
 
 -- ----------------------------
 -- Table structure for sys_job
@@ -4753,6 +4791,8 @@ COMMENT ON TABLE "sys_job_log" IS '任务日志表';
 -- ----------------------------
 -- Records of sys_job_log
 -- ----------------------------
+INSERT INTO "sys_job_log" VALUES (2437, 'checkUserOnline', '2023-12-25 10:30:05.619406', '在线用户定时更新，执行成功');
+INSERT INTO "sys_job_log" VALUES (2438, 'checkUserOnline', '2023-12-25 10:40:05.660222', '在线用户定时更新，执行成功');
 
 -- ----------------------------
 -- Table structure for sys_login_log
@@ -4785,6 +4825,70 @@ COMMENT ON TABLE "sys_login_log" IS '系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_notice
+-- ----------------------------
+DROP TABLE IF EXISTS "sys_notice";
+CREATE TABLE "sys_notice" (
+  "id" int8 NOT NULL DEFAULT nextval('sys_notice_id_seq'::regclass),
+  "title" varchar(64) COLLATE "pg_catalog"."C" NOT NULL,
+  "type" int8 NOT NULL,
+  "tag" int4,
+  "content" text COLLATE "pg_catalog"."C" NOT NULL,
+  "remark" varchar(255) COLLATE "pg_catalog"."C",
+  "sort" int4 NOT NULL DEFAULT 0,
+  "status" int2 DEFAULT 1,
+  "created_by" int8,
+  "updated_by" int8 DEFAULT 0,
+  "created_at" timestamp(6),
+  "updated_at" timestamp(6),
+  "deleted_at" timestamp(6),
+  "receiver" json
+)
+;
+COMMENT ON COLUMN "sys_notice"."title" IS '标题';
+COMMENT ON COLUMN "sys_notice"."type" IS '类型';
+COMMENT ON COLUMN "sys_notice"."tag" IS '标签';
+COMMENT ON COLUMN "sys_notice"."content" IS '内容';
+COMMENT ON COLUMN "sys_notice"."remark" IS '备注';
+COMMENT ON COLUMN "sys_notice"."sort" IS '排序';
+COMMENT ON COLUMN "sys_notice"."status" IS '状态';
+COMMENT ON COLUMN "sys_notice"."created_by" IS '发送人';
+COMMENT ON COLUMN "sys_notice"."updated_by" IS '修改人';
+COMMENT ON COLUMN "sys_notice"."created_at" IS '创建时间';
+COMMENT ON COLUMN "sys_notice"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "sys_notice"."deleted_at" IS '删除时间';
+COMMENT ON COLUMN "sys_notice"."receiver" IS '接收者（私信）';
+COMMENT ON TABLE "sys_notice" IS '通知公告';
+
+-- ----------------------------
+-- Records of sys_notice
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_notice_read
+-- ----------------------------
+DROP TABLE IF EXISTS "sys_notice_read";
+CREATE TABLE "sys_notice_read" (
+  "id" int8 NOT NULL DEFAULT nextval('sys_notice_read_id_seq'::regclass),
+  "notice_id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "clicks" int4,
+  "updated_at" timestamp(6),
+  "created_at" timestamp(6)
+)
+;
+COMMENT ON COLUMN "sys_notice_read"."notice_id" IS '信息id';
+COMMENT ON COLUMN "sys_notice_read"."user_id" IS '用户id';
+COMMENT ON COLUMN "sys_notice_read"."clicks" IS '点击次数';
+COMMENT ON COLUMN "sys_notice_read"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "sys_notice_read"."created_at" IS '阅读时间';
+COMMENT ON TABLE "sys_notice_read" IS '已读记录';
+
+-- ----------------------------
+-- Records of sys_notice_read
 -- ----------------------------
 
 -- ----------------------------
@@ -4827,6 +4931,20 @@ COMMENT ON TABLE "sys_oper_log" IS '操作日志记录';
 -- ----------------------------
 -- Records of sys_oper_log
 -- ----------------------------
+INSERT INTO "sys_oper_log" VALUES (9091, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_user_sex&defaultValue=', '::1', '内网IP', '{"defaultValue":"","dictType":"sys_user_sex"}', NULL, '2023-12-25 10:30:02.479021');
+INSERT INTO "sys_oper_log" VALUES (9092, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:30:02.52122');
+INSERT INTO "sys_oper_log" VALUES (9093, '', 0, '/api/v1/system/dept/treeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dept/treeSelect', '::1', '内网IP', '{}', NULL, '2023-12-25 10:30:08.182382');
+INSERT INTO "sys_oper_log" VALUES (9094, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_user_sex&defaultValue=', '::1', '内网IP', '{"defaultValue":"","dictType":"sys_user_sex"}', NULL, '2023-12-25 10:30:08.224896');
+INSERT INTO "sys_oper_log" VALUES (9095, '', 0, '/api/v1/system/user/params', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/params', '::1', '内网IP', '{}', NULL, '2023-12-25 10:30:08.238603');
+INSERT INTO "sys_oper_log" VALUES (9096, '用户管理', 0, '/api/v1/system/user/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/list?pageNum=1&pageSize=10&roleId=2&deptId=&mobile=&status=&keyWords=', '::1', '内网IP', '{"deptId":"","keyWords":"","mobile":"","pageNum":"1","pageSize":"10","roleId":"2","status":""}', NULL, '2023-12-25 10:30:08.254042');
+INSERT INTO "sys_oper_log" VALUES (9097, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_user_sex&defaultValue=', '::1', '内网IP', '{"defaultValue":"","dictType":"sys_user_sex"}', NULL, '2023-12-25 10:30:11.98615');
+INSERT INTO "sys_oper_log" VALUES (9098, '', 0, '/api/v1/system/user/params', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/params', '::1', '内网IP', '{}', NULL, '2023-12-25 10:30:11.988784');
+INSERT INTO "sys_oper_log" VALUES (9099, '用户管理', 0, '/api/v1/system/user/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/list?pageNum=1&pageSize=10&roleId=1&deptId=&mobile=&status=&keyWords=', '::1', '内网IP', '{"deptId":"","keyWords":"","mobile":"","pageNum":"1","pageSize":"10","roleId":"1","status":""}', NULL, '2023-12-25 10:30:11.996789');
+INSERT INTO "sys_oper_log" VALUES (9100, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:30:55.773961');
+INSERT INTO "sys_oper_log" VALUES (9101, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:50.985398');
+INSERT INTO "sys_oper_log" VALUES (9102, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:52.03759');
+INSERT INTO "sys_oper_log" VALUES (9103, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:52.325655');
+INSERT INTO "sys_oper_log" VALUES (9104, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:52.541516');
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -5354,7 +5472,7 @@ SELECT setval('"demo_gen_tree_id_seq"', 11, false);
 -- ----------------------------
 ALTER SEQUENCE "sys_auth_rule_id_seq"
 OWNED BY "sys_auth_rule"."id";
-SELECT setval('"sys_auth_rule_id_seq"', 59, false);
+SELECT setval('"sys_auth_rule_id_seq"', 92, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5375,14 +5493,14 @@ SELECT setval('"sys_dept_dept_id_seq"', 204, false);
 -- ----------------------------
 ALTER SEQUENCE "sys_dict_data_dict_code_seq"
 OWNED BY "sys_dict_data"."dict_code";
-SELECT setval('"sys_dict_data_dict_code_seq"', 106, false);
+SELECT setval('"sys_dict_data_dict_code_seq"', 111, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "sys_dict_type_dict_id_seq"
 OWNED BY "sys_dict_type"."dict_id";
-SELECT setval('"sys_dict_type_dict_id_seq"', 51, true);
+SELECT setval('"sys_dict_type_dict_id_seq"', 52, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5396,7 +5514,7 @@ SELECT setval('"sys_job_job_id_seq"', 9, false);
 -- ----------------------------
 ALTER SEQUENCE "sys_job_log_id_seq"
 OWNED BY "sys_job_log"."id";
-SELECT setval('"sys_job_log_id_seq"', 2436, true);
+SELECT setval('"sys_job_log_id_seq"', 2438, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5408,9 +5526,19 @@ SELECT setval('"sys_login_log_info_id_seq"', 199, true);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
+SELECT setval('"sys_notice_id_seq"', 1, false);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"sys_notice_read_id_seq"', 1, false);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
 ALTER SEQUENCE "sys_oper_log_oper_id_seq"
 OWNED BY "sys_oper_log"."oper_id";
-SELECT setval('"sys_oper_log_oper_id_seq"', 9090, true);
+SELECT setval('"sys_oper_log_oper_id_seq"', 9104, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5576,6 +5704,21 @@ ALTER TABLE "sys_job_log" ADD CONSTRAINT "pk_sys_job_log" PRIMARY KEY ("id");
 -- Primary Key structure for table sys_login_log
 -- ----------------------------
 ALTER TABLE "sys_login_log" ADD CONSTRAINT "pk_sys_login_log" PRIMARY KEY ("info_id");
+
+-- ----------------------------
+-- Primary Key structure for table sys_notice
+-- ----------------------------
+ALTER TABLE "sys_notice" ADD CONSTRAINT "sys_notice_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Uniques structure for table sys_notice_read
+-- ----------------------------
+ALTER TABLE "sys_notice_read" ADD CONSTRAINT "sys_notice_read_notice_id_user_id_key" UNIQUE ("notice_id", "user_id");
+
+-- ----------------------------
+-- Primary Key structure for table sys_notice_read
+-- ----------------------------
+ALTER TABLE "sys_notice_read" ADD CONSTRAINT "sys_notice_read_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table sys_oper_log
