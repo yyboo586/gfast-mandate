@@ -13,6 +13,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -24,7 +25,6 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 	"github.com/tiger1103/gfast/v3/library/libWebsocket"
 	"github.com/tiger1103/gfast/v3/library/liberr"
-	"strconv"
 )
 
 func init() {
@@ -101,6 +101,7 @@ func (s *sSysNotice) ListShow(ctx context.Context, req *model.SysNoticeSearchReq
 	}
 	err = g.Try(ctx, func(ctx context.Context) {
 		m := dao.SysNotice.Ctx(ctx).WithAll().As("n")
+		m = m.LeftJoin("sys_notice_read as nr", fmt.Sprintf("nr.notice_id=n.id AND nr.user_id=%d", currentUserId))
 		if req.Id != "" {
 			m = m.Where("n."+dao.SysNotice.Columns().Id+" = ?", req.Id)
 		}
@@ -109,9 +110,12 @@ func (s *sSysNotice) ListShow(ctx context.Context, req *model.SysNoticeSearchReq
 		}
 		if req.Type != "" {
 			m = m.Where("n."+dao.SysNotice.Columns().Type+" = ?", gconv.Int64(req.Type))
-			if req.Type == "2" {
-				ids, _ := s.CurrentUseWithIds(ctx, currentUserId, 2)
-				m = m.WhereIn("n."+dao.SysNotice.Columns().Id, ids)
+			if gconv.Int(req.Type) == consts.SysLetterType {
+				if service.ToolsGenTable().IsMysql() {
+					m = m.Where(fmt.Sprintf("JSON_CONTAINS(n.receiver,'%d')", currentUserId))
+				} else {
+					m = m.Where(fmt.Sprintf("receiver::jsonb @> '%d'::jsonb", currentUserId))
+				}
 			}
 		}
 		if req.Tag != "" {
@@ -136,14 +140,9 @@ func (s *sSysNotice) ListShow(ctx context.Context, req *model.SysNoticeSearchReq
 		if req.OrderBy != "" {
 			order = req.OrderBy
 		}
-		m = m.LeftJoin("sys_notice_read as nr", "nr.notice_id=n.id")
-		/*Where("nr.user_id=?", currentUserId)*/
 		var res []*model.SysNoticeListRes
-
 		err = m.Page(req.PageNum, req.PageSize).Fields("" +
-			"n.*," +
-			"(nr.user_id=" + strconv.FormatUint(currentUserId, 10) + ") as isRead" + //查询是否已读
-			"").Order(order).Group("n.id").Scan(&res)
+			"n.*,nr.id IS NOT NULL as isRead").Order(order).Scan(&res)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
 		listRes.List = res
 	})
@@ -214,7 +213,7 @@ func (s *sSysNotice) Edit(ctx context.Context, req *model.SysNoticeEditReq) (err
 			Event: "notice",
 			Data:  data,
 		}
-		if data.Type == consts.SysLetterType {
+		if req.Type == consts.SysLetterType {
 			//系统私信
 			if len(req.Receiver) > 0 {
 				for _, id := range req.Receiver {
@@ -253,7 +252,7 @@ func (s *sSysNotice) Delete(ctx context.Context, ids []int64) (err error) {
 //未读消息列表
 func (s *sSysNotice) UnReadList(ctx context.Context) (res *model.SysNoticeListRes, err error) {
 	//TODO implement me
-	return
+	panic("implement me")
 }
 
 func (s *sSysNotice) UnReadCount(ctx context.Context, currentUserId uint64) (sysNoticeUnreadCount *model.SysNoticeUnreadCount, err error) {
@@ -283,8 +282,8 @@ func (s *sSysNotice) UnReadCount(ctx context.Context, currentUserId uint64) (sys
 		return
 	}
 	sysNoticeUnreadCount = new(model.SysNoticeUnreadCount)
-	sysNoticeUnreadCount.NotifyCount = countFunc(1) //获取未读通知数量
-	sysNoticeUnreadCount.NoticeCount = countFunc(2) //获取未读私信数量
+	sysNoticeUnreadCount.NotifyCount = countFunc(consts.SysNoticeType) //获取未读通知数量
+	sysNoticeUnreadCount.NoticeCount = countFunc(consts.SysLetterType) //获取未读私信数量
 	return
 }
 
@@ -320,34 +319,20 @@ func (s *sSysNotice) GetUserNameList(ctx context.Context, search string) (res []
 	return
 }
 
-/*func (s *sSysNotice) NoticeReadLengthAdd(ctx context.Context, id int64) (err error) {
-	_, err = g.DB().Exec(ctx, "update sys_notice set read_len=(read_len+1) where id = ?", id)
-	return
-}
-*/
-
 func (s *sSysNotice) NoticeReadAddUserId(ctx context.Context, req *model.SysNoticeReadAddUserReq) (err error) {
 
 	return
 }
 
 func (s *sSysNotice) CurrentUseWithIds(ctx context.Context, currentUserId uint64, noticeType int) (ids []int64, err error) {
-	/*	columns, err := s.Model(ctx, &handler.Option{FilterAuth: false}).
-			Fields("id").
-			Where("status", consts.StatusEnabled).
-			Where("(`type` IN(?) OR (`type` = ? and JSON_CONTAINS(`receiver`,'"+gconv.String(memberId)+"')))",
-				[]int{consts.NoticeTypeNotify, consts.NoticeTypeNotice}, consts.NoticeTypeLetter,
-			).Array()
-		if err != nil {
-			err = gerror.Wrap(err, "获取我的消息失败！")
-			return
-		}
-
-		ids = g.NewVar(columns).Int64s()*/
 	m := dao.SysNotice.Ctx(ctx)
 	m = m.Where("status =?", 1).
-		Where("type=?", noticeType).
-		Where("(`type` IN(?) OR (`type` = ? and JSON_CONTAINS(`receiver`,'"+gconv.String(currentUserId)+"')))", 1, 2)
+		Where("type=?", noticeType)
+	if service.ToolsGenTable().IsMysql() {
+		m = m.Where("(`type` = ? OR (`type` = ? and JSON_CONTAINS(`receiver`,'?')))", consts.SysNoticeType, consts.SysLetterType, currentUserId)
+	} else {
+		m = m.Where("(type = ? OR (type = ? and receiver::jsonb @> '"+gconv.String(currentUserId)+"'::jsonb))", consts.SysNoticeType, consts.SysLetterType)
+	}
 	all, err := m.Fields("id").All()
 	if err != nil {
 		return
