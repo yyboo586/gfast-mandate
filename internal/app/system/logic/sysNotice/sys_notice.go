@@ -267,7 +267,7 @@ func (s *sSysNotice) UnReadCount(ctx context.Context, currentUserId uint64) (sys
 		}
 		all, serr := dao.SysNotice.Ctx(ctx).
 			WhereIn(dao.SysNotice.Columns().Id, noticeIds).
-			Where(dao.SysNotice.Columns().Type, t).Count()
+			Count()
 		if serr != nil {
 			return 0
 		}
@@ -326,12 +326,14 @@ func (s *sSysNotice) NoticeReadAddUserId(ctx context.Context, req *model.SysNoti
 
 func (s *sSysNotice) CurrentUseWithIds(ctx context.Context, currentUserId uint64, noticeType int) (ids []int64, err error) {
 	m := dao.SysNotice.Ctx(ctx)
-	m = m.Where("status =?", 1).
-		Where("type=?", noticeType)
-	if service.ToolsGenTable().IsMysql() {
-		m = m.Where("(`type` = ? OR (`type` = ? and JSON_CONTAINS(`receiver`,'?')))", consts.SysNoticeType, consts.SysLetterType, currentUserId)
-	} else {
-		m = m.Where("(type = ? OR (type = ? and receiver::jsonb @> '"+gconv.String(currentUserId)+"'::jsonb))", consts.SysNoticeType, consts.SysLetterType)
+	m = m.Where(dao.SysNotice.Columns().Status, 1).
+		Where(dao.SysNotice.Columns().Type, noticeType)
+	if noticeType == consts.SysLetterType {
+		if service.ToolsGenTable().IsMysql() {
+			m = m.Where("JSON_CONTAINS(`receiver`,'" + fmt.Sprintf("%d", currentUserId) + "')")
+		} else {
+			m = m.Where("receiver::jsonb @> '" + gconv.String(currentUserId) + "'::jsonb")
+		}
 	}
 	all, err := m.Fields("id").All()
 	if err != nil {
