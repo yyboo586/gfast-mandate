@@ -49,7 +49,7 @@ import (
     {{if gt (len .table.LinkedTables) 0}}
     "errors"
     {{if ne $.table.ModuleName "system"}}
-    systemService "github.com/tiger1103/gfast/v3/internal/app/system/service"
+    systemService "{{.goModName}}/internal/app/system/service"
     {{else}}
     "{{.goModName}}/internal/app/system/service"
     {{end}}
@@ -70,7 +70,7 @@ import (
     systemApi "{{$.goModName}}/api/v1/system"
     {{end}}
     {{if $hasCommonService}}
-    commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
+    commonService "{{.goModName}}/internal/app/common/service"
     {{end}}
     "{{$.goModName}}/{{$.table.PackageName}}/model"
     {{end}}

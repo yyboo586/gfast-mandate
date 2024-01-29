@@ -122,3 +122,32 @@ type UserDeleteReq struct {
 
 type UserDeleteRes struct {
 }
+
+type UserSelectorReq struct {
+	g.Meta   `path:"/user/selector" tags:"用户管理" method:"get" summary:"获取用户选择器"`
+	DeptId   string `p:"deptId"` //部门id
+	RoleId   uint   `p:"roleId"`
+	Mobile   string `p:"mobile"`
+	Status   string `p:"status"`
+	KeyWords string `p:"keyWords"`
+	commonApi.PageReq
+	commonApi.Author
+}
+
+type UserSelectorRes struct {
+	g.Meta `mime:"application/json"`
+	commonApi.ListRes
+	UserList []*model.SysUserSimpleRes `json:"userList"`
+}
+
+type UserByIdsReq struct {
+	g.Meta `path:"/user/getUserByIds" tags:"用户管理" method:"get" summary:"根据ids获取用户"`
+	Ids    []int `p:"ids"  v:"required#ids不能为空"`
+	commonApi.PageReq
+	commonApi.Author
+}
+
+type UserByIdsRes struct {
+	g.Meta   `mime:"application/json"`
+	UserList []*model.SysUserSimpleRes `json:"userList"`
+}

@@ -49,7 +49,6 @@ type SysUserSimpleRes struct {
 	Id           uint64 `orm:"id"       json:"id"`                   //
 	Avatar       string `orm:"avatar" json:"avatar"`                 // 头像
 	Sex          int    `orm:"sex" json:"sex"`                       // 性别
-	UserName     string `orm:"user_name" json:"userName"`            // 用户名
 	UserNickname string `orm:"user_nickname"    json:"userNickname"` // 用户昵称
 }
 

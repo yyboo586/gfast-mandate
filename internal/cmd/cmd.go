@@ -30,14 +30,17 @@ var (
 				router.R.BindController(ctx, group)
 			})
 			//重新配置swaggerUI静态页面--start--,若要使用原版gf字段swaggerUI请删除或注释此段
-			s.BindHookHandler(g.Cfg().MustGet(ctx, "server.swaggerPath").String()+"/*", ghttp.HookBeforeServe, func(r *ghttp.Request) {
-				content := gstr.ReplaceByMap(consts.SwaggerUITemplate, map[string]string{
-					`{SwaggerUIDocUrl}`:             g.Cfg().MustGet(ctx, "server.openapiPath").String(),
-					`{SwaggerUIDocNamePlaceHolder}`: gstr.TrimRight(fmt.Sprintf(`//%s`, r.Host)),
+			swaggerPath := g.Cfg().MustGet(ctx, "server.swaggerPath").String()
+			if swaggerPath != "" {
+				s.BindHookHandler(swaggerPath+"/*", ghttp.HookBeforeServe, func(r *ghttp.Request) {
+					content := gstr.ReplaceByMap(consts.SwaggerUITemplate, map[string]string{
+						`{SwaggerUIDocUrl}`:             g.Cfg().MustGet(ctx, "server.openapiPath").String(),
+						`{SwaggerUIDocNamePlaceHolder}`: gstr.TrimRight(fmt.Sprintf(`//%s`, r.Host)),
+					})
+					r.Response.Write(content)
+					r.ExitAll()
 				})
-				r.Response.Write(content)
-				r.ExitAll()
-			})
+			}
 			//重新配置swaggerUI静态页面--end--
 			enhanceOpenAPIDoc(s)
 			//注册相关组件

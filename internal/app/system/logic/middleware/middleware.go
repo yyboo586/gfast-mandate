@@ -37,6 +37,7 @@ func (s *sMiddleware) Ctx(r *ghttp.Request) {
 	if err != nil {
 		// 执行下一步请求逻辑
 		r.Middleware.Next()
+		return
 	}
 	if data != nil {
 		context := new(model.Context)
@@ -45,6 +46,7 @@ func (s *sMiddleware) Ctx(r *ghttp.Request) {
 			g.Log().Error(ctx, err)
 			// 执行下一步请求逻辑
 			r.Middleware.Next()
+			return
 		}
 		service.Context().Init(r, context)
 	}

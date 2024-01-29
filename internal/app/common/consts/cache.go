@@ -10,6 +10,7 @@ package consts
 const (
 	CacheModelMem   = "memory"
 	CacheModelRedis = "redis"
+	CacheModelDist  = "dist"
 
 	// CacheSysDict 字典缓存菜单KEY
 	CacheSysDict = "sysDict"

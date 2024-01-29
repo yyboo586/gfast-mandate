@@ -29,4 +29,6 @@ type TokenOptions struct {
 	// 拦截排除地址
 	ExcludePaths g.SliceStr `json:"excludePaths"`
 	CacheModel   string     `json:"cacheModel"`
+	//磁盘缓存路径
+	DistPath string `json:"distPath"`
 }

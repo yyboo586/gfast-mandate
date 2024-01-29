@@ -406,6 +406,32 @@ func inSlice(field string, excludes []string) bool {
 	return false
 }
 
+// 根据用户ID 获取用户
+func (s *sSysUser) GetByIdsUser(ctx context.Context, req *system.UserByIdsReq) (total interface{}, userList []*entity.SysUser, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		m := dao.SysUser.Ctx(ctx)
+		if req.Ids != nil {
+			m = m.Where("id in (?)", req.Ids)
+		}
+		//dao.SysUserPost.Columns().UserId+" in (?)", ids
+		if req.PageSize == 0 {
+			req.PageSize = consts.PageSize
+		}
+		if req.PageNum == 0 {
+			req.PageNum = 1
+		}
+		total, err = m.Count()
+		liberr.ErrIsNil(ctx, err, "获取用户数据失败")
+
+		// 排除password字段
+		m = m.Fields(fieldsEx())
+
+		err = m.Page(req.PageNum, req.PageSize).Order("id asc").Scan(&userList)
+		liberr.ErrIsNil(ctx, err, "获取用户列表失败")
+	})
+	return
+}
+
 // List 用户列表
 func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total interface{}, userList []*entity.SysUser, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
@@ -433,6 +459,51 @@ func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total i
 			m = m.As("a").LeftJoin("casbin_rule", "b", "b.v0 = CONCAT('u_',a.id )")
 			m = m.Where("v1 = ? and SUBSTR(v0,1,2) = 'u_'", req.RoleId)
 		}
+		if req.PageSize == 0 {
+			req.PageSize = consts.PageSize
+		}
+		if req.PageNum == 0 {
+			req.PageNum = 1
+		}
+		total, err = m.Count()
+		liberr.ErrIsNil(ctx, err, "获取用户数据失败")
+
+		// 排除password字段
+		if req.RoleId > 0 {
+			m = m.Fields(fieldsEx())
+		} else {
+			m = m.FieldsEx(dao.SysUser.Columns().UserPassword, dao.SysUser.Columns().UserSalt)
+		}
+
+		err = m.Page(req.PageNum, req.PageSize).Order("id asc").Scan(&userList)
+		liberr.ErrIsNil(ctx, err, "获取用户列表失败")
+	})
+	return
+}
+
+// GetUserSelector 获取用户选择器数据
+func (s *sSysUser) GetUserSelector(ctx context.Context, req *system.UserSelectorReq) (total interface{}, userList []*model.SysUserSimpleRes, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		m := dao.SysUser.Ctx(ctx)
+		if req.KeyWords != "" {
+			keyWords := "%" + req.KeyWords + "%"
+			m = m.Where("user_name like ? or  user_nickname like ?", keyWords, keyWords)
+		}
+		if req.DeptId != "" {
+			deptIds, e := s.getSearchDeptIds(ctx, gconv.Uint64(req.DeptId))
+			liberr.ErrIsNil(ctx, e)
+			m = m.Where("dept_id in (?)", deptIds)
+		}
+		if req.Status != "" {
+			m = m.Where("user_status", gconv.Int(req.Status))
+		}
+		if req.Mobile != "" {
+			m = m.Where("mobile like ?", "%"+req.Mobile+"%")
+		}
+		if len(req.DateRange) > 0 {
+			m = m.Where("created_at >=? AND created_at <=?", req.DateRange[0], req.DateRange[1])
+		}
+
 		if req.PageSize == 0 {
 			req.PageSize = consts.PageSize
 		}

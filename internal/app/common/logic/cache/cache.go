@@ -10,6 +10,7 @@ package cache
 import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/tiger1103/gfast-cache/adapter"
 	"github.com/tiger1103/gfast-cache/cache"
 	"github.com/tiger1103/gfast/v3/internal/app/common/consts"
 	"github.com/tiger1103/gfast/v3/internal/app/common/service"
@@ -26,9 +27,14 @@ func New() service.ICache {
 	)
 	prefix := g.Cfg().MustGet(ctx, "system.cache.prefix").String()
 	model := g.Cfg().MustGet(ctx, "system.cache.model").String()
+	distPath := g.Cfg().MustGet(ctx, "system.cache.distPath").String()
 	if model == consts.CacheModelRedis {
 		// redis
 		cacheContainer = cache.NewRedis(prefix)
+	} else if model == consts.CacheModelDist {
+		// dist
+		adapter.SetConfig(&adapter.Config{Dir: distPath})
+		cacheContainer = cache.NewDist(prefix)
 	} else {
 		// memory
 		cacheContainer = cache.New(prefix)

@@ -25,10 +25,15 @@ func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGro
 			//登录
 			controller.Login,
 		)
-		//登录验证拦截
-		service.GfToken().Middleware(group)
 		//context拦截器
 		group.Middleware(service.Middleware().Ctx)
+		//自动绑定定义的控制器
+		if err := libRouter.RouterAutoBindBefore(ctx, router, group); err != nil {
+			panic(err)
+		}
+		//登录验证拦截
+		service.GfToken().Middleware(group)
+
 		//自动绑定定义的控制器
 		if err := libRouter.RouterAutoBind(ctx, router, group); err != nil {
 			panic(err)

@@ -37,6 +37,7 @@ type (
 		GetMenusTree(menus []*model.UserMenus, pid uint) []*model.UserMenus
 		GetPermissions(ctx context.Context, roleIds []uint) (userButtons []string, err error)
 		List(ctx context.Context, req *system.UserSearchReq) (total interface{}, userList []*entity.SysUser, err error)
+		GetByIdsUser(ctx context.Context, req *system.UserByIdsReq) (total interface{}, userList []*entity.SysUser, err error)
 		GetUsersRoleDept(ctx context.Context, userList []*entity.SysUser) (users []*model.SysUserRoleDeptRes, err error)
 		Add(ctx context.Context, req *system.UserAddReq) (err error)
 		Edit(ctx context.Context, req *system.UserEditReq) (err error)
@@ -53,6 +54,7 @@ type (
 		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}) (where g.Map, err error)
 		HasAccessByDataWhere(ctx context.Context, where g.Map, uid interface{}) bool
 		AccessRule(ctx context.Context, userId uint64, rule string) bool
+		GetUserSelector(ctx context.Context, req *system.UserSelectorReq) (total interface{}, userList []*model.SysUserSimpleRes, err error)
 	}
 )
 

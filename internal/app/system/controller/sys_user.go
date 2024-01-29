@@ -115,3 +115,17 @@ func (c *userController) Delete(ctx context.Context, req *system.UserDeleteReq) 
 	err = service.SysUser().Delete(ctx, req.Ids)
 	return
 }
+
+// GetUserSelector 获取用户选择器数据
+func (c *userController) GetUserSelector(ctx context.Context, req *system.UserSelectorReq) (res *system.UserSelectorRes, err error) {
+	res = new(system.UserSelectorRes)
+	res.Total, res.UserList, err = service.SysUser().GetUserSelector(ctx, req)
+	return
+}
+
+// GetByIds 根据id 获取用户信息
+func (c *userController) GetByIds(ctx context.Context, req *system.UserByIdsReq) (res *system.UserByIdsRes, err error) {
+	res = new(system.UserByIdsRes)
+	res.UserList, err = service.SysUser().GetUsers(ctx, req.Ids)
+	return
+}

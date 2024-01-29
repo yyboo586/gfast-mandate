@@ -21,6 +21,8 @@ manifest/output/
 tmp/
 resource/data/gen_sql
 resource/data/storage
+resource/data/distCacheDb
+resource/data/distTokenDb
 resource/log/
 resource/public/big_file
 resource/public/upload_file

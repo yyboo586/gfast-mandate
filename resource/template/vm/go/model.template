@@ -43,9 +43,9 @@ import (
     "github.com/gogf/gf/v2/os/gtime"
     {{end}}
     "github.com/gogf/gf/v2/util/gmeta"
-    comModel "github.com/tiger1103/gfast/v3/internal/app/common/model"
+    comModel "{{.goModName}}/internal/app/common/model"
     {{if $hasUser}}
-    systemModel "github.com/tiger1103/gfast/v3/internal/app/system/model"
+    systemModel "{{.goModName}}/internal/app/system/model"
     {{end}}
 )
 

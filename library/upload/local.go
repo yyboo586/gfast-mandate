@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/common/consts"
 	"strings"
@@ -21,7 +22,19 @@ func (s *Local) Upload(ctx context.Context, file *ghttp.UploadFile) (result syst
 		return
 	}
 	r := g.RequestFromCtx(ctx)
-	urlPerfix := fmt.Sprintf("//%s/", r.Host)
+	host := r.Host
+	forwardedHost := r.Header.Get("X-Forwarded-Host")
+	if forwardedHost != "" {
+		host = forwardedHost
+	}
+	uri := r.Header.Get("X-Original-URI")
+	if uri != "" {
+		pos := gstr.PosI(uri, "/api/v1")
+		if pos >= 0 {
+			uri = gstr.SubStr(uri, 1, pos)
+		}
+	}
+	urlPerfix := fmt.Sprintf("//%s/%s", host, uri)
 	p := strings.Trim(consts.UploadPath, "/")
 	sp := s.getStaticPath(ctx)
 	if sp != "" {
