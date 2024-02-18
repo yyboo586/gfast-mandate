@@ -6,6 +6,7 @@ require (
 	github.com/ArtisanCloud/PowerWeChat/v3 v3.1.8
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.8+incompatible
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
+	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/casbin/casbin/v2 v2.42.0
 	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.6.2
 	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.6.2
