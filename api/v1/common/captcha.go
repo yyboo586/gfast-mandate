@@ -26,9 +26,10 @@ type CheckCaptchaV2Req struct {
 }
 
 type CaptchaRes struct {
-	g.Meta `mime:"application/json"`
-	Key    string `json:"key"`
-	Img    string `json:"img"`
+	g.Meta       `mime:"application/json"`
+	Key          string `json:"key"`
+	Img          string `json:"img"`
+	VerifyStatus int    `json:"verifyStatus"`
 }
 
 type CaptchaV2Res struct {

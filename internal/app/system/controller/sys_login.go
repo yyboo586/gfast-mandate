@@ -13,8 +13,8 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
-	"github.com/gogf/gf/v2/util/gmode"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model"
@@ -38,20 +38,29 @@ func (c *loginController) Login(ctx context.Context, req *system.UserLoginReq) (
 		menuList    []*model.UserMenus
 	)
 	//判断验证码是否正确
-	debug := gmode.IsDevelop()
-	if !debug {
+	verifyStatus := g.Cfg().MustGet(ctx, "system.verifyStatus").Int()
+	if verifyStatus == 1 {
 		// 验证码v1版
-		//if !commonService.Captcha().VerifyString(req.VerifyKey, req.VerifyCode) {
-		//	err = gerror.New("验证码输入错误")
-		//	return
-		//}
-
+		if gstr.Trim(req.VerifyCode) == "" {
+			err = gerror.New("验证码输入错误")
+			return
+		}
+		if !commonService.Captcha().VerifyString(req.VerifyKey, req.VerifyCode) {
+			err = gerror.New("验证码输入错误")
+			return
+		}
+	} else if verifyStatus == 2 {
 		// 验证码v2版
+		if gstr.Trim(req.VerifyCode) == "" {
+			err = gerror.New("人机交互验证失败")
+			return
+		}
 		err = commonService.Captcha().CheckCaptchaV2(ctx, req.VerifyKey, req.VerifyCode, true)
 		if err != nil {
 			return
 		}
 	}
+
 	ip := libUtils.GetClientIp(ctx)
 	userAgent := libUtils.GetUserAgent(ctx)
 	user, err = service.SysUser().GetAdminUserByUsernamePassword(ctx, req)

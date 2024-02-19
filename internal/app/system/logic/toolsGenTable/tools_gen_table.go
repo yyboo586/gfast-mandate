@@ -1087,35 +1087,35 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 			for key, code := range genData {
 				switch key {
 				case "api":
-					path := strings.Join([]string{curDir, "/", apiName, "/", modulePath, "/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", apiName, "/", modulePath, "/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "controller":
-					path := strings.Join([]string{curDir, "/", packageName, "/controller/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/controller/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "dao":
-					path := strings.Join([]string{curDir, "/", packageName, "/dao/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/dao/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "dao_internal":
-					path := strings.Join([]string{curDir, "/", packageName, "/dao/internal/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/dao/internal/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "logic":
-					path := strings.Join([]string{curDir, "/", packageName, "/logic/", businessName, "/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/logic/", businessName, "/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "model":
-					path := strings.Join([]string{curDir, "/", packageName, "/model/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/model/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "model_do":
-					path := strings.Join([]string{curDir, "/", packageName, "/model/do/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/model/do/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "model_entity":
-					path := strings.Join([]string{curDir, "/", packageName, "/model/entity/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/model/entity/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "router":
@@ -1125,15 +1125,15 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 						liberr.ErrIsNil(ctx, err)
 					}
 				case "router_func":
-					path := strings.Join([]string{curDir, "/", packageName, "/router/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/router/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "service":
-					path := strings.Join([]string{curDir, "/", packageName, "/service/", extendData.TableName, ".go"}, "")
+					path := strings.Join([]string{curDir, "/", packageName, "/service/", extendData.BusinessName, ".go"}, "")
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)
 				case "sql":
-					path := strings.Join([]string{curDir, "/resource/data/gen_sql/", modulePath, "/", extendData.TableName, ".sql"}, "")
+					path := strings.Join([]string{curDir, "/resource/data/gen_sql/", modulePath, "/", extendData.BusinessName, ".sql"}, "")
 					hasSql := gfile.Exists(path)
 					err = s.createFile(path, code, extendData.Overwrite)
 					liberr.ErrIsNil(ctx, err)

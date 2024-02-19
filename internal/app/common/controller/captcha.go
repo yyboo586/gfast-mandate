@@ -10,6 +10,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/tiger1103/gfast/v3/api/v1/common"
 	"github.com/tiger1103/gfast/v3/internal/app/common/service"
 	"time"
@@ -24,8 +25,9 @@ type captchaController struct {
 func (c *captchaController) Get(ctx context.Context, req *common.CaptchaReq) (res *common.CaptchaRes, err error) {
 	idKeyC, base64stringC, err := service.Captcha().GetVerifyImgString(ctx)
 	res = &common.CaptchaRes{
-		Key: idKeyC,
-		Img: base64stringC,
+		Key:          idKeyC,
+		Img:          base64stringC,
+		VerifyStatus: g.Cfg().MustGet(ctx, "system.verifyStatus").Int(),
 	}
 	return
 }
