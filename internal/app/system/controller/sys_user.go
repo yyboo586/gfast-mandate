@@ -21,12 +21,14 @@ func (c *userController) GetUserMenus(ctx context.Context, req *system.UserMenus
 	var (
 		permissions []string
 		menuList    []*model.UserMenus
+		loginUser   = service.Context().GetLoginUser(ctx)
 	)
-	userId := service.Context().GetUserId(ctx)
+	userId := loginUser.Id
 	menuList, permissions, err = service.SysUser().GetAdminRules(ctx, userId)
 	res = &system.UserMenusRes{
 		MenuList:    menuList,
 		Permissions: permissions,
+		UserInfo:    loginUser.LoginUserRes,
 	}
 	return
 }

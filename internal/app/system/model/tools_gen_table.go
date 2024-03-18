@@ -32,11 +32,12 @@ type ToolsGenTableEx struct {
 	UpdateTime     *gtime.Time              // 更新时间
 	Remark         string                   // 备注
 	Overwrite      bool                     // 是否覆盖原有文件
+	OverwriteInfo  []*entity.OverwriteInfo  //覆盖文件信息
 	SortColumn     string                   // 缺省排序字段
 	SortType       string                   // 缺省排序方式 (asc顺序 desc倒序)
 	ShowDetail     bool                     // 是否有查看详情功能
 	ExcelPort      bool                     // 是否有导出excel功能
-	ExcelImp      bool                      // 是否有导入excel功能
+	ExcelImp       bool                     // 是否有导入excel功能
 	UseSnowId      bool                     // 主键是否使用雪花ID
 	UseVirtual     bool                     // 树表是否使用虚拟表
 	TreeCode       string                   // 树编码字段

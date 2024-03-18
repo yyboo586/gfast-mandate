@@ -15,7 +15,7 @@ import (
 )
 
 type PersonalInfoReq struct {
-	g.Meta `path:"/personal/getPersonalInfo" tags:"用户管理" method:"get" summary:"登录用户信息"`
+	g.Meta `path:"/personal/getPersonalInfo" tags:"系统后台/用户管理" method:"get" summary:"登录用户信息"`
 	commonApi.Author
 }
 
@@ -40,7 +40,7 @@ type SetPersonalReq struct {
 
 // PersonalEditReq 修改个人
 type PersonalEditReq struct {
-	g.Meta `path:"/personal/edit" tags:"用户管理" method:"put" summary:"修改个人资料"`
+	g.Meta `path:"/personal/edit" tags:"系统后台/用户管理" method:"put" summary:"修改个人资料"`
 	*SetPersonalReq
 	commonApi.Author
 }
@@ -52,7 +52,7 @@ type PersonalEditRes struct {
 }
 
 type PersonalResetPwdReq struct {
-	g.Meta   `path:"/personal/resetPwd" tags:"用户管理" method:"put" summary:"重置个人密码"`
+	g.Meta   `path:"/personal/resetPwd" tags:"系统后台/用户管理" method:"put" summary:"重置个人密码"`
 	Password string `p:"password" v:"required|password#密码不能为空|密码以字母开头，只能包含字母、数字和下划线，长度在6~18之间"`
 	commonApi.Author
 }

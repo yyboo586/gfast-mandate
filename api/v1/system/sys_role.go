@@ -16,7 +16,7 @@ import (
 )
 
 type RoleListReq struct {
-	g.Meta   `path:"/role/list" tags:"角色管理" method:"get" summary:"角色列表"`
+	g.Meta   `path:"/role/list" tags:"系统后台/角色管理" method:"get" summary:"角色列表"`
 	RoleName string `p:"roleName"`   //参数名称
 	Status   string `p:"roleStatus"` //状态
 	commonApi.PageReq
@@ -29,7 +29,7 @@ type RoleListRes struct {
 }
 
 type RoleGetParamsReq struct {
-	g.Meta `path:"/role/getParams" tags:"角色管理" method:"get" summary:"角色编辑参数"`
+	g.Meta `path:"/role/getParams" tags:"系统后台/角色管理" method:"get" summary:"角色编辑参数"`
 }
 
 type RoleGetParamsRes struct {
@@ -39,7 +39,7 @@ type RoleGetParamsRes struct {
 }
 
 type RoleAddReq struct {
-	g.Meta    `path:"/role/add" tags:"角色管理" method:"post" summary:"添加角色"`
+	g.Meta    `path:"/role/add" tags:"系统后台/角色管理" method:"post" summary:"添加角色"`
 	Pid       uint   `p:"pid"`
 	Name      string `p:"name" v:"required#角色名称不能为空"`
 	Status    uint   `p:"status"    `
@@ -47,25 +47,26 @@ type RoleAddReq struct {
 	Remark    string `p:"remark"    `
 	MenuIds   []uint `p:"menuIds"`
 	CreatedBy uint64
+	model.EffectiveTimeInfo
 }
 
 type RoleAddRes struct {
 }
 
 type RoleGetReq struct {
-	g.Meta `path:"/role/get" tags:"角色管理" method:"get" summary:"获取角色信息"`
+	g.Meta `path:"/role/get" tags:"系统后台/角色管理" method:"get" summary:"获取角色信息"`
 	commonApi.Author
 	Id uint `p:"id" v:"required#角色id不能为空""`
 }
 
 type RoleGetRes struct {
 	g.Meta  `mime:"application/json"`
-	Role    *entity.SysRole `json:"role"`
-	MenuIds []int           `json:"menuIds"`
+	Role    *model.RoleInfoRes `json:"role"`
+	MenuIds []int              `json:"menuIds"`
 }
 
 type RoleEditReq struct {
-	g.Meta `path:"/role/edit" tags:"角色管理" method:"put" summary:"修改角色"`
+	g.Meta `path:"/role/edit" tags:"系统后台/角色管理" method:"put" summary:"修改角色"`
 	commonApi.Author
 	Id        int64  `p:"id" v:"required#角色id必须"`
 	Pid       uint   `p:"pid"`
@@ -74,21 +75,23 @@ type RoleEditReq struct {
 	ListOrder uint   `p:"listOrder" `
 	Remark    string `p:"remark"    `
 	MenuIds   []uint `p:"menuIds"`
+	model.EffectiveTimeInfo
 }
 
 type RoleEditRes struct {
 }
 
 type RoleDeleteReq struct {
-	g.Meta `path:"/role/delete" tags:"角色管理" method:"delete" summary:"删除角色"`
+	g.Meta `path:"/role/delete" tags:"系统后台/角色管理" method:"delete" summary:"删除角色"`
 	Ids    []int64 `p:"ids" v:"required#角色id不能为空"`
 }
 
 type RoleDeleteRes struct {
+	g.Meta `mime:"application/json"`
 }
 
 type RoleDeptTreeSelectReq struct {
-	g.Meta `path:"/role/deptTreeSelect" tags:"角色管理" method:"get" summary:"获取角色数据权限"`
+	g.Meta `path:"/role/deptTreeSelect" tags:"系统后台/角色管理" method:"get" summary:"获取部门树"`
 	commonApi.Author
 	RoleId int64 `p:"roleId" v:"required#角色id必须"`
 }
@@ -99,9 +102,20 @@ type RoleDeptTreeSelectRes struct {
 	CheckedKeys []int64                 `json:"checkedKeys"`
 }
 
+type RoleMenuTreeSelectReq struct {
+	g.Meta `path:"/role/menuTreeSelect" tags:"系统后台/角色管理" method:"get" summary:"获取菜单树"`
+	commonApi.Author
+	RoleId int64 `p:"roleId" v:"required#角色id必须"`
+}
+
+type RoleMenuTreeSelectRes struct {
+	g.Meta `mime:"application/json"`
+	Rules  []*model.SysAuthRuleTreeRes `json:"rules"`
+}
+
 // DataScopeReq 角色数据授权参数
 type DataScopeReq struct {
-	g.Meta    `path:"/role/dataScope" tags:"角色管理" method:"put" summary:"角色数据授权"`
+	g.Meta    `path:"/role/dataScope" tags:"系统后台/角色管理" method:"put" summary:"角色数据授权"`
 	RoleId    uint   `p:"roleId" v:"required#角色ID不能为空"`
 	DataScope uint   `p:"dataScope" v:"required#权限范围不能为空"`
 	DeptIds   []uint `p:"deptIds"`

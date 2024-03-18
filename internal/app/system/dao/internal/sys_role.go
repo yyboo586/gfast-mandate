@@ -29,6 +29,7 @@ type SysRoleColumns struct {
 	CreatedAt string // 创建时间
 	UpdatedAt string // 更新时间
 	CreatedBy string // 创建人
+	EffectiveTime string //角色有效日期
 }
 
 // sysRoleColumns holds the columns for table sys_role.
@@ -43,6 +44,7 @@ var sysRoleColumns = SysRoleColumns{
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 	CreatedBy: "created_by",
+	EffectiveTime:"effective_time",
 }
 
 // NewSysRoleDao creates and returns a new DAO object for table data access.

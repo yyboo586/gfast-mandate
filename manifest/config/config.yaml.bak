@@ -72,6 +72,7 @@ system:
     model: "dist"  #缓存模式 memory OR redis OR dist
     distPath: "./resource/data/distCacheDb" #使用磁盘缓存时配置数据缓存的目录
     prefix: "gFastV3Cache:" #缓存前缀
+  verifyStatus: 1 #0关闭验证码 1图形验证码 2交互验证码
 
 #casbin配置
 casbin:

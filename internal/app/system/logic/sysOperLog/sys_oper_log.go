@@ -15,6 +15,7 @@ import (
 	"github.com/gogf/gf/v2/os/grpool"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/text/gstr"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
 	"github.com/tiger1103/gfast/v3/internal/app/system/dao"
@@ -105,7 +106,7 @@ func (s *sOperateLog) operationLogAdd(ctx context.Context, data *model.SysOperLo
 		OperIp:        data.ClientIp,
 		OperLocation:  libUtils.GetCityByIp(data.ClientIp),
 		OperTime:      gtime.Now(),
-		OperParam:     data.Params,
+		OperParam:     gstr.SubStrRune(gconv.String(data.Params), 0, 60000),
 	}
 	rawQuery := data.Url.RawQuery
 	if rawQuery != "" {

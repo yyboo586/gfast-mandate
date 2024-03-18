@@ -19,7 +19,7 @@ import (
 
 // SysJobSearchReq 分页请求参数
 type SysJobSearchReq struct {
-	g.Meta   `path:"/list" tags:"定时任务" method:"get" summary:"定时任务列表"`
+	g.Meta   `path:"/list" tags:"系统后台/定时任务" method:"get" summary:"定时任务列表"`
 	JobName  string `p:"jobName"`                          //任务名称
 	JobGroup string `p:"jobGroup"`                         //任务组名
 	Status   string `p:"status" v:"status@integer#状态需为整数"` //状态
@@ -36,7 +36,7 @@ type SysJobSearchRes struct {
 
 // SysJobAddReq 添加操作请求参数
 type SysJobAddReq struct {
-	g.Meta `path:"/add" tags:"定时任务" method:"post" summary:"定时任务添加"`
+	g.Meta `path:"/add" tags:"系统后台/定时任务" method:"post" summary:"定时任务添加"`
 	commonApi.Author
 	JobName        string `p:"jobName" v:"required#任务名称不能为空"`
 	JobParams      string `p:"jobParams" `
@@ -56,7 +56,7 @@ type SysJobAddRes struct {
 
 // SysJobEditReq 修改操作请求参数
 type SysJobEditReq struct {
-	g.Meta `path:"/edit" tags:"定时任务" method:"put" summary:"定时任务修改"`
+	g.Meta `path:"/edit" tags:"系统后台/定时任务" method:"put" summary:"定时任务修改"`
 	commonApi.Author
 	JobId          uint64 `p:"jobId" v:"required#主键ID不能为空"`
 	JobName        string `p:"jobName" v:"required#任务名称不能为空"`
@@ -77,7 +77,7 @@ type SysJobEditRes struct {
 
 // SysJobGetReq 获取一条数据请求
 type SysJobGetReq struct {
-	g.Meta `path:"/get" tags:"定时任务" method:"get" summary:"获取定时任务信息"`
+	g.Meta `path:"/get" tags:"系统后台/定时任务" method:"get" summary:"获取定时任务信息"`
 	commonApi.Author
 	JobId uint64 `p:"jobId" v:"required#主键必须"` //通过主键获取
 }
@@ -90,7 +90,7 @@ type SysJobGetRes struct {
 
 // SysJobDeleteReq 删除数据请求
 type SysJobDeleteReq struct {
-	g.Meta `path:"/delete" tags:"定时任务" method:"delete" summary:"删除定时任务"`
+	g.Meta `path:"/delete" tags:"系统后台/定时任务" method:"delete" summary:"删除定时任务"`
 	commonApi.Author
 	JobIds []uint64 `p:"jobIds" v:"required#主键必须"` //通过主键删除
 }
@@ -101,7 +101,7 @@ type SysJobDeleteRes struct {
 }
 
 type SysJobStartReq struct {
-	g.Meta `path:"/start" tags:"定时任务" method:"put" summary:"启动任务"`
+	g.Meta `path:"/start" tags:"系统后台/定时任务" method:"put" summary:"启动任务"`
 	commonApi.Author
 	JobId uint64 `p:"jobId" v:"required#jobId必须"`
 }
@@ -111,7 +111,7 @@ type SysJobStartRes struct {
 }
 
 type SysJobStopReq struct {
-	g.Meta `path:"/stop" tags:"定时任务" method:"put" summary:"停止任务"`
+	g.Meta `path:"/stop" tags:"系统后台/定时任务" method:"put" summary:"停止任务"`
 	commonApi.Author
 	JobId uint64 `p:"jobId" v:"required#jobId必须"`
 }
@@ -121,7 +121,7 @@ type SysJobStopRes struct {
 }
 
 type SysJobRunReq struct {
-	g.Meta `path:"/run" tags:"定时任务" method:"put" summary:"运行任务"`
+	g.Meta `path:"/run" tags:"系统后台/定时任务" method:"put" summary:"运行任务"`
 	commonApi.Author
 	JobId uint64 `p:"jobId" v:"required#jobId必须"`
 }
@@ -131,7 +131,7 @@ type SysJobRunRes struct {
 }
 
 type SysJobLogListReq struct {
-	g.Meta `path:"/logs" tags:"定时任务" method:"get" summary:"执行日志"`
+	g.Meta `path:"/logs" tags:"系统后台/定时任务" method:"get" summary:"执行日志"`
 	commonApi.Author
 	commonApi.PageReq
 	TargetName string `p:"targetName" v:"required#targetName必须"`
@@ -144,7 +144,7 @@ type SysJobLogListRes struct {
 }
 
 type SysJobLogDeleteReq struct {
-	g.Meta `path:"/deleteLogs" tags:"定时任务" method:"delete" summary:"删除执行日志"`
+	g.Meta `path:"/deleteLogs" tags:"系统后台/定时任务" method:"delete" summary:"删除执行日志"`
 	commonApi.Author
 	LogIds []uint64 `p:"logIds" v:"required#主键必须"`
 }

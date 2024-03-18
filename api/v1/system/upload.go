@@ -7,13 +7,13 @@ import (
 
 // 单图上传
 type UploadSingleImgReq struct {
-	g.Meta `path:"/upload/singleImg" tags:"后台文件上传" method:"post" summary:"上传图片"`
+	g.Meta `path:"/upload/singleImg" tags:"系统后台/后台文件上传" method:"post" summary:"上传图片"`
 	File   *ghttp.UploadFile `p:"file" type:"file" dc:"选择上传文件" v:"required#上传文件必须"`
 }
 
 // 单文件上传
 type UploadSingleFileReq struct {
-	g.Meta `path:"/upload/singleFile" tags:"后台文件上传" method:"post" summary:"上传文件"`
+	g.Meta `path:"/upload/singleFile" tags:"系统后台/后台文件上传" method:"post" summary:"上传文件"`
 	File   *ghttp.UploadFile `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
 }
 
@@ -24,13 +24,13 @@ type UploadSingleRes struct {
 
 // 多图上传
 type UploadMultipleImgReq struct {
-	g.Meta `path:"/upload/multipleImg" tags:"后台文件上传" method:"post" summary:"上传多图片"`
+	g.Meta `path:"/upload/multipleImg" tags:"系统后台/后台文件上传" method:"post" summary:"上传多图片"`
 	File   ghttp.UploadFiles `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
 }
 
 // 多文件上传
 type UploadMultipleFileReq struct {
-	g.Meta `path:"/upload/multipleFile" tags:"后台文件上传" method:"post" summary:"上传多文件"`
+	g.Meta `path:"/upload/multipleFile" tags:"系统后台/后台文件上传" method:"post" summary:"上传多文件"`
 	File   ghttp.UploadFiles `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
 }
 

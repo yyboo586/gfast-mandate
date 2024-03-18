@@ -429,6 +429,9 @@ export default defineComponent({
           {{$isNumber = true}}
           {{end}}
           {{end}}
+          {{if and (not $isNumber) (eq $column.TsType "number")}}
+          {{$isNumber = true}}
+          {{end}}
           {{if $isNumber}}
           data.{{$column.HtmlField}} = parseInt(data.{{$column.HtmlField}})
           {{else}}

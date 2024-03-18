@@ -18,6 +18,7 @@ import (
 	commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
 	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
 	"github.com/tiger1103/gfast/v3/internal/app/system/dao"
+	"github.com/tiger1103/gfast/v3/internal/app/system/model"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/do"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
@@ -76,7 +77,7 @@ func (s *sSysRole) GetRoleList(ctx context.Context) (list []*entity.SysRole, err
 	cache := commonService.Cache()
 	//从缓存获取
 	iList := cache.GetOrSetFuncLock(ctx, consts.CacheSysRole, s.getRoleListFromDb, 0, consts.CacheSysAuthTag)
-	if iList != nil {
+	if !iList.IsEmpty() {
 		err = gconv.Struct(iList, &list)
 	}
 	return
@@ -129,7 +130,15 @@ func (s *sSysRole) AddRole(ctx context.Context, req *system.RoleAddReq) (err err
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
 			req.CreatedBy = service.Context().GetUserId(ctx)
-			roleId, e := dao.SysRole.Ctx(ctx).TX(tx).InsertAndGetId(req)
+			roleId, e := dao.SysRole.Ctx(ctx).TX(tx).InsertAndGetId(do.SysRole{
+				Pid:           req.Pid,
+				Status:        req.Status,
+				ListOrder:     req.ListOrder,
+				Name:          req.Name,
+				Remark:        req.Remark,
+				CreatedBy:     req.CreatedBy,
+				EffectiveTime: req.EffectiveTimeInfo,
+			})
 			liberr.ErrIsNil(ctx, e, "添加角色失败")
 			//过滤ruleIds 把没有权限的过滤掉
 			req.MenuIds, err = s.filterAccessRuleIds(ctx, req.MenuIds)
@@ -145,14 +154,19 @@ func (s *sSysRole) AddRole(ctx context.Context, req *system.RoleAddReq) (err err
 	return
 }
 
-func (s *sSysRole) Get(ctx context.Context, id uint) (res *entity.SysRole, err error) {
+func (s *sSysRole) Get(ctx context.Context, id uint) (res *model.RoleInfoRes, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		//判断是否具有此角色的权限
 		if !s.hasManageAccess(ctx, id, true) {
 			liberr.ErrIsNil(ctx, errors.New("没有查看这个角色的权限"))
 		}
-		err = dao.SysRole.Ctx(ctx).WherePri(id).Scan(&res)
+		res = new(model.RoleInfoRes)
+		err = dao.SysRole.Ctx(ctx).WherePri(id).Scan(&res.SysRole)
 		liberr.ErrIsNil(ctx, err, "获取角色信息失败")
+		err = gconv.Struct(res.SysRole.EffectiveTime, &res.EffectiveTimeInfo)
+		if err != nil {
+			res.EffectiveTimeInfo = new(model.EffectiveTimeInfo)
+		}
 	})
 	return
 }
@@ -218,11 +232,12 @@ func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err e
 				liberr.ErrIsNil(ctx, errors.New("没有修改这个角色的权限"))
 			}
 			_, e := dao.SysRole.Ctx(ctx).TX(tx).WherePri(req.Id).Data(&do.SysRole{
-				Pid:       req.Pid,
-				Status:    req.Status,
-				ListOrder: req.ListOrder,
-				Name:      req.Name,
-				Remark:    req.Remark,
+				Pid:           req.Pid,
+				Status:        req.Status,
+				ListOrder:     req.ListOrder,
+				Name:          req.Name,
+				Remark:        req.Remark,
+				EffectiveTime: req.EffectiveTimeInfo,
 			}).Update()
 			liberr.ErrIsNil(ctx, e, "修改角色失败")
 			//过滤ruleIds 把没有权限的过滤掉

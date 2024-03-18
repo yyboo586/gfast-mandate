@@ -34,4 +34,5 @@ type ToolsGenTable struct {
 	ExcelImp      interface{} // 是否有导入excel功能
 	UseSnowId      interface{} //主键是否使用雪花ID
 	UseVirtual     interface{} //树表是否使用虚拟表
+	OverwriteInfo interface{} //覆盖文件信息
 }

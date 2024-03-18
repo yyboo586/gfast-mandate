@@ -10,7 +10,7 @@
 
 {{$structName := .table.BusinessName | CaseCamelLower}}
 
-package logic
+package {{$structName}}
 ////
 {{$gjson:=false}}
 {{$libUtils:=false}}

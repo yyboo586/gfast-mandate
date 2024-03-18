@@ -13,7 +13,7 @@ import (
 )
 
 type CacheRemoveReq struct {
-	g.Meta   `path:"/cache/remove" tags:"缓存管理" method:"delete" summary:"清除缓存"`
+	g.Meta `path:"/cache/remove" tags:"系统后台/缓存管理" method:"delete" summary:"清除缓存"`
 	commonApi.Author
 }
 

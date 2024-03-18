@@ -6,3 +6,20 @@
  */
 
 package model
+
+import (
+	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
+)
+
+type EffectiveTimeInfo struct {
+	EffectiveType int           `json:"effectiveType"`
+	WeekDay       []int         `json:"weekDay"`
+	DayRange      []*gtime.Time `json:"dayRange"`
+	DateRange     []*gtime.Time `json:"dateRange"`
+}
+
+type RoleInfoRes struct {
+	*entity.SysRole
+	*EffectiveTimeInfo
+}

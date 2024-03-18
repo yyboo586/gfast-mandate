@@ -21,4 +21,5 @@ type SysRole struct {
 	UpdatedAt *gtime.Time `json:"updatedAt" description:"更新时间"`
 	UserCnt   uint        `json:"userCnt" description:"用户数量"`
 	CreatedBy uint64      `json:"createdBy" orm:"created_by" description:"创建人"`
+	EffectiveTime string `json:"effectiveTime" orm:"effective_time" description:"角色有效日期"`
 }

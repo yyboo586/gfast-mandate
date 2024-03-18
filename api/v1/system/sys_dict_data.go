@@ -16,7 +16,7 @@ import (
 
 // GetDictReq 获取字典信息请求参数
 type GetDictReq struct {
-	g.Meta `path:"/dict/data/getDictData" tags:"字典管理" method:"get" summary:"获取字典数据公共方法"`
+	g.Meta `path:"/dict/data/getDictData" tags:"系统后台/字典管理" method:"get" summary:"获取字典数据公共方法"`
 	commonApi.Author
 	DictType     string `p:"dictType" v:"required#字典类型不能为空"`
 	DefaultValue string `p:"defaultValue"`
@@ -31,7 +31,7 @@ type GetDictRes struct {
 
 // DictDataSearchReq 分页请求参数
 type DictDataSearchReq struct {
-	g.Meta    `path:"/dict/data/list" tags:"字典管理" method:"get" summary:"字典数据列表"`
+	g.Meta    `path:"/dict/data/list" tags:"系统后台/字典管理" method:"get" summary:"字典数据列表"`
 	DictType  string `p:"dictType"`  //字典类型
 	DictLabel string `p:"dictLabel"` //字典标签
 	Status    string `p:"status"`    //状态
@@ -58,7 +58,7 @@ type DictDataReq struct {
 }
 
 type DictDataAddReq struct {
-	g.Meta `path:"/dict/data/add" tags:"字典管理" method:"post" summary:"添加字典数据"`
+	g.Meta `path:"/dict/data/add" tags:"系统后台/字典管理" method:"post" summary:"添加字典数据"`
 	*DictDataReq
 }
 
@@ -66,7 +66,7 @@ type DictDataAddRes struct {
 }
 
 type DictDataGetReq struct {
-	g.Meta   `path:"/dict/data/get" tags:"字典管理" method:"get" summary:"获取字典数据"`
+	g.Meta   `path:"/dict/data/get" tags:"系统后台/字典管理" method:"get" summary:"获取字典数据"`
 	DictCode uint `p:"dictCode"`
 }
 
@@ -76,7 +76,7 @@ type DictDataGetRes struct {
 }
 
 type DictDataEditReq struct {
-	g.Meta   `path:"/dict/data/edit" tags:"字典管理" method:"put" summary:"修改字典数据"`
+	g.Meta   `path:"/dict/data/edit" tags:"系统后台/字典管理" method:"put" summary:"修改字典数据"`
 	DictCode int `p:"dictCode" v:"required|min:1#主键ID不能为空|主键ID不能小于1"`
 	*DictDataReq
 }
@@ -85,7 +85,7 @@ type DictDataEditRes struct {
 }
 
 type DictDataDeleteReq struct {
-	g.Meta `path:"/dict/data/delete" tags:"字典管理" method:"delete" summary:"删除字典数据"`
+	g.Meta `path:"/dict/data/delete" tags:"系统后台/字典管理" method:"delete" summary:"删除字典数据"`
 	Ids    []int `p:"ids"`
 }
 

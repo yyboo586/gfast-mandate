@@ -22,4 +22,5 @@ type SysRole struct {
 	CreatedAt *gtime.Time // 创建时间
 	UpdatedAt *gtime.Time // 更新时间
 	CreatedBy interface{} //创建人
+	EffectiveTime interface{} //角色有效日期
 }

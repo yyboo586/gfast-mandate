@@ -17,7 +17,7 @@ import (
 
 // SysNoticeReadSearchReq 分页请求参数
 type SysNoticeReadSearchReq struct {
-	g.Meta `path:"/list" tags:"已读记录" method:"get" summary:"已读记录列表"`
+	g.Meta `path:"/list" tags:"系统后台/已读记录" method:"get" summary:"已读记录列表"`
 	commonApi.Author
 	model.SysNoticeReadSearchReq
 }
@@ -30,7 +30,7 @@ type SysNoticeReadSearchRes struct {
 
 // SysNoticeReadAddReq 添加操作请求参数
 type SysNoticeReadAddReq struct {
-	g.Meta `path:"/add" tags:"已读记录" method:"post" summary:"已读记录添加"`
+	g.Meta `path:"/add" tags:"系统后台/已读记录" method:"post" summary:"已读记录添加"`
 	commonApi.Author
 	*model.SysNoticeReadAddReq
 }
@@ -42,7 +42,7 @@ type SysNoticeReadAddRes struct {
 
 // SysNoticeReadAddReq 添加操作请求参数
 type SysNoticeReadNoticeAddReq struct {
-	g.Meta `path:"/readNotice" tags:"已读记录" method:"post" summary:"已读记录"`
+	g.Meta `path:"/readNotice" tags:"系统后台/已读记录" method:"post" summary:"已读记录"`
 	commonApi.Author
 	*model.SysNoticeReadNoticeReq
 }
@@ -54,7 +54,7 @@ type SysNoticeReadNoticeAddRes struct {
 
 // SysNoticeReadEditReq 修改操作请求参数
 type SysNoticeReadEditReq struct {
-	g.Meta `path:"/edit" tags:"已读记录" method:"put" summary:"已读记录修改"`
+	g.Meta `path:"/edit" tags:"系统后台/已读记录" method:"put" summary:"已读记录修改"`
 	commonApi.Author
 	*model.SysNoticeReadEditReq
 }
@@ -66,7 +66,7 @@ type SysNoticeReadEditRes struct {
 
 // SysNoticeReadGetReq 获取一条数据请求
 type SysNoticeReadGetReq struct {
-	g.Meta `path:"/get" tags:"已读记录" method:"get" summary:"获取已读记录信息"`
+	g.Meta `path:"/get" tags:"系统后台/已读记录" method:"get" summary:"获取已读记录信息"`
 	commonApi.Author
 	Id int64 `p:"id" v:"required#主键必须"` //通过主键获取
 }
@@ -79,7 +79,7 @@ type SysNoticeReadGetRes struct {
 
 // SysNoticeReadDeleteReq 删除数据请求
 type SysNoticeReadDeleteReq struct {
-	g.Meta `path:"/delete" tags:"已读记录" method:"delete" summary:"删除已读记录"`
+	g.Meta `path:"/delete" tags:"系统后台/已读记录" method:"delete" summary:"删除已读记录"`
 	commonApi.Author
 	Ids []int64 `p:"ids" v:"required#主键必须"` //通过主键删除
 }

@@ -42,6 +42,7 @@ type ToolsGenTableColumns struct {
 	ExcelImp       string // 是否有导入excel功能
 	UseSnowId      string //主键是否使用雪花ID
 	UseVirtual     string // 树表是否使用虚拟表
+	OverwriteInfo  string // 覆盖文件信息
 }
 
 // toolsGenTableColumns holds the columns for table tools_gen_table.
@@ -68,6 +69,7 @@ var toolsGenTableColumns = ToolsGenTableColumns{
 	ExcelImp:       "excel_imp",
 	UseSnowId:      "use_snow_id",
 	UseVirtual:     "use_virtual",
+	OverwriteInfo:"overwrite_info",
 }
 
 // NewToolsGenTableDao creates and returns a new DAO object for table data access.

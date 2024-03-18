@@ -7,6 +7,7 @@ package service
 
 import (
 	"context"
+	"github.com/tiger1103/gfast/v3/internal/app/system/model"
 
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
@@ -19,7 +20,7 @@ type (
 		AddRoleRule(ctx context.Context, ruleIds []uint, roleId int64) (err error)
 		DelRoleRule(ctx context.Context, roleId int64) (err error)
 		AddRole(ctx context.Context, req *system.RoleAddReq) (err error)
-		Get(ctx context.Context, id uint) (res *entity.SysRole, err error)
+		Get(ctx context.Context, id uint) (res *model.RoleInfoRes, err error)
 		GetFilteredNamedPolicy(ctx context.Context, id uint) (gpSlice []int, err error)
 		EditRole(ctx context.Context, req *system.RoleEditReq) (err error)
 		DeleteByIds(ctx context.Context, ids []int64) (err error)

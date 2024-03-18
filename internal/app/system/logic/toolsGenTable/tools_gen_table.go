@@ -424,12 +424,18 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 	}
 	if req.PackageName != "" {
 		table.PackageName = req.PackageName
+		//从包名中获取模块名
+		lastIndex := gstr.PosR(table.PackageName, "/")
+		if lastIndex != -1 {
+			table.ModuleName = gstr.SubStr(table.PackageName, lastIndex+1)
+		}
 	}
 	if req.Remark != "" {
 		table.Remark = req.Remark
 	}
 	if req.Overwrite != "" {
 		table.Overwrite = gconv.Bool(req.Overwrite)
+		table.OverwriteInfo = req.OverwriteInfo
 	}
 	if req.SortColumn != "" {
 		table.SortColumn = req.SortColumn
@@ -1084,60 +1090,64 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 			packageName := extendData.PackageName
 			businessName := gstr.CaseCamelLower(extendData.BusinessName)
 			modulePath := gstr.StrEx(extendData.PackageName, "internal/app/")
+			overwriteInfo := gmap.NewStrAnyMap()
+			for _, ov := range extendData.OverwriteInfo {
+				overwriteInfo.Set(ov.Key, ov.Value)
+			}
 			for key, code := range genData {
 				switch key {
 				case "api":
 					path := strings.Join([]string{curDir, "/", apiName, "/", modulePath, "/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("api")))
 					liberr.ErrIsNil(ctx, err)
 				case "controller":
 					path := strings.Join([]string{curDir, "/", packageName, "/controller/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("controller")))
 					liberr.ErrIsNil(ctx, err)
 				case "dao":
 					path := strings.Join([]string{curDir, "/", packageName, "/dao/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("dao")))
 					liberr.ErrIsNil(ctx, err)
 				case "dao_internal":
 					path := strings.Join([]string{curDir, "/", packageName, "/dao/internal/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("dao_internal")))
 					liberr.ErrIsNil(ctx, err)
 				case "logic":
 					path := strings.Join([]string{curDir, "/", packageName, "/logic/", businessName, "/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("logic")))
 					liberr.ErrIsNil(ctx, err)
 				case "model":
 					path := strings.Join([]string{curDir, "/", packageName, "/model/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("model")))
 					liberr.ErrIsNil(ctx, err)
 				case "model_do":
 					path := strings.Join([]string{curDir, "/", packageName, "/model/do/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("model_do")))
 					liberr.ErrIsNil(ctx, err)
 				case "model_entity":
 					path := strings.Join([]string{curDir, "/", packageName, "/model/entity/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("model_entity")))
 					liberr.ErrIsNil(ctx, err)
 				case "router":
 					if !gstr.ContainsI(packageName, "system") { // system 模块不生成router文件
 						path := strings.Join([]string{curDir, "/", packageName, "/router/router", ".go"}, "")
-						err = s.createFile(path, code, false)
+						err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("router")))
 						liberr.ErrIsNil(ctx, err)
 					}
 				case "router_func":
 					path := strings.Join([]string{curDir, "/", packageName, "/router/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("router_func")))
 					liberr.ErrIsNil(ctx, err)
 				case "service":
 					path := strings.Join([]string{curDir, "/", packageName, "/service/", extendData.BusinessName, ".go"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("service")))
 					liberr.ErrIsNil(ctx, err)
 				case "sql":
 					path := strings.Join([]string{curDir, "/resource/data/gen_sql/", modulePath, "/", extendData.BusinessName, ".sql"}, "")
 					hasSql := gfile.Exists(path)
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("sql")))
 					liberr.ErrIsNil(ctx, err)
-					if !hasSql || extendData.Overwrite {
+					if !hasSql || gconv.Bool(overwriteInfo.Get("sql")) {
 						//第一次生成则向数据库写入菜单数据
 						if s.IsPg() {
 							content := gfile.GetContents(path)
@@ -1151,23 +1161,23 @@ func (s *sToolsGenTable) GenCode(ctx context.Context, ids []int) (err error) {
 					}
 				case "tsApi":
 					path := strings.Join([]string{frontDir, "/src/api/", modulePath, "/", businessName, ".ts"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("tsApi")))
 					liberr.ErrIsNil(ctx, err)
 				case "tsModel":
 					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName + "/list/component/model", ".ts"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("tsModel")))
 					liberr.ErrIsNil(ctx, err)
 				case "vue":
 					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName, "/list/index.vue"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("vue")))
 					liberr.ErrIsNil(ctx, err)
 				case "vueDetail":
 					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName + "/list/component/detail", ".vue"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("vueDetail")))
 					liberr.ErrIsNil(ctx, err)
 				case "vueEdit":
 					path := strings.Join([]string{frontDir, "/src/views/", modulePath, "/", businessName + "/list/component/edit", ".vue"}, "")
-					err = s.createFile(path, code, extendData.Overwrite)
+					err = s.createFile(path, code, gconv.Bool(overwriteInfo.Get("vueEdit")))
 					liberr.ErrIsNil(ctx, err)
 				}
 			}

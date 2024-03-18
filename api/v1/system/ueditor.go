@@ -13,12 +13,12 @@ import (
 )
 
 type UEditorConfigReq struct {
-	g.Meta `path:"/uEditor/action" tags:"UEditor" method:"get" summary:"获取UEditor配置"`
+	g.Meta `path:"/uEditor/action" tags:"系统后台/UEditor" method:"get" summary:"获取UEditor配置"`
 	UEditorReq
 }
 
 type UEditorUpFileReq struct {
-	g.Meta `path:"/uEditor/action" tags:"UEditor" method:"post" summary:"UEditor上传"`
+	g.Meta `path:"/uEditor/action" tags:"系统后台/UEditor" method:"post" summary:"UEditor上传"`
 	UEditorReq
 }
 

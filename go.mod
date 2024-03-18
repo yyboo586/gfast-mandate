@@ -20,7 +20,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/sony/sonyflake v1.2.0
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.34
-	github.com/tiger1103/gfast-cache v1.0.4
+	github.com/tiger1103/gfast-cache v1.0.5
 	github.com/tiger1103/gfast-token v1.0.6
 	github.com/wenlng/go-captcha v1.2.5
 	github.com/xuri/excelize/v2 v2.7.1

@@ -10,6 +10,7 @@ package controller
 import (
 	"context"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
+	"github.com/tiger1103/gfast/v3/internal/app/system/model"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 )
 
@@ -69,9 +70,20 @@ func (c *roleController) Delete(ctx context.Context, req *system.RoleDeleteReq) 
 	return
 }
 
-// DeptTreeSelect 获取数据权限
+// DeptTreeSelect 获取角色授权部门数据
 func (c *roleController) DeptTreeSelect(ctx context.Context, req *system.RoleDeptTreeSelectReq) (res *system.RoleDeptTreeSelectRes, err error) {
 	res, err = service.SysRole().RoleDeptTreeSelect(ctx, req.RoleId)
+	return
+}
+
+// MenuTreeSelect 获取角色授权接口数据
+func (c *roleController) MenuTreeSelect(ctx context.Context, req *system.RoleMenuTreeSelectReq) (res *system.RoleMenuTreeSelectRes, err error) {
+	var list []*model.SysAuthRuleInfoRes
+	res = &system.RoleMenuTreeSelectRes{
+		Rules: make([]*model.SysAuthRuleTreeRes, 0),
+	}
+	list, err = service.SysAuthRule().GetMenuListSearch(ctx, &system.RuleSearchReq{})
+	res.Rules = service.SysAuthRule().GetMenuListTree(0, list)
 	return
 }
 

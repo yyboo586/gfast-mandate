@@ -14,7 +14,7 @@ import (
 )
 
 type WxUrlReq struct {
-	g.Meta `path:"/wxUrl" tags:"微信小程序登陆" method:"get" summary:"获取微信小程序url"`
+	g.Meta `path:"/wxUrl" tags:"微信接口/小程序登陆" method:"get" summary:"获取微信小程序url"`
 }
 
 type WxUrlRes struct {
@@ -23,7 +23,7 @@ type WxUrlRes struct {
 }
 
 type WxLoginReq struct {
-	g.Meta    `path:"/wxLogin" tags:"微信小程序登陆" method:"post" summary:"微信登录"`
+	g.Meta    `path:"/wxLogin" tags:"微信接口/小程序登陆" method:"post" summary:"微信登录"`
 	Code      string `p:"code" v:"required#code必须"`
 	PhoneCode string `p:"phoneCode"`
 }
@@ -35,10 +35,9 @@ type WxLoginRes struct {
 }
 
 type UserLoginOutReq struct {
-	g.Meta `path:"/logout" tags:"微信小程序登陆" method:"get" summary:"退出登录"`
+	g.Meta `path:"/logout" tags:"微信接口/小程序登陆" method:"get" summary:"退出登录"`
 	commonApi.Author
 }
 
 type UserLoginOutRes struct {
 }
-

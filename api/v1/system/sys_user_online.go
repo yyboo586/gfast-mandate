@@ -15,7 +15,7 @@ import (
 
 // SysUserOnlineSearchReq 列表搜索参数
 type SysUserOnlineSearchReq struct {
-	g.Meta   `path:"/online/list" tags:"在线用户管理" method:"get" summary:"列表"`
+	g.Meta   `path:"/online/list" tags:"系统后台/在线用户管理" method:"get" summary:"列表"`
 	Username string `p:"userName"`
 	Ip       string `p:"ipaddr"`
 	commonApi.PageReq
@@ -30,7 +30,7 @@ type SysUserOnlineSearchRes struct {
 }
 
 type SysUserOnlineForceLogoutReq struct {
-	g.Meta `path:"/online/forceLogout" tags:"在线用户管理" method:"delete" summary:"强制用户退出登录"`
+	g.Meta `path:"/online/forceLogout" tags:"系统后台/在线用户管理" method:"delete" summary:"强制用户退出登录"`
 	commonApi.Author
 	Ids []int `p:"ids" v:"required#ids不能为空"`
 }

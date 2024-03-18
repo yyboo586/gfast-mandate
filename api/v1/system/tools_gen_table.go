@@ -16,7 +16,7 @@ import (
 
 // ToolsGenTableSearchReq 列表分页请求参数
 type ToolsGenTableSearchReq struct {
-	g.Meta       `path:"/tools/gen/tableList" tags:"代码生成" method:"get" summary:"获取数据表"`
+	g.Meta       `path:"/tools/gen/tableList" tags:"系统后台/代码生成" method:"get" summary:"获取数据表"`
 	TableName    string `p:"tableName"`    //表名称
 	TableComment string `p:"tableComment"` //表描述
 	commonApi.PageReq
@@ -32,7 +32,7 @@ type ToolsGenTableSearchRes struct {
 
 // ToolsGenTableImportSearchReq 要导入的表列表数据
 type ToolsGenTableImportSearchReq struct {
-	g.Meta       `path:"/tools/gen/dataList" tags:"代码生成" method:"get" summary:"获取需要导入的数据表"`
+	g.Meta       `path:"/tools/gen/dataList" tags:"系统后台/代码生成" method:"get" summary:"获取需要导入的数据表"`
 	TableName    string `p:"tableName"`    //表名称
 	TableComment string `p:"tableComment"` //表描述
 	commonApi.PageReq
@@ -41,19 +41,19 @@ type ToolsGenTableImportSearchReq struct {
 
 // ToolsGenTableImportTableReq 导入表数据操作
 type ToolsGenTableImportTableReq struct {
-	g.Meta `path:"/tools/gen/importTableSave" tags:"代码生成" method:"post" summary:"导入表结构操作"`
+	g.Meta `path:"/tools/gen/importTableSave" tags:"系统后台/代码生成" method:"post" summary:"导入表结构操作"`
 	commonApi.Author
 	Tables []string `p:"tables" v:"required#表名必须指定"`
 }
 
 type ToolsGenTableDeleteReq struct {
-	g.Meta `path:"/tools/gen/tableDelete" tags:"代码生成" method:"delete" summary:"删除已导入的表"`
+	g.Meta `path:"/tools/gen/tableDelete" tags:"系统后台/代码生成" method:"delete" summary:"删除已导入的表"`
 	commonApi.Author
 	Ids []int `p:"ids" v:"required#删除的id必须"`
 }
 
 type ToolsGenTableEditReq struct {
-	g.Meta `path:"/tools/gen/columnList" tags:"代码生成" method:"get" summary:"生成数据编辑"`
+	g.Meta `path:"/tools/gen/columnList" tags:"系统后台/代码生成" method:"get" summary:"生成数据编辑"`
 	commonApi.Author
 	TableId int64 `p:"tableId" v:"required#tableId字段必须"`
 }
@@ -67,7 +67,7 @@ type ToolsGenTableEditRes struct {
 
 // ToolsGenRelationTableReq 获取关联表数据
 type ToolsGenRelationTableReq struct {
-	g.Meta       `path:"/tools/gen/relationTable" tags:"代码生成" method:"get" summary:"获取关联表数据"`
+	g.Meta       `path:"/tools/gen/relationTable" tags:"系统后台/代码生成" method:"get" summary:"获取关联表数据"`
 	TableName    string `p:"tableName"`    //表名称
 	TableComment string `p:"tableComment"` //表描述
 	commonApi.PageReq
@@ -83,7 +83,7 @@ type ToolsGenRelationTableRes struct {
 
 // ToolsGenTableColumnsEditReq 生成信息修改参数
 type ToolsGenTableColumnsEditReq struct {
-	g.Meta `path:"/tools/gen/editSave" tags:"代码生成" method:"post" summary:"生成信息修改保存"`
+	g.Meta `path:"/tools/gen/editSave" tags:"系统后台/代码生成" method:"post" summary:"生成信息修改保存"`
 	commonApi.Author
 	TableId        int64                         `p:"tableId" v:"required#主键ID不能为空"`
 	TableName      string                        `p:"tableName"  v:"required#表名称不能为空"`
@@ -92,7 +92,7 @@ type ToolsGenTableColumnsEditReq struct {
 	FunctionAuthor string                        `p:"functionAuthor"  v:"required#作者不能为空"`
 	TplCategory    string                        `p:"tplCategory"`
 	PackageName    string                        `p:"packageName" v:"required#生成包路径不能为空"`
-	ModuleName     string                        `p:"moduleName" v:"required#生成模块名不能为空"`
+	ModuleName     string                        `p:"moduleName"`
 	BusinessName   string                        `p:"businessName" v:"required#生成业务名不能为空"`
 	FunctionName   string                        `p:"functionName" v:"required#生成功能名不能为空"`
 	Remark         string                        `p:"remark"`
@@ -109,6 +109,7 @@ type ToolsGenTableColumnsEditReq struct {
 	ExcelImp       string                        `p:"excelImp"`
 	UseSnowId      string                        `p:"useSnowId"`
 	UseVirtual     string                        `p:"useVirtual"`
+	OverwriteInfo  []*entity.OverwriteInfo       `p:"overwriteInfo"`
 }
 
 type ToolsGenTableColumnsEditRes struct {
@@ -116,7 +117,7 @@ type ToolsGenTableColumnsEditRes struct {
 }
 
 type ToolsGenTablePreviewReq struct {
-	g.Meta  `path:"/tools/gen/preview" tags:"代码生成" method:"get" summary:"代码预览"`
+	g.Meta  `path:"/tools/gen/preview" tags:"系统后台/代码生成" method:"get" summary:"代码预览"`
 	TableId int64 `p:"tableId" v:"required#表ID必须"`
 }
 
@@ -126,7 +127,7 @@ type ToolsGenTablePreviewRes struct {
 }
 
 type ToolsGenTableBatchGenCodeReq struct {
-	g.Meta `path:"/tools/gen/batchGenCode" tags:"代码生成" method:"post" summary:"代码生成"`
+	g.Meta `path:"/tools/gen/batchGenCode" tags:"系统后台/代码生成" method:"post" summary:"代码生成"`
 	Ids    []int `p:"ids" v:"required#ids必须且不能为空"`
 }
 
@@ -135,7 +136,7 @@ type ToolsGenTableBatchGenCodeRes struct {
 }
 
 type ToolsGenTableSyncTableReq struct {
-	g.Meta `path:"/tools/gen/syncTable" tags:"代码生成" method:"post" summary:"同步表结构"`
+	g.Meta `path:"/tools/gen/syncTable" tags:"系统后台/代码生成" method:"post" summary:"同步表结构"`
 	commonApi.Author
 	TableId int64 `p:"tableId" v:"required#表ID必须"`
 }

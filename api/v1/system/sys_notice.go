@@ -17,7 +17,7 @@ import (
 
 // SysNoticeSearchReq 分页请求参数
 type SysNoticeSearchReq struct {
-	g.Meta `path:"/list" tags:"通知私信" method:"get" summary:"通知公告列表(管理)"`
+	g.Meta `path:"/list" tags:"系统后台/通知私信" method:"get" summary:"通知公告列表(管理)"`
 	commonApi.Author
 	model.SysNoticeSearchReq
 }
@@ -30,7 +30,7 @@ type SysNoticeSearchRes struct {
 
 // SysNoticeSearchReq 分页请求参数
 type SysNoticeShowSearchReq struct {
-	g.Meta `path:"/listShow" tags:"通知私信" method:"get" summary:"通知公告列表(浏览)"`
+	g.Meta `path:"/listShow" tags:"系统后台/通知私信" method:"get" summary:"通知公告列表(浏览)"`
 	commonApi.Author
 	model.SysNoticeSearchReq
 }
@@ -43,7 +43,7 @@ type SysNoticeShowSearchRes struct {
 
 // SysNoticeAddReq 添加操作请求参数
 type SysNoticeAddReq struct {
-	g.Meta `path:"/add" tags:"通知私信" method:"post" summary:"通知公告添加"`
+	g.Meta `path:"/add" tags:"系统后台/通知私信" method:"post" summary:"通知公告添加"`
 	commonApi.Author
 	*model.SysNoticeAddReq
 }
@@ -55,7 +55,7 @@ type SysNoticeAddRes struct {
 
 // SysNoticeEditReq 修改操作请求参数
 type SysNoticeEditReq struct {
-	g.Meta `path:"/edit" tags:"通知私信" method:"put" summary:"通知公告修改"`
+	g.Meta `path:"/edit" tags:"系统后台/通知私信" method:"put" summary:"通知公告修改"`
 	commonApi.Author
 	*model.SysNoticeEditReq
 }
@@ -67,7 +67,7 @@ type SysNoticeEditRes struct {
 
 // SysNoticeGetReq 获取一条数据请求
 type SysNoticeGetReq struct {
-	g.Meta `path:"/get" tags:"通知私信" method:"get" summary:"获取通知公告信息"`
+	g.Meta `path:"/get" tags:"系统后台/通知私信" method:"get" summary:"获取通知公告信息"`
 	commonApi.Author
 	Id int64 `p:"id" v:"required#主键必须"` //通过主键获取
 }
@@ -80,7 +80,7 @@ type SysNoticeGetRes struct {
 
 // SysNoticeDeleteReq 删除数据请求
 type SysNoticeDeleteReq struct {
-	g.Meta `path:"/delete" tags:"通知私信" method:"delete" summary:"删除通知公告"`
+	g.Meta `path:"/delete" tags:"系统后台/通知私信" method:"delete" summary:"删除通知公告"`
 	commonApi.Author
 	Ids []int64 `p:"ids" v:"required#主键必须"` //通过主键删除
 }
@@ -91,7 +91,7 @@ type SysNoticeDeleteRes struct {
 }
 
 type SysNoticeIndexDataReq struct {
-	g.Meta `path:"getIndexData" tags:"通知私信" method:"get" summary:"获取首页通知预览数据"`
+	g.Meta `path:"getIndexData" tags:"系统后台/通知私信" method:"get" summary:"获取首页通知预览数据"`
 	commonApi.Author
 }
 type SysNoticeIndexDataRes struct {
@@ -99,7 +99,7 @@ type SysNoticeIndexDataRes struct {
 	*model.SysNoticeIndexRes
 }
 type SysNoticeUnReadCountReq struct {
-	g.Meta `path:"unReadCount" tags:"通知私信" method:"get" summary:"获取未读数量"`
+	g.Meta `path:"unReadCount" tags:"系统后台/通知私信" method:"get" summary:"获取未读数量"`
 	commonApi.Author
 }
 type SysNoticeUnReadCountRes struct {
@@ -109,7 +109,7 @@ type SysNoticeUnReadCountRes struct {
 
 // SysNoticeShowSearchReq 通知展示分页请求参数
 type SysNoticeUserSearchReq struct {
-	g.Meta `path:"/userList" tags:"通知私信" method:"get" summary:"获取待指定的用户"`
+	g.Meta `path:"/userList" tags:"系统后台/通知私信" method:"get" summary:"获取待指定的用户"`
 	commonApi.Author
 	UserNickName string `p:"userNickname"`
 }
@@ -122,7 +122,7 @@ type SysNoticeUserSearchRes struct {
 
 // SysNoticeShowSearchReq 通知展示分页请求参数
 type SysNoticeUserReadReq struct {
-	g.Meta `path:"/userList" tags:"通知私信" method:"get" summary:"获取待指定的用户"`
+	g.Meta `path:"/userList" tags:"系统后台/通知私信" method:"get" summary:"获取待指定的用户"`
 	commonApi.Author
 	string `p:"userNickName"`
 }

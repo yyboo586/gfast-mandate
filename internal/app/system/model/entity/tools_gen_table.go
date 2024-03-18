@@ -32,4 +32,5 @@ type ToolsGenTable struct {
 	ExcelImp      bool        `json:"excelImp" description:"是否有excel导入功能"`
 	UseSnowId      bool        `json:"useSnowId" description:"主键是否使用雪花ID"`
 	UseVirtual     bool        `json:"useVirtual" orm:"use_virtual" description:"树表是否使用虚拟表"`
+	OverwriteInfo  []*OverwriteInfo `json:"overwriteInfo" orm:"overwrite_info" description:"覆盖文件信息"`
 }

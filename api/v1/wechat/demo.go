@@ -13,7 +13,7 @@ import (
 )
 
 type DemoReq struct {
-	g.Meta `path:"/demo" tags:"微信小程序测试" method:"get" summary:"测试"`
+	g.Meta `path:"/demo" tags:"微信接口/小程序测试" method:"get" summary:"测试"`
 	common.Author
 }
 

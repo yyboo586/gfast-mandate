@@ -13,7 +13,7 @@ const (
     <link rel="icon" href="{SwaggerUIDocNamePlaceHolder}/doc/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
-    <script type="module" crossorigin src="{SwaggerUIDocNamePlaceHolder}/doc/webjars/js/doc-7814a93f.js"></script>
+    <script type="module" crossorigin src="{SwaggerUIDocNamePlaceHolder}/doc/webjars/js/doc-30bb18f4.js"></script>
     <link rel="stylesheet" href="{SwaggerUIDocNamePlaceHolder}/doc/webjars/css/doc-e469198e.css">
   </head>
   <body>

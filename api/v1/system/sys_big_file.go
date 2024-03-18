@@ -30,7 +30,7 @@ type BigFileForm struct {
 }
 
 type BigFileGetReq struct {
-	g.Meta `path:"/bigFile/get" tags:"大文件管理" method:"get" summary:"获取大文件信息"`
+	g.Meta `path:"/bigFile/get" tags:"系统后台/大文件管理" method:"get" summary:"获取大文件信息"`
 	Id     uint64 `p:"id"`
 }
 
@@ -40,7 +40,7 @@ type BigFileGetRes struct {
 }
 
 type BigFileAddReq struct {
-	g.Meta `path:"/bigFile/add" tags:"大文件管理" method:"post" summary:"大文件新增"`
+	g.Meta `path:"/bigFile/add" tags:"系统后台/大文件管理" method:"post" summary:"大文件新增"`
 	BigFileForm
 }
 
@@ -48,7 +48,7 @@ type BigFileAddRes struct {
 }
 
 type BigFileEditReq struct {
-	g.Meta   `path:"/bigFile/edit" tags:"大文件管理" method:"put" summary:"大文件新增"`
+	g.Meta   `path:"/bigFile/edit" tags:"系统后台/大文件管理" method:"put" summary:"大文件新增"`
 	Id       uint64 `p:"id" v:"required|min:1#主键ID不能为空|主键ID参数错误"`
 	Name     string `p:"name"  v:"required#标题必须"`
 	Describe string `p:"describe"`
@@ -58,7 +58,7 @@ type BigFileEditRes struct {
 }
 
 type BigFileDeleteReq struct {
-	g.Meta `path:"/bigFile/delete" tags:"大文件管理" method:"delete" summary:"大文件删除"`
+	g.Meta `path:"/bigFile/delete" tags:"系统后台/大文件管理" method:"delete" summary:"大文件删除"`
 	Ids    []uint64 `p:"ids"`
 }
 
