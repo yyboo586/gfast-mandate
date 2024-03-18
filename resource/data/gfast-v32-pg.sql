@@ -12,7 +12,7 @@
  Target Server Version : 140010
  File Encoding         : 65001
 
- Date: 02/01/2024 17:52:50
+ Date: 18/03/2024 10:32:41
 */
 
 
@@ -4791,8 +4791,6 @@ COMMENT ON TABLE "sys_job_log" IS '任务日志表';
 -- ----------------------------
 -- Records of sys_job_log
 -- ----------------------------
-INSERT INTO "sys_job_log" VALUES (2437, 'checkUserOnline', '2023-12-25 10:30:05.619406', '在线用户定时更新，执行成功');
-INSERT INTO "sys_job_log" VALUES (2438, 'checkUserOnline', '2023-12-25 10:40:05.660222', '在线用户定时更新，执行成功');
 
 -- ----------------------------
 -- Table structure for sys_login_log
@@ -4866,6 +4864,9 @@ COMMENT ON TABLE "sys_notice" IS '通知公告';
 -- ----------------------------
 -- Records of sys_notice
 -- ----------------------------
+INSERT INTO "sys_notice" VALUES (1, '11111', 1, 2, '<p>11111</p>', '', 0, 1, 31, 0, '2024-01-08 11:16:16.363992', '2024-01-08 11:16:16.363992', NULL, NULL);
+INSERT INTO "sys_notice" VALUES (2, '私信测试001', 2, 0, '<p>私信测试000001</p>', '', 0, 1, 31, 0, '2024-01-08 11:16:55.63036', '2024-01-08 11:16:55.63036', NULL, '[3,31]');
+INSERT INTO "sys_notice" VALUES (3, '私信测试002', 2, 0, '<p>测试002</p>', '', 0, 1, 31, 0, '2024-01-08 14:40:13.734401', '2024-01-08 14:40:13.734401', NULL, '[3,31]');
 
 -- ----------------------------
 -- Table structure for sys_notice_read
@@ -4890,6 +4891,7 @@ COMMENT ON TABLE "sys_notice_read" IS '已读记录';
 -- ----------------------------
 -- Records of sys_notice_read
 -- ----------------------------
+INSERT INTO "sys_notice_read" VALUES (1, 2, 31, 0, '2024-01-08 14:39:46.05947', '2024-01-08 14:39:46.05947');
 
 -- ----------------------------
 -- Table structure for sys_oper_log
@@ -4931,20 +4933,6 @@ COMMENT ON TABLE "sys_oper_log" IS '操作日志记录';
 -- ----------------------------
 -- Records of sys_oper_log
 -- ----------------------------
-INSERT INTO "sys_oper_log" VALUES (9091, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_user_sex&defaultValue=', '::1', '内网IP', '{"defaultValue":"","dictType":"sys_user_sex"}', NULL, '2023-12-25 10:30:02.479021');
-INSERT INTO "sys_oper_log" VALUES (9092, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:30:02.52122');
-INSERT INTO "sys_oper_log" VALUES (9093, '', 0, '/api/v1/system/dept/treeSelect', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dept/treeSelect', '::1', '内网IP', '{}', NULL, '2023-12-25 10:30:08.182382');
-INSERT INTO "sys_oper_log" VALUES (9094, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_user_sex&defaultValue=', '::1', '内网IP', '{"defaultValue":"","dictType":"sys_user_sex"}', NULL, '2023-12-25 10:30:08.224896');
-INSERT INTO "sys_oper_log" VALUES (9095, '', 0, '/api/v1/system/user/params', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/params', '::1', '内网IP', '{}', NULL, '2023-12-25 10:30:08.238603');
-INSERT INTO "sys_oper_log" VALUES (9096, '用户管理', 0, '/api/v1/system/user/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/list?pageNum=1&pageSize=10&roleId=2&deptId=&mobile=&status=&keyWords=', '::1', '内网IP', '{"deptId":"","keyWords":"","mobile":"","pageNum":"1","pageSize":"10","roleId":"2","status":""}', NULL, '2023-12-25 10:30:08.254042');
-INSERT INTO "sys_oper_log" VALUES (9097, '', 0, '/api/v1/system/dict/data/getDictData', 'GET', 1, 'demo', '财务部门', '/api/v1/system/dict/data/getDictData?dictType=sys_user_sex&defaultValue=', '::1', '内网IP', '{"defaultValue":"","dictType":"sys_user_sex"}', NULL, '2023-12-25 10:30:11.98615');
-INSERT INTO "sys_oper_log" VALUES (9098, '', 0, '/api/v1/system/user/params', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/params', '::1', '内网IP', '{}', NULL, '2023-12-25 10:30:11.988784');
-INSERT INTO "sys_oper_log" VALUES (9099, '用户管理', 0, '/api/v1/system/user/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/user/list?pageNum=1&pageSize=10&roleId=1&deptId=&mobile=&status=&keyWords=', '::1', '内网IP', '{"deptId":"","keyWords":"","mobile":"","pageNum":"1","pageSize":"10","roleId":"1","status":""}', NULL, '2023-12-25 10:30:11.996789');
-INSERT INTO "sys_oper_log" VALUES (9100, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:30:55.773961');
-INSERT INTO "sys_oper_log" VALUES (9101, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:50.985398');
-INSERT INTO "sys_oper_log" VALUES (9102, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:52.03759');
-INSERT INTO "sys_oper_log" VALUES (9103, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:52.325655');
-INSERT INTO "sys_oper_log" VALUES (9104, '角色管理', 0, '/api/v1/system/role/list', 'GET', 1, 'demo', '财务部门', '/api/v1/system/role/list?roleName=&roleStatus=&pageNum=1&pageSize=10', '::1', '内网IP', '{"pageNum":"1","pageSize":"10","roleName":"","roleStatus":""}', NULL, '2023-12-25 10:39:52.541516');
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -5004,7 +4992,8 @@ CREATE TABLE "sys_role" (
   "created_at" timestamp(6),
   "updated_at" timestamp(6),
   "created_by" int8 NOT NULL DEFAULT 0,
-  "pid" int8 NOT NULL DEFAULT 0
+  "pid" int8 NOT NULL DEFAULT 0,
+  "effectiveTime" text COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "sys_role"."status" IS '状态;0:禁用;1:正常';
@@ -5016,18 +5005,19 @@ COMMENT ON COLUMN "sys_role"."created_at" IS '创建时间';
 COMMENT ON COLUMN "sys_role"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "sys_role"."created_by" IS '添加人';
 COMMENT ON COLUMN "sys_role"."pid" IS '父级ID';
+COMMENT ON COLUMN "sys_role"."effectiveTime" IS '角色有效日期';
 COMMENT ON TABLE "sys_role" IS '角色表';
 
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
-INSERT INTO "sys_role" VALUES (1, 1, 0, '超级管理员', '备注', 2, '2022-04-01 11:38:39', '2023-09-28 10:27:55', 0, 0);
-INSERT INTO "sys_role" VALUES (2, 1, 0, '普通管理员', '备注', 5, '2022-04-01 11:38:39', '2023-10-26 14:59:46', 0, 0);
-INSERT INTO "sys_role" VALUES (3, 1, 0, '站点管理员', '站点管理人员', 3, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, 0);
-INSERT INTO "sys_role" VALUES (4, 1, 0, '初级管理员', '初级管理员', 3, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, 0);
-INSERT INTO "sys_role" VALUES (5, 1, 0, '高级管理员', '高级管理员', 2, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, 0);
-INSERT INTO "sys_role" VALUES (8, 1, 0, '区级管理员', '', 2, '2022-04-01 11:38:39', '2022-04-06 09:53:40', 0, 0);
-INSERT INTO "sys_role" VALUES (9, 1, 0, '测试', '', 3, '2023-04-22 12:39:13', '2023-12-18 10:44:35.803106', 3, 0);
+INSERT INTO "sys_role" VALUES (1, 1, 0, '超级管理员', '备注', 2, '2022-04-01 11:38:39', '2023-09-28 10:27:55', 0, 0, NULL);
+INSERT INTO "sys_role" VALUES (2, 1, 0, '普通管理员', '备注', 5, '2022-04-01 11:38:39', '2023-10-26 14:59:46', 0, 0, NULL);
+INSERT INTO "sys_role" VALUES (3, 1, 0, '站点管理员', '站点管理人员', 3, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, 0, NULL);
+INSERT INTO "sys_role" VALUES (4, 1, 0, '初级管理员', '初级管理员', 3, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, 0, NULL);
+INSERT INTO "sys_role" VALUES (5, 1, 0, '高级管理员', '高级管理员', 2, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, 0, NULL);
+INSERT INTO "sys_role" VALUES (8, 1, 0, '区级管理员', '', 2, '2022-04-01 11:38:39', '2022-04-06 09:53:40', 0, 0, NULL);
+INSERT INTO "sys_role" VALUES (9, 1, 0, '测试', '', 3, '2023-04-22 12:39:13', '2023-12-18 10:44:35.803106', 3, 0, NULL);
 
 -- ----------------------------
 -- Table structure for sys_role_dept
@@ -5141,7 +5131,7 @@ INSERT INTO "sys_user" VALUES (41, 'awu', '13578556546', '阿五', 0, '3b36a96af
 INSERT INTO "sys_user" VALUES (42, 'demo01', '13699888556', '测试01222', 0, '048dc94116558fb40920f3553ecd5fe8', 'KiVrfzKJQx', 1, '456@qq.com', 2, '', 109, '测试用户', 1, '', '', '', NULL, '2022-04-12 16:15:23', '2022-04-12 17:54:49', NULL, '');
 INSERT INTO "sys_user" VALUES (43, 'lx', '13855668855', '李希', 0, 'a1e3fe5983811d344950c04902ee6b76', 'Ezcs0vshdf', 1, '', 0, '', 101, '', 1, '', '', '::1', '2023-06-14 11:03:46', '2023-06-14 11:01:47', '2023-06-14 11:01:47', NULL, '');
 INSERT INTO "sys_user" VALUES (1, 'admin', '13578342363', '超级管理员', 0, 'c567ae329f9929b518759d3bea13f492', 'f9aZTAa8yz', 1, 'yxh669@qq.com', 1, 'https://yxh-1301841944.cos.ap-chongqing.myqcloud.com/gfast/2021-07-19/ccwpeuqz1i2s769hua.jpeg', 101, '', 1, 'asdasfdsaf大发放打发士大夫发按时', '描述信息', '::1', '2023-11-21 16:34:31.877568', '2021-06-22 17:58:00', '2023-04-22 14:39:18', NULL, '');
-INSERT INTO "sys_user" VALUES (31, 'demo', '15334455789', '李四', 0, '6dd68eea81e0fca319add0bd58c3fdf6', '46PvWe1Sl7', 1, '123@qq.com', 2, 'upload_file/2023-11-01/cwn4m6vp1qxkxvfqlx.jpg', 109, '3', 1, '云南省曲靖市22223', '生活变的再糟糕，也不妨碍我变得更好', '::1', '2023-12-11 09:41:38.37509', '2021-06-22 17:58:00', '2023-11-01 10:40:19', NULL, '');
+INSERT INTO "sys_user" VALUES (31, 'demo', '15334455789', '李四', 0, '6dd68eea81e0fca319add0bd58c3fdf6', '46PvWe1Sl7', 1, '123@qq.com', 2, 'upload_file/2023-11-01/cwn4m6vp1qxkxvfqlx.jpg', 109, '3', 1, '云南省曲靖市22223', '生活变的再糟糕，也不妨碍我变得更好', '::1', '2024-01-08 14:32:20.449498', '2021-06-22 17:58:00', '2023-11-01 10:40:19', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_user_online
@@ -5170,6 +5160,7 @@ COMMENT ON TABLE "sys_user_online" IS '用户在线状态表';
 -- ----------------------------
 -- Records of sys_user_online
 -- ----------------------------
+INSERT INTO "sys_user_online" VALUES (102, '4ca7c57a6ddbf53b7ad0713055e86eda', '7ZUSfVIf2HyYjcv86SKPPs29v003ECPEScsdYsYYqO2jMvy85Rgm/bvtinhwP9fzUGo8C+jHi0PTqsJMeFClCW/u+wVWjLSWNYUskOj2NVfWpWRbhotfDj6Z+KJ5kbDpXXBDp2WwvCBdbY3nHojH5Q==', '2024-01-08 14:32:20.480226', 'demo', '::1', 'Chrome', 'Windows 10');
 
 -- ----------------------------
 -- Table structure for sys_user_post
@@ -5241,7 +5232,8 @@ CREATE TABLE "tools_gen_table" (
   "excel_port" bool NOT NULL DEFAULT false,
   "use_snow_id" bool NOT NULL DEFAULT false,
   "use_virtual" bool NOT NULL DEFAULT false,
-  "excel_imp" bool NOT NULL DEFAULT false
+  "excel_imp" bool NOT NULL DEFAULT false,
+  "overwrite_info" json
 )
 ;
 COMMENT ON COLUMN "tools_gen_table"."table_id" IS '编号';
@@ -5266,17 +5258,18 @@ COMMENT ON COLUMN "tools_gen_table"."excel_port" IS '是否有导出excel功能'
 COMMENT ON COLUMN "tools_gen_table"."use_snow_id" IS '主键是否雪花ID';
 COMMENT ON COLUMN "tools_gen_table"."use_virtual" IS '树表是否使用虚拟表';
 COMMENT ON COLUMN "tools_gen_table"."excel_imp" IS '是否导入excel';
+COMMENT ON COLUMN "tools_gen_table"."overwrite_info" IS '生成覆盖的文件';
 COMMENT ON TABLE "tools_gen_table" IS '代码生成业务表';
 
 -- ----------------------------
 -- Records of tools_gen_table
 -- ----------------------------
-INSERT INTO "tools_gen_table" VALUES (91, 'demo_gen', '代码生成测试表', 'DemoGen', 'crud', 'internal/app/demo', 'demo', 'demo_gen', '代码生成测试', 'gfast', '', '2022-11-01 17:27:43', '2023-08-22 11:46:58', '', 't', 'id', 'asc', 't', 't', 'f', 'f', 'f');
-INSERT INTO "tools_gen_table" VALUES (92, 'demo_gen_class', '代码生成关联测试表', 'DemoGenClass', 'crud', 'internal/app/demo', 'demo', 'demo_gen_class', '分类信息', 'gfast', '', '2022-11-03 06:36:57', '2023-08-18 15:33:30', '分类', 't', 'id', 'asc', 't', 't', 'f', 'f', 'f');
-INSERT INTO "tools_gen_table" VALUES (93, 'demo_gen_tree', '代码生成树形结构测试表', 'DemoGenTree', 'tree', 'internal/app/demo', 'demo', 'demo_gen_tree', '代码生成树形结构测试', 'gfast', '{"treeCode":"id","treeName":"demoName","treeParentCode":"parentId"}', '2022-11-29 15:11:34', '2023-11-02 18:16:23', '', 't', 'id', 'asc', 't', 'f', 'f', 't', 'f');
-INSERT INTO "tools_gen_table" VALUES (94, 'demo_data_auth', '数据权限测试', 'DemoDataAuth', 'crud', 'internal/app/demo', 'de_mo', 'demo_data_auth', '数据权限测试', 'gfast', '', '2023-02-12 11:18:42', '2023-07-18 15:22:28', '', 't', 'id', 'asc', 'f', 'f', 'f', 'f', 'f');
-INSERT INTO "tools_gen_table" VALUES (95, 'demo_snow_id', '雪花ID测试', 'DemoSnowId', 'crud', 'internal/app/demo', 'demo', 'demo_snow_id', '雪花ID测试', 'gfast', '', '2023-09-19 15:34:46', '2023-09-20 14:48:07', '', 't', 'id', 'asc', 't', 't', 't', 'f', 'f');
-INSERT INTO "tools_gen_table" VALUES (96, 'demo_city_code', '省市区县和天气预报编码', 'DemoCityCode', 'tree', 'internal/app/demo', 'demo', 'demo_city_code', '省市区县', 'gfast', '{"treeCode":"id","treeName":"name","treeParentCode":"pid"}', '2023-11-02 10:38:51', '2023-11-03 09:39:49', '', 't', 'id', 'asc', 't', 'f', 'f', 't', 'f');
+INSERT INTO "tools_gen_table" VALUES (91, 'demo_gen', '代码生成测试表', 'DemoGen', 'crud', 'internal/app/demo', 'demo', 'demo_gen', '代码生成测试', 'gfast', '', '2022-11-01 17:27:43', '2023-08-22 11:46:58', '', 't', 'id', 'asc', 't', 't', 'f', 'f', 'f', NULL);
+INSERT INTO "tools_gen_table" VALUES (92, 'demo_gen_class', '代码生成关联测试表', 'DemoGenClass', 'crud', 'internal/app/demo', 'demo', 'demo_gen_class', '分类信息', 'gfast', '', '2022-11-03 06:36:57', '2023-08-18 15:33:30', '分类', 't', 'id', 'asc', 't', 't', 'f', 'f', 'f', NULL);
+INSERT INTO "tools_gen_table" VALUES (93, 'demo_gen_tree', '代码生成树形结构测试表', 'DemoGenTree', 'tree', 'internal/app/demo', 'demo', 'demo_gen_tree', '代码生成树形结构测试', 'gfast', '{"treeCode":"id","treeName":"demoName","treeParentCode":"parentId"}', '2022-11-29 15:11:34', '2023-11-02 18:16:23', '', 't', 'id', 'asc', 't', 'f', 'f', 't', 'f', NULL);
+INSERT INTO "tools_gen_table" VALUES (94, 'demo_data_auth', '数据权限测试', 'DemoDataAuth', 'crud', 'internal/app/demo', 'de_mo', 'demo_data_auth', '数据权限测试', 'gfast', '', '2023-02-12 11:18:42', '2023-07-18 15:22:28', '', 't', 'id', 'asc', 'f', 'f', 'f', 'f', 'f', NULL);
+INSERT INTO "tools_gen_table" VALUES (95, 'demo_snow_id', '雪花ID测试', 'DemoSnowId', 'crud', 'internal/app/demo', 'demo', 'demo_snow_id', '雪花ID测试', 'gfast', '', '2023-09-19 15:34:46', '2023-09-20 14:48:07', '', 't', 'id', 'asc', 't', 't', 't', 'f', 'f', NULL);
+INSERT INTO "tools_gen_table" VALUES (96, 'demo_city_code', '省市区县和天气预报编码', 'DemoCityCode', 'tree', 'internal/app/demo', 'demo', 'demo_city_code', '省市区县', 'gfast', '{"treeCode":"id","treeName":"name","treeParentCode":"pid"}', '2023-11-02 10:38:51', '2023-11-03 09:39:49', '', 't', 'id', 'asc', 't', 'f', 'f', 't', 'f', NULL);
 
 -- ----------------------------
 -- Table structure for tools_gen_table_column
@@ -5514,31 +5507,31 @@ SELECT setval('"sys_job_job_id_seq"', 9, false);
 -- ----------------------------
 ALTER SEQUENCE "sys_job_log_id_seq"
 OWNED BY "sys_job_log"."id";
-SELECT setval('"sys_job_log_id_seq"', 2438, true);
+SELECT setval('"sys_job_log_id_seq"', 2461, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "sys_login_log_info_id_seq"
 OWNED BY "sys_login_log"."info_id";
-SELECT setval('"sys_login_log_info_id_seq"', 199, true);
+SELECT setval('"sys_login_log_info_id_seq"', 200, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
-SELECT setval('"sys_notice_id_seq"', 1, false);
+SELECT setval('"sys_notice_id_seq"', 3, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
-SELECT setval('"sys_notice_read_id_seq"', 1, false);
+SELECT setval('"sys_notice_read_id_seq"', 1, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "sys_oper_log_oper_id_seq"
 OWNED BY "sys_oper_log"."oper_id";
-SELECT setval('"sys_oper_log_oper_id_seq"', 9104, true);
+SELECT setval('"sys_oper_log_oper_id_seq"', 9181, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5566,7 +5559,7 @@ SELECT setval('"sys_user_id_seq"', 44, false);
 -- ----------------------------
 ALTER SEQUENCE "sys_user_online_id_seq"
 OWNED BY "sys_user_online"."id";
-SELECT setval('"sys_user_online_id_seq"', 101, true);
+SELECT setval('"sys_user_online_id_seq"', 102, true);
 
 -- ----------------------------
 -- Alter sequences owned by
