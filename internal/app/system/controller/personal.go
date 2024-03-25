@@ -11,6 +11,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
@@ -37,7 +38,7 @@ func (c *personalController) EditPersonal(ctx context.Context, req *system.Perso
 	}
 	key := gconv.String(res.UserInfo.Id) + "-" + gmd5.MustEncryptString(res.UserInfo.UserName) + gmd5.MustEncryptString(res.UserInfo.UserPassword)
 	if g.Cfg().MustGet(ctx, "gfToken.multiLogin").Bool() {
-		key = gconv.String(res.UserInfo.Id) + "-" + gmd5.MustEncryptString(res.UserInfo.UserName) + gmd5.MustEncryptString(res.UserInfo.UserPassword+ip+userAgent)
+		key = gconv.String(res.UserInfo.Id) + "-" + gmd5.MustEncryptString(res.UserInfo.UserName) + gmd5.MustEncryptString(res.UserInfo.UserPassword+ip+userAgent+gtime.Now().String())
 	}
 	res.UserInfo.UserPassword = ""
 	res.Token, err = service.GfToken().GenerateToken(ctx, key, res.UserInfo)

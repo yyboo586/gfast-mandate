@@ -66,7 +66,7 @@ func (c *loginController) Login(ctx context.Context, req *system.UserLoginReq) (
 	user, err = service.SysUser().GetAdminUserByUsernamePassword(ctx, req)
 	if err != nil {
 		// 保存登录失败的日志信息
-		service.SysLoginLog().Invoke(ctx, &model.LoginLogParams{
+		service.SysLoginLog().Invoke(gctx.New(), &model.LoginLogParams{
 			Status:    0,
 			Username:  req.Username,
 			Ip:        ip,

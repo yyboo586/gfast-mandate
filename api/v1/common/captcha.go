@@ -12,11 +12,11 @@ import (
 )
 
 type CaptchaReq struct {
-	g.Meta `path:"/get" tags:"通用接口/通用接口/验证码" method:"get" summary:"获取验证码"`
+	g.Meta `path:"/get" tags:"通用接口/验证码" method:"get" summary:"获取验证码"`
 }
 
 type CaptchaV2Req struct {
-	g.Meta `path:"/v2" tags:"通用接口/通用接口/验证码" method:"get" summary:"获取v2验证码"`
+	g.Meta `path:"/v2" tags:"通用接口/验证码" method:"get" summary:"获取v2验证码"`
 }
 
 type CheckCaptchaV2Req struct {
