@@ -4,6 +4,7 @@
 {{$treeParentCode := .table.TreeParentCode}}
 {{$treeCode := .table.TreeCode}}
 {{$treeName := .table.TreeName}}
+{{$firstColumn := index .table.ListColumns 0 }}
 
   <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-container">
     <el-card shadow="hover">
@@ -716,7 +717,7 @@ export default defineComponent({
             treeData.value = list
         }
         //=============================================================================================================
-        const expandColumnKey = '{{$treeCode}}'
+        const expandColumnKey = '{{$firstColumn.HtmlField}}'
 
         const expandedRowKeys = ref<string[]>([])
 
