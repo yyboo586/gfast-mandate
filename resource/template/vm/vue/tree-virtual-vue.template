@@ -468,6 +468,11 @@ export default defineComponent({
             })
             {{end}}
             {{end}}
+            if(list.length > 0 &&  typeof list[0].id == "undefined"){
+                list.map((item:any)=>{
+                    item.id = item.categoryId
+                })
+            }
             dataList.value = _.clone(res.data.list)
             list = proxy.handleTree(res.data.list||[], "{{$treeCode}}", "{{$treeParentCode}}");
             state.tableData.data = list;

@@ -8,19 +8,19 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/dao/internal"
 )
 
-// internalSysRoleDeptDao is internal type for wrapping internal DAO implements.
-type internalSysRoleDeptDao = *internal.SysRoleDeptDao
+// internalSysRoleScopeDao is internal type for wrapping internal DAO implements.
+type internalSysRoleScopeDao = *internal.SysRoleScopeDao
 
-// sysRoleDeptDao is the data access object for table sys_role_dept.
+// sysRoleScopeDao is the data access object for table sys_role_scope.
 // You can define custom methods on it to extend its functionality as you wish.
-type sysRoleDeptDao struct {
-	internalSysRoleDeptDao
+type sysRoleScopeDao struct {
+	internalSysRoleScopeDao
 }
 
 var (
-	// SysRoleDept is globally public accessible object for table sys_role_dept operations.
-	SysRoleDept = sysRoleDeptDao{
-		internal.NewSysRoleDeptDao(),
+	// SysRoleScope is globally public accessible object for table sys_role_scope operations.
+	SysRoleScope = sysRoleScopeDao{
+		internal.NewSysRoleScopeDao(),
 	}
 )
 

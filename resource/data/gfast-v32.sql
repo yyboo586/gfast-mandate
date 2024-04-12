@@ -11,7 +11,7 @@
  Target Server Version : 50736
  File Encoding         : 65001
 
- Date: 18/03/2024 10:34:48
+ Date: 12/04/2024 17:11:01
 */
 
 SET NAMES utf8mb4;
@@ -104,8 +104,6 @@ CREATE TABLE `casbin_rule`  (
 -- Records of casbin_rule
 -- ----------------------------
 INSERT INTO `casbin_rule` VALUES ('g', 'u_3', '1', '', '', '', '');
-INSERT INTO `casbin_rule` VALUES ('g', 'u_3', '2', '', '', '', '');
-INSERT INTO `casbin_rule` VALUES ('g', 'u_31', '2', '', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('g', 'u_1', '1', '', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('g', 'u_43', '1', '', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '1', '27', 'All', '', '', '');
@@ -170,7 +168,10 @@ INSERT INTO `casbin_rule` VALUES ('p', '9', '23', 'All', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '9', '24', 'All', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '9', '25', 'All', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '9', '26', 'All', '', '', '');
+INSERT INTO `casbin_rule` VALUES ('g', 'u_3', '2', '', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('g', 'u_5', '2', '', '', '', '');
+INSERT INTO `casbin_rule` VALUES ('g', 'u_31', '2', '', '', '', '');
+INSERT INTO `casbin_rule` VALUES ('g', 'u_6', '2', '', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '2', '1', 'All', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '2', '2', 'All', '', '', '');
 INSERT INTO `casbin_rule` VALUES ('p', '2', '3', 'All', '', '', '');
@@ -4056,7 +4057,7 @@ CREATE TABLE `sys_auth_rule`  (
   UNIQUE INDEX `name`(`name`) USING BTREE,
   INDEX `pid`(`pid`) USING BTREE,
   INDEX `weigh`(`weigh`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 66 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '菜单节点表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 120 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '菜单节点表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_auth_rule
@@ -4108,6 +4109,12 @@ INSERT INTO `sys_auth_rule` VALUES (62, 60, 'api/v1/system/sysNotice/add', '通�
 INSERT INTO `sys_auth_rule` VALUES (63, 60, 'api/v1/system/sysNotice/edit', '通知公告修改', '', '', '通知公告修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO `sys_auth_rule` VALUES (64, 60, 'api/v1/system/sysNotice/delete', '通知公告删除', '', '', '通知公告删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO `sys_auth_rule` VALUES (65, 59, 'api/v1/system/sysNotice/show', '通知公告展示', 'iconfont icon-tongzhi', '', '', 0, 0, 0, '/system/sysNotice/show', 'system/sysNotice/show/index', 0, '', 0, 0, 1, '', 0, '', '2023-12-25 10:34:32', '2024-01-03 10:09:12');
+INSERT INTO `sys_auth_rule` VALUES (114, 10, 'api/v1/system/role/dataScope', '授权数据权限', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:18:23', '2024-04-11 11:19:17');
+INSERT INTO `sys_auth_rule` VALUES (115, 10, 'api/v1/system/role/setRoleUser', '授权用户权限', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:18:59', '2024-04-11 11:18:59');
+INSERT INTO `sys_auth_rule` VALUES (116, 26, 'api/v1/system/user/add', '新增用户', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:16:14', '2024-04-11 11:16:14');
+INSERT INTO `sys_auth_rule` VALUES (117, 26, 'api/v1/system/user/edit', '修改用户', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:16:45', '2024-04-11 11:19:25');
+INSERT INTO `sys_auth_rule` VALUES (118, 26, 'api/v1/system/user/getEdit', '用户信息', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:17:21', '2024-04-11 11:19:30');
+INSERT INTO `sys_auth_rule` VALUES (119, 26, 'api/v1/system/user/delete', '删除用户', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:17:39', '2024-04-11 11:19:34');
 
 -- ----------------------------
 -- Table structure for sys_config
@@ -4525,7 +4532,7 @@ CREATE TABLE `sys_role`  (
 -- Records of sys_role
 -- ----------------------------
 INSERT INTO `sys_role` VALUES (1, 0, 1, 0, '超级管理员', '备注', 2, '2022-04-01 11:38:39', '2023-09-28 10:27:55', 0, NULL);
-INSERT INTO `sys_role` VALUES (2, 1, 1, 0, '普通管理员', '备注', 5, '2022-04-01 11:38:39', '2024-01-29 15:18:28', 0, NULL);
+INSERT INTO `sys_role` VALUES (2, 1, 1, 0, '普通管理员', '备注', 5, '2022-04-01 11:38:39', '2024-04-12 17:09:26', 0, '{\"effectiveType\":2,\"weekDay\":[1,2,3,4,5],\"dayRange\":[\"2024-04-12 08:00:00\",\"2024-04-12 18:00:00\"],\"dateRange\":null}');
 INSERT INTO `sys_role` VALUES (3, 0, 1, 0, '站点管理员', '站点管理人员', 3, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, NULL);
 INSERT INTO `sys_role` VALUES (4, 5, 1, 0, '初级管理员', '初级管理员', 3, '2022-04-01 11:38:39', '2024-03-18 10:16:15', 0, '{\"effectiveType\":0,\"weekDay\":null,\"dayRange\":null,\"dateRange\":null}');
 INSERT INTO `sys_role` VALUES (5, 0, 1, 0, '高级管理员', '高级管理员', 2, '2022-04-01 11:38:39', '2022-04-01 11:38:39', 0, NULL);
@@ -4556,6 +4563,31 @@ INSERT INTO `sys_role_dept` VALUES (5, 104);
 INSERT INTO `sys_role_dept` VALUES (5, 105);
 INSERT INTO `sys_role_dept` VALUES (8, 105);
 INSERT INTO `sys_role_dept` VALUES (8, 106);
+
+-- ----------------------------
+-- Table structure for sys_role_scope
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_role_scope`;
+CREATE TABLE `sys_role_scope`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `role_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '角色id',
+  `menu_id` int(11) NOT NULL COMMENT 'api接口id',
+  `data_scope` int(11) NOT NULL COMMENT '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
+  `dept_ids` json NULL COMMENT '扩展数据',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `role_id`(`role_id`, `menu_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色数据权限' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_role_scope
+-- ----------------------------
+INSERT INTO `sys_role_scope` VALUES (8, 2, 59, 5, '[]');
+INSERT INTO `sys_role_scope` VALUES (9, 2, 60, 5, '[]');
+INSERT INTO `sys_role_scope` VALUES (10, 2, 61, 2, '[101, 103, 104, 105, 106, 107]');
+INSERT INTO `sys_role_scope` VALUES (11, 2, 62, 5, '[]');
+INSERT INTO `sys_role_scope` VALUES (12, 2, 63, 5, '[]');
+INSERT INTO `sys_role_scope` VALUES (13, 2, 64, 5, '[]');
+INSERT INTO `sys_role_scope` VALUES (14, 2, 65, 5, '[]');
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -4611,7 +4643,7 @@ INSERT INTO `sys_user` VALUES (22, 'yxfmlbb', '15969423326', '大数据部门测
 INSERT INTO `sys_user` VALUES (23, 'wangming', '18687460581', '王明', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '::1', '2023-11-03 16:03:56', '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL, 'oHUVQ6CKETZ7gvqkHdJqdlw2WXNE');
 INSERT INTO `sys_user` VALUES (24, 'zhk', '13699885591', '综合科', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '192.168.0.146', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL, '');
 INSERT INTO `sys_user` VALUES (28, 'demo3', '18699888855', '测试账号1', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '123132@qq.com', 0, '', 109, '', 1, '', '', '192.168.0.229', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL, '');
-INSERT INTO `sys_user` VALUES (31, 'demo', '15334455789', '李四', 0, '6dd68eea81e0fca319add0bd58c3fdf6', '46PvWe1Sl7', 1, '123@qq.com', 2, 'upload_file/2023-11-01/cwn4m6vp1qxkxvfqlx.jpg', 109, '3', 1, '云南省曲靖市22223', '生活变的再糟糕，也不妨碍我变得更好', '::1', '2024-03-18 09:25:54', '2021-06-22 17:58:00', '2023-11-01 10:40:19', NULL, '');
+INSERT INTO `sys_user` VALUES (31, 'demo', '15334455789', '李四', 0, '6dd68eea81e0fca319add0bd58c3fdf6', '46PvWe1Sl7', 1, '123@qq.com', 2, 'upload_file/2024-03-25/d02qmdqwk47kraexvh.jpg', 109, '3', 1, '云南省曲靖市22223', '生活变的再糟糕，也不妨碍我变得更好', '::1', '2024-04-12 16:59:11', '2021-06-22 17:58:00', '2024-03-25 17:52:53', NULL, '');
 INSERT INTO `sys_user` VALUES (32, 'demo100', '18699888859', '测试账号1', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '[::1]', '2021-11-24 18:01:21', '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL, '');
 INSERT INTO `sys_user` VALUES (33, 'demo110', '18699888853', '测试账号1', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '', 0, '', 0, '', 1, '', '', '', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL, '');
 INSERT INTO `sys_user` VALUES (34, 'yxfmlbb2', '15969423327', '研发部门测试', 0, '542a6e44dbac171f260fc4a032cd5522', 'dlqVVBTADg', 1, '1111@qqq.com', 1, '', 103, '', 0, '', '', '127.0.0.1', NULL, '2021-06-22 17:58:00', '2021-06-22 17:58:00', NULL, '');
@@ -4640,13 +4672,12 @@ CREATE TABLE `sys_user_online`  (
   `os` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作系统',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uni_token`(`token`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户在线状态表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户在线状态表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_user_online
 -- ----------------------------
-INSERT INTO `sys_user_online` VALUES (14, 'fbb637e7a7babe0d8baf41e4aa82d2e6', '7ZUSfVIf2HyYjcv86SKPPs29v003ECPEScsdYsYYqO2wMop+JHFZf/yt1ELqjTJMqqVsRyuOr5KCYVYPtppY7PZObwWyrJnrdsNoNKmIPppl/7ZQXLIjEtbkdOW16VbCVuN8BysS4FqcD0kQ3N282A==', '2024-03-18 09:04:21', 'demo', '::1', 'Chrome', 'Windows 10');
-INSERT INTO `sys_user_online` VALUES (15, '971718350e51a3ef017d7dd2959376ac', '7ZUSfVIf2HyYjcv86SKPPs29v003ECPEScsdYsYYqO2wMop+JHFZf/yt1ELqjTJMD9pHUJLWArEmhBWGfrsJWS2XL9AgfCvBwNBD87mX8MF1fsPKYREna3phbaK5zVihZw7cjB08NO3Z8YPtgdxVRQ==', '2024-03-18 09:25:54', 'demo', '::1', 'Chrome', 'Windows 10');
+INSERT INTO `sys_user_online` VALUES (24, '28f6ff7ef1b458a8045c28d230cc407d', '7ZUSfVIf2HyYjcv86SKPPs29v003ECPEScsdYsYYqO2stWX3CLiQnNjppjBEfqsS32u585t9PjZ2foOtqiALTZXn1TV10cNP+J+Aa5CDWcsnteYNacuGQZBID8Ab9DYstNmkHzInT0B85Gu0XiPl3g==', '2024-04-12 16:59:11', 'demo', '::1', 'Chrome', 'Windows 10');
 
 -- ----------------------------
 -- Table structure for sys_user_post
@@ -4718,17 +4749,18 @@ CREATE TABLE `tools_gen_table`  (
   `excel_imp` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否导入excel',
   `overwrite_info` json NULL COMMENT '生成覆盖的文件',
   PRIMARY KEY (`table_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 97 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '代码生成业务表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 98 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '代码生成业务表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of tools_gen_table
 -- ----------------------------
 INSERT INTO `tools_gen_table` VALUES (91, 'demo_gen', '代码生成测试表', 'DemoGen', 'crud', 'internal/app/demo', 'demo', 'demo_gen', '代码生成测试', 'gfast', '', '2022-11-01 17:27:43', '2024-03-18 10:17:04', '', b'1', 'id', 'asc', b'1', b'1', b'0', b'0', b'1', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
-INSERT INTO `tools_gen_table` VALUES (92, 'demo_gen_class', '代码生成关联测试表', 'DemoGenClass', 'crud', 'internal/app/demo', 'demo', 'demo_gen_class', '分类信息', 'gfast', '', '2022-11-03 06:36:57', '2024-03-18 10:17:14', '分类', b'1', 'id', 'asc', b'1', b'1', b'0', b'0', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
+INSERT INTO `tools_gen_table` VALUES (92, 'demo_gen_class', '代码生成关联测试表', 'DemoGenClass', 'crud', 'internal/app/demo', 'demo', 'demo_gen_class', '分类信息', 'gfast', '', '2022-11-03 06:36:57', '2024-03-19 09:29:18', '分类', b'1', 'id', 'asc', b'1', b'1', b'0', b'0', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
 INSERT INTO `tools_gen_table` VALUES (93, 'demo_gen_tree', '代码生成树形结构测试表', 'DemoGenTree', 'tree', 'internal/app/demo', 'demo', 'demo_gen_tree', '代码生成树形结构测试', 'gfast', '{\"treeCode\":\"id\",\"treeName\":\"demoName\",\"treeParentCode\":\"parentId\"}', '2022-11-29 15:11:34', '2024-03-18 10:17:50', '', b'1', 'id', 'asc', b'1', b'0', b'0', b'1', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
 INSERT INTO `tools_gen_table` VALUES (94, 'demo_data_auth', '数据权限测试', 'DemoDataAuth', 'crud', 'internal/app/demo', 'demo', 'demo_data_auth', '数据权限测试', 'gfast', '', '2023-02-12 11:18:42', '2024-03-18 10:18:00', '', b'1', 'id', 'asc', b'0', b'0', b'0', b'0', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
 INSERT INTO `tools_gen_table` VALUES (95, 'demo_snow_id', '雪花ID测试', 'DemoSnowId', 'crud', 'internal/app/demo', 'demo', 'demo_snow_id', '雪花ID测试', 'gfast', '', '2023-09-19 15:34:46', '2024-03-18 10:16:51', '', b'1', 'id', 'asc', b'1', b'1', b'1', b'0', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
-INSERT INTO `tools_gen_table` VALUES (96, 'demo_city_code', '省市区县和天气预报编码', 'DemoCityCode', 'tree', 'internal/app/demo', 'demo', 'demo_city_code', '省市区县', 'gfast', '{\"treeCode\":\"id\",\"treeName\":\"name\",\"treeParentCode\":\"pid\"}', '2023-11-02 10:38:51', '2024-03-18 10:18:14', '', b'1', 'id', 'asc', b'1', b'0', b'0', b'1', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
+INSERT INTO `tools_gen_table` VALUES (96, 'demo_city_code', '省市区县和天气预报编码', 'DemoCityCode', 'tree', 'internal/app/demo', 'demo', 'demo_city_code', '省市区县', 'gfast', '{\"treeCode\":\"id\",\"treeName\":\"name\",\"treeParentCode\":\"pid\"}', '2023-11-02 10:38:51', '2024-04-07 09:30:57', '', b'1', 'id', 'asc', b'1', b'0', b'0', b'1', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
+INSERT INTO `tools_gen_table` VALUES (97, 'product_category', '商品分类表', 'ProductCategory', 'tree', 'internal/app/demo', 'demo', 'product_category', '商品分类表', 'gfast', '{\"treeCode\":\"categoryId\",\"treeName\":\"categoryName\",\"treeParentCode\":\"parentId\"}', '2024-04-07 09:08:30', '2024-04-07 10:08:26', '', b'1', 'category_id', 'asc', b'0', b'0', b'0', b'1', b'0', '[{\"key\": \"api\", \"value\": true}, {\"key\": \"controller\", \"value\": true}, {\"key\": \"dao\", \"value\": true}, {\"key\": \"dao_internal\", \"value\": true}, {\"key\": \"logic\", \"value\": true}, {\"key\": \"model\", \"value\": true}, {\"key\": \"model_do\", \"value\": true}, {\"key\": \"model_entity\", \"value\": true}, {\"key\": \"router\", \"value\": true}, {\"key\": \"router_func\", \"value\": true}, {\"key\": \"service\", \"value\": true}, {\"key\": \"sql\", \"value\": true}, {\"key\": \"tsApi\", \"value\": true}, {\"key\": \"tsModel\", \"value\": true}, {\"key\": \"vue\", \"value\": true}, {\"key\": \"vueDetail\", \"value\": true}, {\"key\": \"vueEdit\", \"value\": true}]');
 
 -- ----------------------------
 -- Table structure for tools_gen_table_column
@@ -4775,7 +4807,7 @@ CREATE TABLE `tools_gen_table_column`  (
   `parent_column_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '上级字段名',
   `cascade_column_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '级联查询字段',
   PRIMARY KEY (`column_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1009 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 1023 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of tools_gen_table_column
@@ -4836,5 +4868,19 @@ INSERT INTO `tools_gen_table_column` VALUES (1005, 96, 'pinyin', '城市拼音',
 INSERT INTO `tools_gen_table_column` VALUES (1006, 96, 'ext_id', '完整ID', 'varchar(255)', 'string', 'string', 'ExtId', 'extId', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 7, 7, 7, 7, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (1007, 96, 'ext_name', '城市全称', 'varchar(255)', 'string', 'string', 'ExtName', 'extName', b'0', b'0', b'1', b'1', b'1', b'1', b'0', 8, 8, 8, 8, 'LIKE', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
 INSERT INTO `tools_gen_table_column` VALUES (1008, 96, 'weathercode', '天气预报的编码', 'varchar(255)', 'string', 'string', 'Weathercode', 'weathercode', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 9, 9, 9, 9, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 100, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1009, 97, 'category_id', '分类ID', 'bigint(10) unsigned', 'uint64', 'number', 'CategoryId', 'categoryId', b'1', b'1', b'1', b'0', b'1', b'1', b'0', 1, 1, 1, 1, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1010, 97, 'category_name', '分类名称', 'varchar(11)', 'string', 'string', 'CategoryName', 'categoryName', b'0', b'0', b'1', b'1', b'1', b'1', b'1', 2, 2, 2, 2, 'LIKE', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1011, 97, 'parent_id', '父分类ID', 'bigint(10) unsigned', 'uint64', 'number', 'ParentId', 'parentId', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 3, 3, 3, 3, 'EQ', 'treeSelect', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1012, 97, 'category_pic', '分类图标', 'varchar(255)', 'string', 'string', 'CategoryPic', 'categoryPic', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 4, 4, 4, 4, 'EQ', 'imagefile', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1013, 97, 'category_big_pic', '分类图片', 'varchar(255)', 'string', 'string', 'CategoryBigPic', 'categoryBigPic', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 5, 5, 5, 5, 'EQ', 'imagefile', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1014, 97, 'category_code', '分类编码', 'varchar(11)', 'string', 'string', 'CategoryCode', 'categoryCode', b'0', b'0', b'1', b'1', b'1', b'1', b'0', 6, 6, 6, 6, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1015, 97, 'category_level', '分类层级', 'tinyint(4)', 'int', 'number', 'CategoryLevel', 'categoryLevel', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 7, 7, 7, 7, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1016, 97, 'category_status', '分类状态', 'tinyint(4)', 'int', 'number', 'CategoryStatus', 'categoryStatus', b'0', b'0', b'1', b'1', b'0', b'1', b'0', 8, 8, 8, 8, 'EQ', 'radio', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1017, 97, 'is_show', '是否推荐', 'tinyint(4)', 'int', 'number', 'IsShow', 'isShow', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 9, 9, 9, 9, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1018, 97, 'sort', '排序方式(数字越小越靠前)', 'int(11) unsigned', 'uint', 'number', 'Sort', 'sort', b'0', b'0', b'0', b'1', b'1', b'1', b'0', 10, 10, 10, 10, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1019, 97, 'app_id', '应用id', 'int(11) unsigned', 'uint', 'number', 'AppId', 'appId', b'0', b'0', b'0', b'1', b'0', b'1', b'0', 11, 11, 11, 11, 'EQ', 'input', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1020, 97, 'created_at', '', 'datetime', 'Time', 'string', 'CreatedAt', 'createdAt', b'0', b'0', b'0', b'0', b'1', b'1', b'0', 12, 12, 12, 12, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1021, 97, 'updated_at', '', 'datetime', 'Time', 'string', 'UpdatedAt', 'updatedAt', b'0', b'0', b'0', b'0', b'0', b'0', b'0', 13, 13, 13, 13, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
+INSERT INTO `tools_gen_table_column` VALUES (1022, 97, 'deleted_at', '', 'datetime', 'Time', 'string', 'DeletedAt', 'deletedAt', b'0', b'0', b'0', b'0', b'0', b'0', b'0', 14, 14, 14, 14, 'EQ', 'datetime', '', '', '', '', '', '', '', '', 12, 1, b'0', 150, b'0', b'0', b'0', '', '');
 
 SET FOREIGN_KEY_CHECKS = 1;

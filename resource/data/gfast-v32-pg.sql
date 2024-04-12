@@ -12,7 +12,7 @@
  Target Server Version : 140010
  File Encoding         : 65001
 
- Date: 18/03/2024 10:32:41
+ Date: 12/04/2024 17:11:52
 */
 
 
@@ -221,6 +221,17 @@ CACHE 1;
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "sys_role_id_seq";
 CREATE SEQUENCE "sys_role_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for sys_role_scope_id_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "sys_role_scope_id_seq";
+CREATE SEQUENCE "sys_role_scope_id_seq" 
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 9223372036854775807
@@ -4460,6 +4471,12 @@ INSERT INTO "sys_auth_rule" VALUES (89, 87, 'api/v1/system/sysNotice/add', '通�
 INSERT INTO "sys_auth_rule" VALUES (90, 87, 'api/v1/system/sysNotice/edit', '通知公告修改', '', '', '通知公告修改', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO "sys_auth_rule" VALUES (91, 87, 'api/v1/system/sysNotice/delete', '通知公告删除', '', '', '通知公告删除', 2, 0, 0, '', '', 0, 'sys_admin', 0, 0, 1, '', 0, '', NULL, NULL);
 INSERT INTO "sys_auth_rule" VALUES (92, 86, 'api/v1/system/sysNotice/show', '通知公告扎展示', 'iconfont icon-tongzhi', '', '', 0, 0, 0, '/system/sysNotice/show', 'system/sysNotice/show/index', 0, '', 0, 0, 1, '', 0, '', '2023-12-25 10:34:32', '2023-12-25 10:34:32');
+INSERT INTO "sys_auth_rule" VALUES (93, 10, 'api/v1/system/role/dataScope', '授权数据权限', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:18:23', '2024-04-11 11:19:17');
+INSERT INTO "sys_auth_rule" VALUES (94, 10, 'api/v1/system/role/setRoleUser', '授权用户权限', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:18:59', '2024-04-11 11:18:59');
+INSERT INTO "sys_auth_rule" VALUES (95, 26, 'api/v1/system/user/add', '新增用户', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:16:14', '2024-04-11 11:16:14');
+INSERT INTO "sys_auth_rule" VALUES (96, 26, 'api/v1/system/user/edit', '修改用户', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:16:45', '2024-04-11 11:19:25');
+INSERT INTO "sys_auth_rule" VALUES (97, 26, 'api/v1/system/user/getEdit', '用户信息', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:17:21', '2024-04-11 11:19:30');
+INSERT INTO "sys_auth_rule" VALUES (98, 26, 'api/v1/system/user/delete', '删除用户', '', '', '', 2, 0, 0, '', '', 0, '', 0, 0, 1, '', 0, '', '2024-04-11 11:17:39', '2024-04-11 11:19:34');
 
 -- ----------------------------
 -- Table structure for sys_config
@@ -5048,6 +5065,29 @@ INSERT INTO "sys_role_dept" VALUES (8, 105);
 INSERT INTO "sys_role_dept" VALUES (8, 106);
 
 -- ----------------------------
+-- Table structure for sys_role_scope
+-- ----------------------------
+DROP TABLE IF EXISTS "sys_role_scope";
+CREATE TABLE "sys_role_scope" (
+  "id" int8 NOT NULL DEFAULT nextval('sys_role_scope_id_seq'::regclass),
+  "role_id" int8 NOT NULL DEFAULT 0,
+  "menu_id" int4 NOT NULL,
+  "data_scope" int4 NOT NULL,
+  "dept_ids" json
+)
+;
+COMMENT ON COLUMN "sys_role_scope"."id" IS 'ID';
+COMMENT ON COLUMN "sys_role_scope"."role_id" IS '角色id';
+COMMENT ON COLUMN "sys_role_scope"."menu_id" IS 'api接口id';
+COMMENT ON COLUMN "sys_role_scope"."data_scope" IS '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限)';
+COMMENT ON COLUMN "sys_role_scope"."dept_ids" IS '扩展数据';
+COMMENT ON TABLE "sys_role_scope" IS '角色数据权限';
+
+-- ----------------------------
+-- Records of sys_role_scope
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS "sys_user";
@@ -5465,7 +5505,7 @@ SELECT setval('"demo_gen_tree_id_seq"', 11, false);
 -- ----------------------------
 ALTER SEQUENCE "sys_auth_rule_id_seq"
 OWNED BY "sys_auth_rule"."id";
-SELECT setval('"sys_auth_rule_id_seq"', 92, true);
+SELECT setval('"sys_auth_rule_id_seq"', 98, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5546,6 +5586,13 @@ SELECT setval('"sys_post_post_id_seq"', 10, false);
 ALTER SEQUENCE "sys_role_id_seq"
 OWNED BY "sys_role"."id";
 SELECT setval('"sys_role_id_seq"', 10, false);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+ALTER SEQUENCE "sys_role_scope_id_seq"
+OWNED BY "sys_role_scope"."id";
+SELECT setval('"sys_role_scope_id_seq"', 1, false);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5739,6 +5786,16 @@ ALTER TABLE "sys_role" ADD CONSTRAINT "pk_sys_role" PRIMARY KEY ("id");
 -- Primary Key structure for table sys_role_dept
 -- ----------------------------
 ALTER TABLE "sys_role_dept" ADD CONSTRAINT "pk_sys_role_dept" PRIMARY KEY ("role_id", "dept_id");
+
+-- ----------------------------
+-- Uniques structure for table sys_role_scope
+-- ----------------------------
+ALTER TABLE "sys_role_scope" ADD CONSTRAINT "sys_role_scope_role_id_menu_id_key" UNIQUE ("role_id", "menu_id");
+
+-- ----------------------------
+-- Primary Key structure for table sys_role_scope
+-- ----------------------------
+ALTER TABLE "sys_role_scope" ADD CONSTRAINT "sys_role_scope_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Indexes structure for table sys_user

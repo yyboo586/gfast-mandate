@@ -28,6 +28,7 @@ type (
 		GetMenuListTree(pid uint, list []*model.SysAuthRuleInfoRes) []*model.SysAuthRuleTreeRes
 		DeleteMenuByIds(ctx context.Context, ids []int) (err error)
 		FindSonByParentId(list []*model.SysAuthRuleInfoRes, pid uint) []*model.SysAuthRuleInfoRes
+		GetIdByName(ctx context.Context,name string)(id uint,err error)
 	}
 )
 

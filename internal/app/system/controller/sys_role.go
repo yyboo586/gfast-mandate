@@ -72,7 +72,7 @@ func (c *roleController) Delete(ctx context.Context, req *system.RoleDeleteReq) 
 
 // DeptTreeSelect 获取角色授权部门数据
 func (c *roleController) DeptTreeSelect(ctx context.Context, req *system.RoleDeptTreeSelectReq) (res *system.RoleDeptTreeSelectRes, err error) {
-	res, err = service.SysRole().RoleDeptTreeSelect(ctx, req.RoleId)
+	res, err = service.SysRole().RoleDeptTreeSelect(ctx)
 	return
 }
 
@@ -83,12 +83,21 @@ func (c *roleController) MenuTreeSelect(ctx context.Context, req *system.RoleMen
 		Rules: make([]*model.SysAuthRuleTreeRes, 0),
 	}
 	list, err = service.SysAuthRule().GetMenuListSearch(ctx, &system.RuleSearchReq{})
+	if err != nil {
+		return
+	}
 	res.Rules = service.SysAuthRule().GetMenuListTree(0, list)
+	res.DataScope, err = service.SysRole().GetRoleDataScope(ctx, req.RoleId)
 	return
 }
 
 // RoleDataScope 设置角色数据权限
 func (c *roleController) RoleDataScope(ctx context.Context, req *system.DataScopeReq) (res *system.DataScopeRes, err error) {
 	err = service.SysRole().RoleDataScope(ctx, req)
+	return
+}
+
+func (s *roleController) SetRoleUsers(ctx context.Context, req *system.SetRoleUserReq) (res *system.SetRoleUserRes, err error) {
+	err = service.SysUser().SetUserRole(ctx, req.RoleId, req.UserIds)
 	return
 }

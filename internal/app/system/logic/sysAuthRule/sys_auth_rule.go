@@ -314,3 +314,17 @@ func (s *sSysAuthRule) FindSonByParentId(list []*model.SysAuthRuleInfoRes, pid u
 	}
 	return children
 }
+
+func (s *sSysAuthRule) GetIdByName(ctx context.Context, name string) (id uint, err error) {
+	var menuList []*model.SysAuthRuleInfoRes
+	menuList, err = s.GetMenuList(ctx)
+	if err != nil {
+		return
+	}
+	for _, menu := range menuList {
+		if menu.Name == name {
+			id = menu.Id
+		}
+	}
+	return
+}

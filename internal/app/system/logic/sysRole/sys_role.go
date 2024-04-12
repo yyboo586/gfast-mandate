@@ -306,55 +306,60 @@ func (s *sSysRole) DeleteByIds(ctx context.Context, ids []int64) (err error) {
 	return
 }
 
-func (s *sSysRole) RoleDeptTreeSelect(ctx context.Context, roleId int64) (res *system.RoleDeptTreeSelectRes, err error) {
+func (s *sSysRole) RoleDeptTreeSelect(ctx context.Context) (res *system.RoleDeptTreeSelectRes, err error) {
 	res = new(system.RoleDeptTreeSelectRes)
 	err = g.Try(ctx, func(ctx context.Context) {
 		list, err := service.SysDept().GetList(ctx, &system.DeptSearchReq{
 			Status: "1",
 		})
 		liberr.ErrIsNil(ctx, err)
-		//获取关联的角色数据权限
-		checkedKeys, err := s.GetRoleDepts(ctx, roleId)
-		liberr.ErrIsNil(ctx, err)
-
 		dList := service.SysDept().GetListTree(0, list)
 		res.Depts = dList
-		res.CheckedKeys = checkedKeys
 	})
 	return
 }
 
-func (s *sSysRole) GetRoleDepts(ctx context.Context, roleId int64) ([]int64, error) {
-	var entities []*entity.SysRoleDept
-	err := dao.SysRoleDept.Ctx(ctx).Where("role_id", roleId).Scan(&entities)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]int64, 0)
-	for _, v := range entities {
-		result = append(result, v.DeptId)
-	}
-	return result, nil
+func (s *sSysRole) GetRoleDataScope(ctx context.Context, roleId uint) (data []*model.ScopeAuthData, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		err = dao.SysRoleScope.Ctx(ctx).Where("role_id", roleId).Scan(&data)
+		liberr.ErrIsNil(ctx, err, "获取角色数据权限失败")
+	})
+	return
+}
+
+func (s *sSysRole) GetRoleMenuScope(ctx context.Context, roleIds []uint, menuId uint) (data []*model.ScopeAuthData, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		err = dao.SysRoleScope.Ctx(ctx).WhereIn("role_id", roleIds).
+			Where("menu_id", menuId).
+			Scan(&data)
+		liberr.ErrIsNil(ctx, err, "获取角色数据权限失败")
+	})
+	return
 }
 
 // RoleDataScope 设置角色数据权限
 func (s *sSysRole) RoleDataScope(ctx context.Context, req *system.DataScopeReq) error {
 	err := g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err := g.Try(ctx, func(ctx context.Context) {
-			_, err := tx.Model(dao.SysRole.Table()).Where("id", req.RoleId).Data(g.Map{"data_scope": req.DataScope}).Update()
-			liberr.ErrIsNil(ctx, err, "设置失败")
-			if req.DataScope == 2 {
-				_, err = tx.Model(dao.SysRoleDept.Table()).Where("role_id", req.RoleId).Delete()
-				liberr.ErrIsNil(ctx, err, "设置失败")
-				data := g.List{}
-				for _, deptId := range req.DeptIds {
-					data = append(data, g.Map{"role_id": req.RoleId, "dept_id": deptId})
+			data := make([]do.SysRoleScope, 0, len(req.AuthData))
+			for _, v := range req.AuthData {
+				if v.MenuId != 0 && v.Scope != 0 {
+					data = append(data, do.SysRoleScope{
+						RoleId:    req.RoleId,
+						MenuId:    v.MenuId,
+						DataScope: v.Scope,
+						DeptIds:   gconv.String(v.DeptIds),
+					})
 				}
-				_, err = tx.Model(dao.SysRoleDept.Table()).Data(data).Insert()
-				liberr.ErrIsNil(ctx, err, "设置失败")
 			}
-			//清除缓存
-			commonService.Cache().Remove(ctx, consts.CacheSysRole)
+			//清除旧权限
+			_, err := dao.SysRoleScope.Ctx(ctx).Where(dao.SysRoleScope.Columns().RoleId, req.RoleId).
+				Delete()
+			liberr.ErrIsNil(ctx, err, "清除旧权限信息失败")
+			if len(data) > 0 {
+				_, err = dao.SysRoleScope.Ctx(ctx).Data(data).Insert()
+				liberr.ErrIsNil(ctx, err, "设置权限信息失败")
+			}
 		})
 		return err
 	})

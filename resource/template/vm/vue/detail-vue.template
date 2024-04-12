@@ -1,5 +1,5 @@
 <template>
-  <!-- {{.table.FunctionName}}详情抽屉 -->
+  <!-- {{.table.TableComment}}详情抽屉 -->
   {{$lens := .table.Columns|len}}
   {{$businessName := .table.BusinessName | CaseCamelLower}}
   {{$treeParentCode := .table.TreeParentCode}}
@@ -8,7 +8,7 @@
   <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-detail">
     <el-drawer v-model="isShowDialog" size="80%" direction="ltr">
       <template #header>
-        <h4>{{.table.FunctionName}}详情</h4>
+        <h4>{{.table.TableComment}}详情</h4>
       </template>
       <el-form ref="formRef" :model="formData" label-width="100px">
       {{ $hasRowEnd := true }}
@@ -177,6 +177,11 @@
   } from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/model"
   export default defineComponent({
     name:"{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail",
+    {{$hascomponent := false}}
+    {{if or $imgsImp $tokenImp $fileImp}}
+    {{$hascomponent = true}}
+    {{end}}
+    {{if $hascomponent}}
     components:{
       {{if $editImp}}
       GfUeditor,
@@ -188,6 +193,19 @@
       uploadFile,
       {{end}}
     },
+    {{end}}
+    {{$hasProps := false}}
+    {{if eq .table.TplCategory "tree"}}
+    {{$hasProps = true}}
+    {{end}}
+    {{if not $hasProps}}
+    {{range $index, $column := .table.Columns}}
+    {{if or (ne $column.DictType "") (ne $column.LinkTableName "") }}
+    {{$hasProps = true}}
+    {{end}}
+    {{end}}
+    {{end}}
+    {{if $hasProps}}
     props:{
       {{range $index, $column := .table.Columns}}
       {{if ne $column.DictType ""}}
@@ -207,13 +225,14 @@
       {{end}}
       {{end}}
       {{if eq .table.TplCategory "tree"}}
-      // {{.table.FunctionName}}树选项
+      // {{.table.TableComment}}树选项
       {{$businessName}}Options :{
         type:Array,
         default:()=>[]
       },
       {{end}}
     },
+    {{end}}
     setup(props,{emit}) {
       {{if or $imgsImp $tokenImp $fileImp}}
       const baseURL:string|undefined|boolean = import.meta.env.VITE_API_URL

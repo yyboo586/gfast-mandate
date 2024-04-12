@@ -93,34 +93,42 @@ type RoleDeleteRes struct {
 type RoleDeptTreeSelectReq struct {
 	g.Meta `path:"/role/deptTreeSelect" tags:"系统后台/角色管理" method:"get" summary:"获取部门树"`
 	commonApi.Author
-	RoleId int64 `p:"roleId" v:"required#角色id必须"`
 }
 
 type RoleDeptTreeSelectRes struct {
-	g.Meta      `mime:"application/json"`
-	Depts       []*model.SysDeptTreeRes `json:"depts"`
-	CheckedKeys []int64                 `json:"checkedKeys"`
+	g.Meta `mime:"application/json"`
+	Depts  []*model.SysDeptTreeRes `json:"depts"`
 }
 
 type RoleMenuTreeSelectReq struct {
 	g.Meta `path:"/role/menuTreeSelect" tags:"系统后台/角色管理" method:"get" summary:"获取菜单树"`
 	commonApi.Author
-	RoleId int64 `p:"roleId" v:"required#角色id必须"`
+	RoleId uint `p:"roleId" v:"required#角色id必须"`
 }
 
 type RoleMenuTreeSelectRes struct {
-	g.Meta `mime:"application/json"`
-	Rules  []*model.SysAuthRuleTreeRes `json:"rules"`
+	g.Meta    `mime:"application/json"`
+	Rules     []*model.SysAuthRuleTreeRes `json:"rules"`
+	DataScope []*model.ScopeAuthData      `json:"dataScope"`
 }
 
 // DataScopeReq 角色数据授权参数
 type DataScopeReq struct {
-	g.Meta    `path:"/role/dataScope" tags:"系统后台/角色管理" method:"put" summary:"角色数据授权"`
-	RoleId    uint   `p:"roleId" v:"required#角色ID不能为空"`
-	DataScope uint   `p:"dataScope" v:"required#权限范围不能为空"`
-	DeptIds   []uint `p:"deptIds"`
+	g.Meta   `path:"/role/dataScope" tags:"系统后台/角色管理" method:"put" summary:"角色数据授权"`
+	RoleId   uint                      `p:"roleId" v:"required#角色ID不能为空"`
+	AuthData []*model.ScopeAuthDataReq `p:"authData"`
 }
 
 type DataScopeRes struct {
+	commonApi.EmptyRes
+}
+
+type SetRoleUserReq struct {
+	g.Meta  `path:"/role/setRoleUser" tags:"系统后台/角色管理" method:"put" summary:"角色用户授权"`
+	RoleId  uint     `p:"roleId" v:"required#角色ID不能为空"`
+	UserIds []uint64 `p:"userIds"`
+}
+
+type SetRoleUserRes struct {
 	commonApi.EmptyRes
 }

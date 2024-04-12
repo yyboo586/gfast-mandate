@@ -5,10 +5,10 @@
   {{$treeCode := .table.TreeCode}}
   {{$treeName := .table.TreeName}}
   <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit">
-    <!-- 添加或修改{{.table.FunctionName}}对话框 -->
+    <!-- 添加或修改{{.table.TableComment}}对话框 -->
     <el-dialog v-model="isShowDialog" width="800px" :close-on-click-modal="false" :destroy-on-close="true">
       <template #header>
-        <div v-drag="['.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog', '.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog__header']">{{"{{"}}(!formData.{{.table.PkColumn.HtmlField}} || formData.{{.table.PkColumn.HtmlField}}==0?'添加':'修改')+'{{.table.FunctionName}}'{{"}}"}}</div>
+        <div v-drag="['.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog', '.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog__header']">{{"{{"}}(!formData.{{.table.PkColumn.HtmlField}} || formData.{{.table.PkColumn.HtmlField}}==0?'添加':'修改')+'{{.table.TableComment}}'{{"}}"}}</div>
       </template>
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">
       {{if .table.IsPkInsertable}}
@@ -301,6 +301,11 @@ import {
 } from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/model"
 export default defineComponent({
   name:"{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit",
+  {{$hascomponent := false}}
+  {{if or $imgsImp $tokenImp $fileImp}}
+  {{$hascomponent = true}}
+  {{end}}
+  {{if $hascomponent}}
   components:{
     {{if $editImp}}
     GfUeditor,
@@ -312,6 +317,19 @@ export default defineComponent({
     uploadFile,
     {{end}}
   },
+  {{end}}
+  {{$hasProps := false}}
+  {{if eq .table.TplCategory "tree"}}
+    {{$hasProps = true}}
+  {{end}}
+  {{if not $hasProps}}
+    {{range $index, $column := .table.Columns}}
+      {{if or (ne $column.DictType "") (ne $column.LinkTableName "") }}
+        {{$hasProps = true}}
+      {{end}}
+    {{end}}
+  {{end}}
+  {{if $hasProps}}
   props:{
     {{range $index, $column := .table.Columns}}
     {{if ne $column.DictType ""}}
@@ -331,13 +349,14 @@ export default defineComponent({
     {{end}}
     {{end}}
     {{if eq .table.TplCategory "tree"}}
-    // {{.table.FunctionName}}树选项
+    // {{.table.TableComment}}树选项
     {{$businessName}}Options :{
       type:Array,
       default:()=>[]
     },
     {{end}}
   },
+  {{end}}
   setup(props,{emit}) {
     {{if or $imgsImp $tokenImp $fileImp}}
     const baseURL:string|undefined|boolean = import.meta.env.VITE_API_URL

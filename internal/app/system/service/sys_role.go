@@ -24,11 +24,12 @@ type (
 		GetFilteredNamedPolicy(ctx context.Context, id uint) (gpSlice []int, err error)
 		EditRole(ctx context.Context, req *system.RoleEditReq) (err error)
 		DeleteByIds(ctx context.Context, ids []int64) (err error)
-		RoleDeptTreeSelect(ctx context.Context, roleId int64) (res *system.RoleDeptTreeSelectRes, err error)
-		GetRoleDepts(ctx context.Context, roleId int64) ([]int64, error)
+		RoleDeptTreeSelect(ctx context.Context) (res *system.RoleDeptTreeSelectRes, err error)
 		RoleDataScope(ctx context.Context, req *system.DataScopeReq) error
 		FindSonByParentId(roleList []*entity.SysRole, id uint) []*entity.SysRole
 		FindSonIdsByParentId(roleList []*entity.SysRole, id uint) []uint
+		GetRoleDataScope(ctx context.Context, roleId uint) (data []*model.ScopeAuthData, err error)
+		GetRoleMenuScope(ctx context.Context, roleIds []uint, menuId uint) (data []*model.ScopeAuthData, err error)
 	}
 )
 

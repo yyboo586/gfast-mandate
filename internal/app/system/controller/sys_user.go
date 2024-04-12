@@ -49,6 +49,13 @@ func (c *userController) List(ctx context.Context, req *system.UserSearchReq) (r
 	return
 }
 
+// GetUsersByRoleId 通过角色id获取用户数据
+func (c *userController) GetUsersByRoleId(ctx context.Context, req *system.UsersRoleIdReq) (res *system.UsersRoleIdRes, err error) {
+	res = new(system.UsersRoleIdRes)
+	res.UserList, err = service.SysUser().GetUsersByRoleId(ctx, req.RoleId)
+	return
+}
+
 // GetParams 获取用户维护相关参数
 func (c *userController) GetParams(ctx context.Context, req *system.UserGetParamsReq) (res *system.UserGetParamsRes, err error) {
 	res = new(system.UserGetParamsRes)

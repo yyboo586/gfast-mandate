@@ -955,12 +955,12 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 			tableEx.HasConversion = true
 			break
 		case "date":
-			columnEx.FieldValidation = gstr.CaseCamelLower(columnName) + "@" + dateValidationRule + "#" + column.ColumnComment + "需为YYYY-MM-DD格式"
-			columnEx.FieldConversion = "gconv.Time"
-			tableEx.HasConversion = true
-			break
 		case "Time":
-			columnEx.FieldValidation = gstr.CaseCamelLower(columnName) + "@" + datetimeValidationRule + "#" + column.ColumnComment + "需为YYYY-MM-DD hh:mm:ss格式"
+			if column.ColumnType == "date" {
+				columnEx.FieldValidation = gstr.CaseCamelLower(columnName) + "@" + dateValidationRule + "#" + column.ColumnComment + "需为YYYY-MM-DD格式"
+			} else {
+				columnEx.FieldValidation = gstr.CaseCamelLower(columnName) + "@" + datetimeValidationRule + "#" + column.ColumnComment + "需为YYYY-MM-DD hh:mm:ss格式"
+			}
 			columnEx.FieldConversion = "gconv.Time"
 			tableEx.HasConversion = true
 			break

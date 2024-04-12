@@ -124,6 +124,16 @@ type UserDeleteReq struct {
 type UserDeleteRes struct {
 }
 
+type UsersRoleIdReq struct {
+	g.Meta `path:"/user/getByRoleId" tags:"系统后台/用户管理" method:"get" summary:"获取角色对应用户"`
+	RoleId uint `p:"roleId"`
+}
+
+type UsersRoleIdRes struct {
+	commonApi.EmptyRes
+	UserList []*model.SysUserRoleDeptRes `json:"userList"`
+}
+
 type UserSelectorReq struct {
 	g.Meta   `path:"/user/selector" tags:"系统后台/用户管理" method:"get" summary:"获取用户选择器"`
 	DeptId   string `p:"deptId"` //部门id

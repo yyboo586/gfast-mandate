@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/container/garray"
+	"github.com/gogf/gf/v2/encoding/gurl"
 	"reflect"
 
 	"github.com/gogf/gf/v2/container/gset"
@@ -285,8 +286,9 @@ func (s *sSysUser) GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (
 	//获取角色对应的菜单id
 	err = g.Try(ctx, func(ctx context.Context) {
 		var (
-			menuArr *garray.Array
-			menuIds = map[uint]uint{}
+			menuArr    *garray.Array
+			menuIds    = map[uint]uint{}
+			menuNameId = map[string]*model.SysAuthRuleInfoRes{}
 		)
 		menuArr, err = s.GetAdminMenusIdsByRoleIds(ctx, roleIds)
 		liberr.ErrIsNil(ctx, err)
@@ -300,9 +302,19 @@ func (s *sSysUser) GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (
 		liberr.ErrIsNil(ctx, err)
 		menus = make([]*model.UserMenus, 0, len(allMenus))
 		for _, v := range allMenus {
+			urlMap, _ := gurl.ParseURL(v.Name, -1)
+			if query, ok := urlMap["query"]; ok && query != "" {
+				menuNameId[urlMap["path"]+"#query"] = v
+			}
+		}
+		for _, v := range allMenus {
+			var roleMenu *model.UserMenu
 			if _, ok := menuIds[v.Id]; gstr.Equal(v.Condition, "nocheck") || ok {
-				var roleMenu *model.UserMenu
 				roleMenu = s.setMenuData(roleMenu, v)
+				menus = append(menus, &model.UserMenus{UserMenu: roleMenu})
+			}
+			if info, ok := menuNameId[v.Name+"#query"]; ok && roleMenu != nil {
+				roleMenu = s.setMenuData(roleMenu, info)
 				menus = append(menus, &model.UserMenus{UserMenu: roleMenu})
 			}
 		}
@@ -477,6 +489,17 @@ func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total i
 
 		err = m.Page(req.PageNum, req.PageSize).Order("id asc").Scan(&userList)
 		liberr.ErrIsNil(ctx, err, "获取用户列表失败")
+	})
+	return
+}
+
+func (s *sSysUser) GetUsersByRoleId(ctx context.Context, roleId uint) (users []*model.SysUserRoleDeptRes, err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		m := dao.SysUser.Ctx(ctx)
+		m = m.As("a").LeftJoin("casbin_rule", "b", "b.v0 = CONCAT('u_',a.id )").
+			Where("v1 = ? and SUBSTR(v0,1,2) = 'u_'", roleId)
+		err = m.Order("id asc").Scan(&users)
+		liberr.ErrIsNil(ctx, err, "获取用户数据失败")
 	})
 	return
 }
@@ -722,6 +745,23 @@ func (s *sSysUser) EditUserRole(ctx context.Context, roleIds []uint, userId int6
 	return
 }
 
+// SetUserRole 设置用户角色
+func (s *sSysUser) SetUserRole(ctx context.Context, roleId uint, userIds []uint64) (err error) {
+	err = g.Try(ctx, func(ctx context.Context) {
+		enforcer, e := commonService.CasbinEnforcer(ctx)
+		liberr.ErrIsNil(ctx, e)
+
+		//删除用户旧角色信息
+		_, err = enforcer.RemoveFilteredGroupingPolicy(1, fmt.Sprintf("%d", roleId))
+		liberr.ErrIsNil(ctx, err)
+		for _, v := range userIds {
+			_, err = enforcer.AddGroupingPolicy(fmt.Sprintf("%s%d", s.casBinUserPrefix, v), gconv.String(roleId))
+			liberr.ErrIsNil(ctx, err)
+		}
+	})
+	return
+}
+
 func (s *sSysUser) UserNameOrMobileExists(ctx context.Context, userName, mobile string, id ...int64) error {
 	user := (*entity.SysUser)(nil)
 	err := g.Try(ctx, func(ctx context.Context) {
@@ -852,70 +892,72 @@ func (s *sSysUser) GetUsers(ctx context.Context, ids []int) (users []*model.SysU
 }
 
 // GetDataWhere 获取数据权限判断条件
-func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}) (where g.Map, err error) {
+func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}, menuId uint) (where g.Map, err error) {
 	whereJustMe := g.Map{} //本人数据权限
 	t := reflect.TypeOf(entityData)
-	for i := 0; i < t.Elem().NumField(); i++ {
-		if t.Elem().Field(i).Name == "CreatedBy" {
-			//若存在用户id的字段，则生成判断数据权限的条件
-			//1、获取当前用户所属角色
-			allRoles := ([]*entity.SysRole)(nil)
-			allRoles, err = service.SysRole().GetRoleList(ctx)
-			if err != nil {
-				return nil, err
-			}
-			roles := ([]*entity.SysRole)(nil)
-			roles, err = s.GetAdminRole(ctx, userInfo.Id, allRoles)
-			if err != nil {
-				return nil, err
-			}
-			//2获取角色对应数据权限
-			deptIdArr := gset.New()
-			for _, role := range roles {
-				switch role.DataScope {
-				case 1: //全部数据权限
-					return
-				case 2: //自定数据权限
-					var deptIds []int64
-					deptIds, err = service.SysRole().GetRoleDepts(ctx, gconv.Int64(role.Id))
-					if err != nil {
-						return
-					}
-					deptIdArr.Add(gconv.Interfaces(deptIds)...)
-				case 3: //本部门数据权限
-					deptIdArr.Add(gconv.Int64(userInfo.DeptId))
-				case 4: //本部门及以下数据权限
-					deptIdArr.Add(gconv.Int64(userInfo.DeptId))
-					//获取正常状态部门数据
-					depts := ([]*entity.SysDept)(nil)
-					depts, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1"})
-					if err != nil {
-						return
-					}
-					var dList g.List
-					for _, d := range depts {
-						m := g.Map{
-							"id":    d.DeptId,
-							"pid":   d.ParentId,
-							"label": d.DeptName,
-						}
-						dList = append(dList, m)
-					}
-					l := libUtils.FindSonByParentId(dList, userInfo.DeptId, "pid", "id")
-					for _, li := range l {
-						deptIdArr.Add(gconv.Int64(li["id"]))
-					}
-				case 5: //仅本人数据权限
+	err = g.Try(ctx, func(ctx context.Context) {
+		for i := 0; i < t.Elem().NumField(); i++ {
+			if t.Elem().Field(i).Name == "CreatedBy" {
+				//若存在用户id的字段，则生成判断数据权限的条件
+				//1、获取当前用户所属角色Ids
+				var (
+					roleIds   []uint
+					scope     []*model.ScopeAuthData
+					deptIdArr = gset.New()
+					allScope  = false
+				)
+				roleIds, err = s.GetAdminRoleIds(ctx, userInfo.Id)
+				liberr.ErrIsNil(ctx, err)
+				scope, err = service.SysRole().GetRoleMenuScope(ctx, roleIds, menuId)
+				liberr.ErrIsNil(ctx, err)
+				if scope == nil {
+					//角色未设置数据权限，默认仅本人数据权限
 					whereJustMe = g.Map{"user.id": userInfo.Id}
+				} else {
+					//2获取角色对应数据权限
+					for _, sv := range scope {
+						switch sv.DataScope {
+						case 1: //全部数据权限
+							allScope = true
+							goto endLoop
+						case 2: //自定数据权限
+							deptIdArr.Add(gconv.Interfaces(sv.DeptIds)...)
+						case 3: //本部门数据权限
+							deptIdArr.Add(gconv.Int64(userInfo.DeptId))
+						case 4: //本部门及以下数据权限
+							deptIdArr.Add(gconv.Int64(userInfo.DeptId))
+							//获取正常状态部门数据
+							deptList := ([]*entity.SysDept)(nil)
+							deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1"})
+							liberr.ErrIsNil(ctx, err)
+							var dList g.List
+							for _, d := range deptList {
+								m := g.Map{
+									"id":    d.DeptId,
+									"pid":   d.ParentId,
+									"label": d.DeptName,
+								}
+								dList = append(dList, m)
+							}
+							l := libUtils.FindSonByParentId(dList, userInfo.DeptId, "pid", "id")
+							for _, li := range l {
+								deptIdArr.Add(gconv.Int64(li["id"]))
+							}
+						case 5: //仅本人数据权限
+							whereJustMe = g.Map{"user.id": userInfo.Id}
+						}
+					}
 				}
-			}
-			if deptIdArr.Size() > 0 {
-				where = g.Map{"user.dept_id": deptIdArr.Slice()}
-			} else if len(whereJustMe) > 0 {
-				where = whereJustMe
+			endLoop:
+				if !allScope && deptIdArr.Size() > 0 {
+					where = g.Map{"user.dept_id": deptIdArr.Slice()}
+				} else if !allScope && len(whereJustMe) > 0 {
+					where = whereJustMe
+				}
+				break
 			}
 		}
-	}
+	})
 	return
 }
 

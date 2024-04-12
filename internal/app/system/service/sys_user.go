@@ -43,6 +43,7 @@ type (
 		Edit(ctx context.Context, req *system.UserEditReq) (err error)
 		AddUserPost(ctx context.Context, tx gdb.TX, postIds []int64, userId int64) (err error)
 		EditUserRole(ctx context.Context, roleIds []uint, userId int64) (err error)
+		SetUserRole(ctx context.Context, roleId uint, userIds []uint64) (err error)
 		UserNameOrMobileExists(ctx context.Context, userName, mobile string, id ...int64) error
 		GetEditUser(ctx context.Context, id uint64) (res *system.UserGetEditRes, err error)
 		GetUserInfoById(ctx context.Context, id uint64, withPwd ...bool) (user *entity.SysUser, err error)
@@ -51,10 +52,11 @@ type (
 		ChangeUserStatus(ctx context.Context, req *system.UserStatusReq) (err error)
 		Delete(ctx context.Context, ids []int) (err error)
 		GetUsers(ctx context.Context, ids []int) (users []*model.SysUserSimpleRes, err error)
-		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}) (where g.Map, err error)
+		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{},menuId uint) (where g.Map, err error)
 		HasAccessByDataWhere(ctx context.Context, where g.Map, uid interface{}) bool
 		AccessRule(ctx context.Context, userId uint64, rule string) bool
 		GetUserSelector(ctx context.Context, req *system.UserSelectorReq) (total interface{}, userList []*model.SysUserSimpleRes, err error)
+		GetUsersByRoleId(ctx context.Context,roleId uint)(users []*model.SysUserRoleDeptRes,err error)
 	}
 )
 
