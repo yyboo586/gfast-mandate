@@ -18,7 +18,7 @@ func ErrIsNil(ctx context.Context, err error, msg ...string) {
 			g.Log().Error(ctx, err.Error())
 			panic(msg[0])
 		} else {
-			panic(err.Error())
+			panic(err)
 		}
 	}
 }

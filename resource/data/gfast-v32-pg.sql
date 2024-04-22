@@ -5010,7 +5010,7 @@ CREATE TABLE "sys_role" (
   "updated_at" timestamp(6),
   "created_by" int8 NOT NULL DEFAULT 0,
   "pid" int8 NOT NULL DEFAULT 0,
-  "effectiveTime" text COLLATE "pg_catalog"."default"
+  "effective_time" text COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "sys_role"."status" IS '状态;0:禁用;1:正常';
@@ -5022,7 +5022,7 @@ COMMENT ON COLUMN "sys_role"."created_at" IS '创建时间';
 COMMENT ON COLUMN "sys_role"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "sys_role"."created_by" IS '添加人';
 COMMENT ON COLUMN "sys_role"."pid" IS '父级ID';
-COMMENT ON COLUMN "sys_role"."effectiveTime" IS '角色有效日期';
+COMMENT ON COLUMN "sys_role"."effective_time" IS '角色有效日期';
 COMMENT ON TABLE "sys_role" IS '角色表';
 
 -- ----------------------------

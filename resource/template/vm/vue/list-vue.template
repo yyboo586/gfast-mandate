@@ -47,7 +47,7 @@
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.DictType "") }}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable >
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
                         <el-option
                             v-for="dict in {{$column.DictType}}"
                             :key="dict.value"
@@ -124,7 +124,7 @@
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.LinkTableName "")}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}}>
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} style="width:200px;">
                       <el-option
                       {{if $column.IsCascade}}
                           v-for="item in {{$column.HtmlField}}QueryOptions"
@@ -164,7 +164,7 @@
                 {{else}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable >
+                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
                         <el-option label="请选择字典生成" value="" />
                     </el-select>
                   </el-form-item>
