@@ -68,7 +68,7 @@ func (s *sMiddleware) Auth(r *ghttp.Request) {
 	//获取登陆用户id
 	adminId := service.Context().GetUserId(ctx)
 	url := gstr.TrimLeft(r.Request.URL.Path, "/")
-	/*if r.Method != "GET" && adminId != 1 && url!="api/v1/system/login" {
+	/*if r.Method != "GET" && adminId != 1 && url != "api/v1/system/login" {
 		libResponse.FailJson(true, r, "对不起！演示系统，不能删改数据！")
 	}*/
 	//获取无需验证权限的用户id
@@ -174,7 +174,7 @@ func (s *sMiddleware) checkAuth(ctx context.Context, adminId uint64, menuId uint
 		roleIdsMap.Iterator(func(k interface{}, v interface{}) bool {
 			b, err = enforcer.Enforce(gconv.String(v), gconv.String(menuId), "All")
 			liberr.ErrIsNil(ctx, err)
-			return b
+			return !b
 		})
 		if !b {
 			liberr.ErrIsNil(ctx, errors.New("没有权限"))

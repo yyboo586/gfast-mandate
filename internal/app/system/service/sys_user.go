@@ -27,10 +27,10 @@ type (
 		GetUserByPhone(ctx context.Context, phone string) (user *model.LoginUserRes, err error)
 		GetUserById(ctx context.Context, id uint64) (user *model.LoginUserRes, err error)
 		LoginLog(ctx context.Context, params *model.LoginLogParams)
-		UpdateLoginInfo(ctx context.Context, id uint64, ip string,openId ...string) (err error)
+		UpdateLoginInfo(ctx context.Context, id uint64, ip string, openId ...string) (err error)
 		GetAdminRules(ctx context.Context, userId uint64) (menuList []*model.UserMenus, permissions []string, err error)
 		GetAdminRole(ctx context.Context, userId uint64, allRoleList []*entity.SysRole) (roles []*entity.SysRole, err error)
-		GetAdminRoleIds(ctx context.Context, userId uint64,includeChildren ...bool) (roleIds []uint, err error)
+		GetAdminRoleIds(ctx context.Context, userId uint64, includeChildren ...bool) (roleIds []uint, err error)
 		GetAllMenus(ctx context.Context) (menus []*model.UserMenus, err error)
 		GetAdminMenusIdsByRoleIds(ctx context.Context, roleIds []uint) (menuIds *garray.Array, err error)
 		GetAdminMenusByRoleIds(ctx context.Context, roleIds []uint) (menus []*model.UserMenus, err error)
@@ -52,11 +52,14 @@ type (
 		ChangeUserStatus(ctx context.Context, req *system.UserStatusReq) (err error)
 		Delete(ctx context.Context, ids []int) (err error)
 		GetUsers(ctx context.Context, ids []int) (users []*model.SysUserSimpleRes, err error)
-		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{},menuId uint) (where g.Map, err error)
+		// Deprecated : 此方法已废弃，请使用更简单的GetAuthWhere方法
+		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}, menuId uint) (where g.Map, err error)
 		HasAccessByDataWhere(ctx context.Context, where g.Map, uid interface{}) bool
 		AccessRule(ctx context.Context, userId uint64, rule string) bool
 		GetUserSelector(ctx context.Context, req *system.UserSelectorReq) (total interface{}, userList []*model.SysUserSimpleRes, err error)
-		GetUsersByRoleId(ctx context.Context,roleId uint)(users []*model.SysUserRoleDeptRes,err error)
+		GetUsersByRoleId(ctx context.Context, roleId uint) (users []*model.SysUserRoleDeptRes, err error)
+		GetAuthWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, field ...string)  *gdb.Model
+		GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, menuId uint, field ...string) (nm *gdb.Model, err error)
 	}
 )
 
