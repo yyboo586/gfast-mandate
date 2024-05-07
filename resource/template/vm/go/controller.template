@@ -261,7 +261,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
     row := len(excelData)
     cr, _ := excelize.JoinCellName(col, row)
     excel.SetCellBorder("Sheet1", "A1", cr)
-    _, err = excel.WriteTo(r.Response.Writer)
+    _, err = excel.WriteTo(r.Response.BufferWriter)
     if err != nil {
         return
     }
@@ -296,7 +296,7 @@ func (c *{{$structName}}Controller) ExcelTemplate(ctx context.Context,req *{{.ta
     row := len(excelData)
     cr, _ := excelize.JoinCellName(col, row)
     excel.SetCellBorder("Sheet1", "A1", cr)
-    _, err = excel.WriteTo(r.Response.Writer)
+    _, err = excel.WriteTo(r.Response.BufferWriter)
     if err != nil {
         return
     }
