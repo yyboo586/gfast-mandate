@@ -33,7 +33,7 @@ func WsPage(r *ghttp.Request) {
 			return true
 		},
 	}
-	conn, err := upGrader.Upgrade(r.Response.ResponseWriter, r.Request, nil)
+	conn, err := upGrader.Upgrade(r.Response.Writer, r.Request, nil)
 	if err != nil {
 		return
 	}
@@ -77,6 +77,6 @@ func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGro
 
 	// 注册消息路由
 	libWebsocket.RegisterMsg(libWebsocket.EventHandlers{
-		"ping":           commonController.Ping.Ping,                       // 心跳
+		"ping": commonController.Ping.Ping, // 心跳
 	})
 }

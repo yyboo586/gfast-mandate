@@ -1053,13 +1053,14 @@ func (s *sSysUser) GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo 
 			}
 		}
 	endLoop:
-		if !allScope && deptIdArr.Size() > 0 {
+		if allScope {
+			nm = m
+		} else if !allScope && deptIdArr.Size() > 0 {
 			nm = m.WhereIn(createdUserField, dao.SysUser.Ctx(ctx).Fields(dao.SysUser.Columns().Id).
 				WhereIn(dao.SysUser.Columns().DeptId, deptIdArr.Slice()))
 		} else if !allScope && len(whereJustMe) > 0 {
 			nm = m.Where(whereJustMe)
 		}
-
 	})
 	return
 }

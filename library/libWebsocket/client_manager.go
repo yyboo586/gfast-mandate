@@ -153,6 +153,10 @@ func (manager *ClientManager) GetUsersLen() (userLen int) {
 
 // EventRegister 用户建立连接事件
 func (manager *ClientManager) EventRegister(client *Client) {
+	if client == nil {
+		g.Log().Warningf(mctx, "EventRegister client == nil.")
+		return
+	}
 	manager.AddClients(client)
 	// 用户登录
 	manager.EventLogin(&login{
