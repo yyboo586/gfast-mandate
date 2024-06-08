@@ -17,7 +17,7 @@ package model
 
 
 {{range $index,$column :=.table.Columns}}
-    {{if and (eq $column.HtmlField "createdBy" "updatedBy") (ne $.table.ModuleName "system")}}
+    {{if and (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (ne $.table.ModuleName "system")}}
         {{$hasUser = true}}
     {{end}}
     {{if eq $column.HtmlType "imagefile" "images" "file" "files" }}
@@ -28,7 +28,7 @@ package model
     {{end}}
 {{end}}
 {{range $index,$column :=.table.EditColumns}}
-    {{if and (eq $column.HtmlField "createdBy" "updatedBy") (ne $.table.ModuleName "system")}}
+    {{if and (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (ne $.table.ModuleName "system")}}
         {{$hasUser = true}}
     {{end}}
     {{if eq $column.GoType "Time"}}
@@ -62,6 +62,9 @@ type {{.table.ClassName}}InfoRes struct {
     {{end}}
     {{if eq $column.HtmlField "createdBy"}}
     CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
+    {{end}}
+    {{if eq $column.HtmlField "deptId"}}
+    DeptInfo        *{{if $hasUser}}systemModel.{{end}}LinkDeptRes     `json:"deptInfo"`
     {{end}}
     {{if eq $column.HtmlField "updatedBy"}}
     UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
@@ -101,6 +104,9 @@ type {{.table.ClassName}}ListRes struct{
     {{if eq $column.HtmlField "createdBy"}}
     CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
     {{end}}
+    {{if eq $column.HtmlField "deptId"}}
+    DeptInfo        *{{if $hasUser}}systemModel.{{end}}LinkDeptRes     `json:"deptInfo"`
+    {{end}}
     {{if eq $column.HtmlField "updatedBy"}}
     UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
     {{end}}
@@ -113,6 +119,9 @@ type {{.table.ClassName}}ListRes struct{
     {{range $index, $column := .table.ListColumns}}
     {{if eq $column.HtmlField "createdBy"}}
     CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
+    {{end}}
+    {{if eq $column.HtmlField "deptId"}}
+    DeptInfo        *{{if $hasUser}}systemModel.{{end}}LinkDeptRes     `json:"deptInfo"`
     {{end}}
     {{if eq $column.HtmlField "updatedBy"}}
     UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedBy"`
@@ -167,6 +176,9 @@ type {{.table.ClassName}}AddReq struct {
     {{end}}
     {{if .table.HasCreatedBy}}
     CreatedBy       uint64
+    {{end}}
+    {{if .table.HasDeptId}}
+    DeptId       uint64
     {{end}}
 }
 

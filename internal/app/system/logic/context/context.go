@@ -64,3 +64,12 @@ func (s *sContext) GetUserId(ctx context.Context) uint64 {
 	}
 	return 0
 }
+
+// GetDeptId 获取当前登录用户部门id
+func (s *sContext) GetDeptId(ctx context.Context) uint64 {
+	user := s.GetLoginUser(ctx)
+	if user != nil {
+		return user.DeptId
+	}
+	return 0
+}

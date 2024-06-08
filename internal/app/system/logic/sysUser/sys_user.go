@@ -13,6 +13,7 @@ import (
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/encoding/gurl"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/tiger1103/gfast/v3/library/libWebsocket"
 	"reflect"
 
 	"github.com/gogf/gf/v2/container/gset"
@@ -687,6 +688,11 @@ func (s *sSysUser) Edit(ctx context.Context, req *system.UserEditReq) (err error
 			liberr.ErrIsNil(ctx, err, "设置用户权限失败")
 			err = s.AddUserPost(ctx, tx, req.PostIds, req.UserId)
 			liberr.ErrIsNil(ctx, err)
+			//通知用户更新token
+			libWebsocket.SendToUser(gconv.Uint64(req.UserId), &libWebsocket.WResponse{
+				Event: consts.WebsocketTypeTokenUpdated,
+				Data:  nil,
+			})
 		})
 		return err
 	})
@@ -758,6 +764,11 @@ func (s *sSysUser) SetUserRole(ctx context.Context, roleId uint, userIds []uint6
 		for _, v := range userIds {
 			_, err = enforcer.AddGroupingPolicy(fmt.Sprintf("%s%d", s.casBinUserPrefix, v), gconv.String(roleId))
 			liberr.ErrIsNil(ctx, err)
+			//通知用户更新token
+			libWebsocket.SendToUser(v, &libWebsocket.WResponse{
+				Event: consts.WebsocketTypeTokenUpdated,
+				Data:  nil,
+			})
 		}
 	})
 	return
@@ -893,7 +904,7 @@ func (s *sSysUser) GetUsers(ctx context.Context, ids []int) (users []*model.SysU
 }
 
 // GetDataWhere 获取数据权限判断条件
-// Deprecated : 此方法已废弃，请使用更简单的GetAuthWhere方法
+// Deprecated : 此方法已废弃，请使用更简单的GetAuthWhere方法或GetAuthDeptWhere方法
 func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}, menuId uint) (where g.Map, err error) {
 	whereJustMe := g.Map{} //本人数据权限
 	t := reflect.TypeOf(entityData)
@@ -963,6 +974,7 @@ func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser
 	return
 }
 
+// GetAuthWhere 获取数据权限判断条件-按创建人id获取(created_by),数据权限会跟随创建人转移
 func (s *sSysUser) GetAuthWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, field ...string) *gdb.Model {
 	var (
 		//当前请求api接口对应的菜单
@@ -985,7 +997,7 @@ func (s *sSysUser) GetAuthWhere(ctx context.Context, m *gdb.Model, userInfo *mod
 	return nm
 }
 
-// GetAuthDataWhere 获取数据权限判断条件
+// GetAuthDataWhere 获取数据权限判断条件-按创建用户
 func (s *sSysUser) GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, menuId uint, field ...string) (nm *gdb.Model, err error) {
 	whereJustMe := g.Map{} //本人数据权限
 	createdUserField := "created_by"
@@ -1008,7 +1020,6 @@ func (s *sSysUser) GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo 
 			roleIds   []uint
 			scope     []*model.ScopeAuthData
 			deptIdArr = gset.New()
-			allScope  = false
 		)
 		roleIds, err = s.GetAdminRoleIds(ctx, userInfo.Id)
 		liberr.ErrIsNil(ctx, err)
@@ -1022,7 +1033,6 @@ func (s *sSysUser) GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo 
 			for _, sv := range scope {
 				switch sv.DataScope {
 				case 1: //全部数据权限
-					allScope = true
 					goto endLoop
 				case 2: //自定数据权限
 					deptIdArr.Add(gconv.Interfaces(sv.DeptIds)...)
@@ -1053,13 +1063,119 @@ func (s *sSysUser) GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo 
 			}
 		}
 	endLoop:
-		if allScope {
-			nm = m
-		} else if !allScope && deptIdArr.Size() > 0 {
+		if deptIdArr.Size() > 0 {
 			nm = m.WhereIn(createdUserField, dao.SysUser.Ctx(ctx).Fields(dao.SysUser.Columns().Id).
 				WhereIn(dao.SysUser.Columns().DeptId, deptIdArr.Slice()))
-		} else if !allScope && len(whereJustMe) > 0 {
+		} else if len(whereJustMe) > 0 {
 			nm = m.Where(whereJustMe)
+		} else {
+			nm = m
+		}
+	})
+	return
+}
+
+// GetAuthDeptWhere 获取部门数据权限判断条件-按部门id获取(dept_id),数据权限依赖部门，不会随创建人转移
+func (s *sSysUser) GetAuthDeptWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, field ...string) *gdb.Model {
+	var (
+		//当前请求api接口对应的菜单
+		url    = gstr.TrimLeft(ghttp.RequestFromCtx(ctx).Request.URL.Path, "/")
+		menuId uint
+		err    error
+		nm     *gdb.Model
+	)
+	//获取菜单ID
+	menuId, err = service.SysAuthRule().GetIdByName(ctx, url)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return m
+	}
+	nm, err = s.GetAuthDeptDataWhere(ctx, m, userInfo, menuId, field...)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return m
+	}
+	return nm
+}
+
+// GetAuthDeptDataWhere 获取数据权限判断条件-按部门
+func (s *sSysUser) GetAuthDeptDataWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, menuId uint, field ...string) (nm *gdb.Model, err error) {
+	whereJustMe := g.Map{} //本人数据权限
+	deptField := "dept_id"
+	createdUserField := "created_by"
+	//表别名
+	tableAlias := ""
+	if len(field) > 0 && field[0] != "" {
+		tableAlias = field[0]
+	}
+	if len(field) > 1 && field[1] != "" {
+		deptField = field[1]
+	}
+
+	if len(field) > 2 && field[2] != "" {
+		createdUserField = field[2]
+	}
+
+	if tableAlias != "" {
+		deptField = tableAlias + "." + deptField
+		createdUserField = tableAlias + "." + createdUserField
+	}
+	err = g.Try(ctx, func(ctx context.Context) {
+		//若存在用户id的字段，则生成判断数据权限的条件
+		//1、获取当前用户所属角色Ids
+		var (
+			roleIds   []uint
+			scope     []*model.ScopeAuthData
+			deptIdArr = gset.New()
+		)
+		roleIds, err = s.GetAdminRoleIds(ctx, userInfo.Id)
+		liberr.ErrIsNil(ctx, err)
+		scope, err = service.SysRole().GetRoleMenuScope(ctx, roleIds, menuId)
+		liberr.ErrIsNil(ctx, err)
+		if scope == nil {
+			//角色未设置数据权限，默认仅本人数据权限
+			whereJustMe = g.Map{deptField: userInfo.DeptId, createdUserField: userInfo.Id}
+		} else {
+			//2获取角色对应数据权限
+			for _, sv := range scope {
+				switch sv.DataScope {
+				case 1: //全部数据权限
+					goto endLoop
+				case 2: //自定数据权限
+					deptIdArr.Add(gconv.Interfaces(sv.DeptIds)...)
+				case 3: //本部门数据权限
+					deptIdArr.Add(gconv.Int64(userInfo.DeptId))
+				case 4: //本部门及以下数据权限
+					deptIdArr.Add(gconv.Int64(userInfo.DeptId))
+					//获取正常状态部门数据
+					deptList := ([]*entity.SysDept)(nil)
+					deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1"})
+					liberr.ErrIsNil(ctx, err)
+					var dList g.List
+					for _, d := range deptList {
+						m := g.Map{
+							"id":    d.DeptId,
+							"pid":   d.ParentId,
+							"label": d.DeptName,
+						}
+						dList = append(dList, m)
+					}
+					l := libUtils.FindSonByParentId(dList, userInfo.DeptId, "pid", "id")
+					for _, li := range l {
+						deptIdArr.Add(gconv.Int64(li["id"]))
+					}
+				case 5: //仅本人数据权限
+					whereJustMe = g.Map{deptField: userInfo.Id, createdUserField: userInfo.Id}
+				}
+			}
+		}
+	endLoop:
+		if deptIdArr.Size() > 0 {
+			nm = m.WhereIn(deptField, deptIdArr.Slice())
+		} else if len(whereJustMe) > 0 {
+			nm = m.Where(whereJustMe)
+		} else {
+			nm = m
 		}
 	})
 	return

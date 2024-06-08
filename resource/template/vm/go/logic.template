@@ -22,7 +22,7 @@ package {{$structName}}
 {{if eq $column.HtmlType "images" "file" "files"}}
 {{$libUtils = true}}
 {{end}}
-{{if and (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy") (ne $.table.ModuleName "system")}}
+{{if and (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy" "deptId") (ne $.table.ModuleName "system")}}
 {{$usedSystemModule = true}}
 {{end}}
 {{if eq $column.HtmlType "selects" "checkbox"}}
@@ -204,6 +204,13 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                     {{if eq $column.HtmlField "createdBy"}}
                 CreatedUser:v.CreatedUser,
                     {{end}}
+                    {{if eq $column.HtmlField "deptId"}}
+                    {{if $usedSystemModule}}
+                DeptInfo:systemService.SysDept().GetByDept(ctx, v.DeptId),
+                    {{else}}
+                DeptInfo:service.SysDept().GetByDept(ctx, v.DeptId),
+                    {{end}}
+                    {{end}}
                     {{if eq $column.HtmlField "UpdatedBy"}}
                 UpdatedUser:v.UpdatedUser,
                     {{end}}
@@ -229,6 +236,13 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                   {{range $index, $column := .table.ListColumns}}
                   {{if eq $column.HtmlField "createdBy"}}
                 CreatedUser:v.CreatedUser,
+                  {{end}}
+                  {{if eq $column.HtmlField "deptId"}}
+                      {{if $usedSystemModule}}
+                DeptInfo:systemService.SysDept().GetByDept(ctx, v.DeptId),
+                      {{else}}
+                DeptInfo:service.SysDept().GetByDept(ctx, v.DeptId),
+                      {{end}}
                   {{end}}
                   {{if eq $column.HtmlField "UpdatedBy"}}
                 UpdatedUser:v.UpdatedUser,
@@ -426,6 +440,15 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
     err =g.Try(ctx, func(ctx context.Context){
         err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
         liberr.ErrIsNil(ctx,err,"获取信息失败")
+        if res!=nil{
+        {{if $.table.HasDeptId}}
+        {{if $usedSystemModule}}
+            res.DeptInfo = systemService.SysDept().GetByDept(ctx, res.DeptId)
+        {{else}}
+            res.DeptInfo = service.SysDept().GetByDept(ctx, res.DeptId)
+        {{end}}
+        {{end}}
+        }
         {{range $index, $column := .table.Columns}}
         {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
         {{range $ti, $linkedTable := $.table.LinkedTables}}
@@ -482,6 +505,13 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.Clas
             CreatedBy:systemService.Context().GetUserId(ctx),
             {{else}}
             CreatedBy:service.Context().GetUserId(ctx),
+            {{end}}
+            {{end}}
+            {{if .table.HasDeptId}}
+            {{if $usedSystemModule}}
+            DeptId:systemService.Context().GetDeptId(ctx),
+            {{else}}
+            DeptId:service.Context().GetDeptId(ctx),
             {{end}}
             {{end}}
         })

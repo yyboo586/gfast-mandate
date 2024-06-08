@@ -9,6 +9,7 @@ package sysDept
 
 import (
 	"context"
+	"errors"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -96,6 +97,9 @@ func (s *sSysDept) Add(ctx context.Context, req *system.DeptAddReq) (err error) 
 // Edit 部门修改
 func (s *sSysDept) Edit(ctx context.Context, req *system.DeptEditReq) (err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
+		if req.DeptId == req.ParentID {
+			liberr.ErrIsNil(ctx, errors.New("上级部门不能是自己"))
+		}
 		_, err = dao.SysDept.Ctx(ctx).WherePri(req.DeptId).Update(do.SysDept{
 			ParentId:  req.ParentID,
 			DeptName:  req.DeptName,
@@ -173,6 +177,18 @@ func (s *sSysDept) GetByDeptId(ctx context.Context, deptId uint64) (dept *entity
 		if v.DeptId == deptId {
 			dept = v
 			break
+		}
+	}
+	return
+}
+
+// GetByDept 获取部门信息
+func (s *sSysDept) GetByDept(ctx context.Context, deptId interface{}) (dept *model.LinkDeptRes) {
+	deptEnt, _ := s.GetByDeptId(ctx, gconv.Uint64(deptId))
+	if deptEnt != nil {
+		dept = &model.LinkDeptRes{
+			DeptId:   deptEnt.DeptId,
+			DeptName: deptEnt.DeptName,
 		}
 	}
 	return

@@ -59,3 +59,14 @@ type PersonalResetPwdReq struct {
 
 type PersonalResetPwdRes struct {
 }
+
+type RefreshTokenReq struct {
+	g.Meta `path:"/personal/refreshToken" tags:"系统后台/用户管理" method:"get" summary:"刷新token"`
+	commonApi.Author
+}
+
+type RefreshTokenRes struct {
+	commonApi.EmptyRes
+	Token    string              `json:"token"`
+	UserInfo *model.LoginUserRes `json:"userInfo"`
+}

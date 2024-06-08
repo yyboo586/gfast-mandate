@@ -175,7 +175,7 @@ func (s *sSysNotice) Add(ctx context.Context, req *model.SysNoticeAddReq) (err e
 		data.Id, err = rows.LastInsertId()
 		liberr.ErrIsNil(ctx, err, "获取ID失败")
 		response := &libWebsocket.WResponse{
-			Event: "notice",
+			Event: consts.WebsocketTypeNotice,
 			Data:  data,
 		}
 		if req.Type == consts.SysLetterType {
@@ -210,7 +210,7 @@ func (s *sSysNotice) Edit(ctx context.Context, req *model.SysNoticeEditReq) (err
 		data.Id = req.Id
 		data.Type = req.Type
 		response := &libWebsocket.WResponse{
-			Event: "notice",
+			Event: consts.WebsocketTypeNotice,
 			Data:  data,
 		}
 		if req.Type == consts.SysLetterType {

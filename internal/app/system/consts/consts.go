@@ -12,4 +12,9 @@ const (
 	EffectiveTypeStartEnd = 1
 	// EffectiveTypeDate 按时间段
 	EffectiveTypeDate = 2
+
+	// WebsocketTypeTokenUpdated websocket通知类型-更新token
+	WebsocketTypeTokenUpdated = "tokenUpdated"
+	// WebsocketTypeNotice websocket通知类型-系统通知
+	WebsocketTypeNotice = "notice"
 )

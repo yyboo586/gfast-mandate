@@ -47,6 +47,7 @@ type ToolsGenTableEx struct {
 	IsPkListable   bool                     // 主键是否出现在列表中
 	HasTimeColumn  bool                     // 是否有时间类型
 	HasCreatedBy   bool                     // 是否有created_by字段
+	HasDeptId      bool                     // 是否右dept_id字段
 	HasUpdatedBy   bool                     // 是否有updated_by字段
 	HasConversion  bool                     // service中是否有转换函数
 	Columns        []*ToolsGenTableColumnEx // 表列信息

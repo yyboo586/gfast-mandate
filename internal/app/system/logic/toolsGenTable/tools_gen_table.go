@@ -987,6 +987,8 @@ func (s *sToolsGenTable) SelectRecordById(ctx context.Context, tableId int64) (t
 
 	_, hasCreatedBy := columnMap["created_by"]
 	tableEx.HasCreatedBy = hasCreatedBy
+	_, hasDeptId := columnMap["dept_id"]
+	tableEx.HasDeptId = hasDeptId
 	_, hasUpdateBy := columnMap["updated_by"]
 	tableEx.HasUpdatedBy = hasUpdateBy
 

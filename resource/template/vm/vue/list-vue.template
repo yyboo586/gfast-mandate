@@ -469,7 +469,7 @@ import {downLoadXml} from "/@/utils/zipdownload";
 import loadExcel from "/@/components/loadExcel/index.vue"
 {{end}}
 export default defineComponent({
-    name: "{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List",
+    name: "{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List",
     components:{
         {{if .table.ExcelImp}}
         loadExcel,
@@ -591,10 +591,13 @@ export default defineComponent({
           list{{.table.ClassName}}(state.tableData.param).then((res:any)=>{
             let list = res.data.list??[];
             {{range $index,$column := .table.ListColumns}}
-            {{if eq $column.HtmlField "createdBy" "updatedBy"}}
+            {{if eq $column.HtmlField "createdBy" "updatedBy" "deptId"}}
             list.map((item:any)=>{
                 {{if eq $column.HtmlField "createdBy"}}
                 item.createdBy = item.createdUser?.userNickname
+                {{end}}
+                {{if eq $column.HtmlField "deptId"}}
+                item.deptId = item.deptInfo?.deptName
                 {{end}}
                 {{if eq $column.HtmlField "updatedBy"}}
                 item.updatedBy = item.updatedUser?.userNickname

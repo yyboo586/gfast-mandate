@@ -309,6 +309,9 @@
               {{if eq $column.HtmlField "createdBy"}}
               data.createdBy = data.createdUser?.userNickname
               {{end}}
+              {{if eq $column.HtmlField "deptId"}}
+              data.deptId = data.deptInfo?.deptName
+              {{end}}
               {{if eq $column.HtmlField "updatedBy"}}
               data.updatedBy = data.updatedUser?.userNickname
               {{end}}

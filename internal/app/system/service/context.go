@@ -18,6 +18,7 @@ type IContext interface {
 	SetUser(ctx context.Context, ctxUser *model.ContextUser)
 	GetLoginUser(ctx context.Context) *model.ContextUser
 	GetUserId(ctx context.Context) uint64
+	GetDeptId(ctx context.Context) uint64
 }
 
 var localContext IContext

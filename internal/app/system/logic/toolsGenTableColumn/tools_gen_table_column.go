@@ -32,7 +32,7 @@ func New() service.IToolsGenTableColumn {
 		ColumnTypeStr:       []string{"char", "varchar", "narchar", "varchar2", "tinytext", "text", "mediumtext", "longtext"},
 		ColumnTypeTime:      []string{"datetime", "time", "date", "timestamp"},
 		ColumnTypeNumber:    []string{"tinyint", "smallint", "mediumint", "int", "number", "integer", "bigint", "float", "float", "double", "decimal"},
-		ColumnNameNotEdit:   []string{"created_by", "created_at", "updated_by", "updated_at", "deleted_at"},
+		ColumnNameNotEdit:   []string{"created_by", "created_at", "updated_by", "updated_at", "deleted_at", "dept_id"},
 		ColumnNameNotList:   []string{"updated_by", "updated_at", "deleted_at"},
 		ColumnNameNotDetail: []string{"updated_at", "deleted_at"},
 		ColumnNameNotQuery:  []string{"updated_by", "updated_at", "deleted_at", "remark"},
@@ -76,10 +76,10 @@ func (s *sToolsGenTableColumn) SelectDbTableColumnsByName(ctx context.Context, t
 			sql += "where " + gdb.FormatSqlWithArgs(" c.table_name=? ", []interface{}{tableName}) + " order by c.ordinal_position"
 		} else {
 			sql = " select column_name, (case when (is_nullable = 'YES' || is_nullable = 'NO' && column_default is not null) then '0' else '1' end) as is_required, " +
-			"(case when column_key = 'PRI' then '1' else '0' end) as is_pk, ordinal_position as sort_order_edit, column_comment," +
-			" (case when extra = 'auto_increment' then '1' else '0' end) as is_increment, column_type from information_schema.columns" +
-			" where table_schema = (select database()) "
-		sql += " and " + gdb.FormatSqlWithArgs(" table_name=? ", []interface{}{tableName}) + " order by ordinal_position ASC "
+				"(case when column_key = 'PRI' then '1' else '0' end) as is_pk, ordinal_position as sort_order_edit, column_comment," +
+				" (case when extra = 'auto_increment' then '1' else '0' end) as is_increment, column_type from information_schema.columns" +
+				" where table_schema = (select database()) "
+			sql += " and " + gdb.FormatSqlWithArgs(" table_name=? ", []interface{}{tableName}) + " order by ordinal_position ASC "
 
 		}
 

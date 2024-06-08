@@ -256,6 +256,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
     }
     //创建excel处理对象
     excel := new(libUtils.ExcelHelper).CreateFile()
+    defer excel.Close()
     excel.ArrToExcel("Sheet1", "A1", excelData)
     col, _ := excelize.ColumnNumberToName(len(tableHead))
     row := len(excelData)
@@ -291,6 +292,7 @@ func (c *{{$structName}}Controller) ExcelTemplate(ctx context.Context,req *{{.ta
     )
     //创建excel处理对象
     excel := new(libUtils.ExcelHelper).CreateFile()
+    defer excel.Close()
     excel.ArrToExcel("Sheet1", "A1", excelData)
     col, _ := excelize.ColumnNumberToName(len(tableHead))
     row := len(excelData)

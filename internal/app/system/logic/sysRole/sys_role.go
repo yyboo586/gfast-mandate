@@ -13,6 +13,7 @@ import (
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
@@ -22,6 +23,7 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/do"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
+	"github.com/tiger1103/gfast/v3/library/libWebsocket"
 	"github.com/tiger1103/gfast/v3/library/liberr"
 )
 
@@ -251,6 +253,8 @@ func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err e
 			liberr.ErrIsNil(ctx, e)
 			//清除缓存
 			commonService.Cache().Remove(ctx, consts.CacheSysRole)
+			//通知刷新token
+			s.refreshToken(ctx, req.Id)
 		})
 		return err
 	})
@@ -360,6 +364,8 @@ func (s *sSysRole) RoleDataScope(ctx context.Context, req *system.DataScopeReq) 
 				_, err = dao.SysRoleScope.Ctx(ctx).Data(data).Insert()
 				liberr.ErrIsNil(ctx, err, "设置权限信息失败")
 			}
+			//通知刷新token
+			s.refreshToken(ctx, gconv.Int64(req.RoleId))
 		})
 		return err
 	})
@@ -388,4 +394,21 @@ func (s *sSysRole) FindSonIdsByParentId(roleList []*entity.SysRole, id uint) []u
 		}
 	}
 	return children
+}
+
+// 刷新角色下用户token
+func (s *sSysRole) refreshToken(ctx context.Context, roleId int64) {
+	_ = g.Try(ctx, func(ctx context.Context) {
+		enforcer, e := commonService.CasbinEnforcer(ctx)
+		liberr.ErrIsNil(ctx, e)
+		userRoleIds := enforcer.GetFilteredGroupingPolicy(1, gconv.String(roleId))
+		for _, v := range userRoleIds {
+			userId := gstr.Split(v[0], "_")[1]
+			//通知用户更新token
+			libWebsocket.SendToUser(gconv.Uint64(userId), &libWebsocket.WResponse{
+				Event: consts.WebsocketTypeTokenUpdated,
+				Data:  nil,
+			})
+		}
+	})
 }

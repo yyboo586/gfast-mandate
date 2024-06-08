@@ -340,7 +340,7 @@ import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|Ca
 import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/detail.vue"
 import _ from 'lodash'
 export default defineComponent({
-    name: "{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List",
+    name: "{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List",
     components:{
         {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit,
         {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail
@@ -457,10 +457,13 @@ export default defineComponent({
           list{{.table.ClassName}}(state.tableData.param).then((res:any)=>{
             let list = res.data.list??[];
             {{range $index,$column := .table.ListColumns}}
-            {{if eq $column.HtmlField "createdBy" "updatedBy"}}
+            {{if eq $column.HtmlField "createdBy" "updatedBy" "dept_id"}}
             list.map((item:any)=>{
                 {{if eq $column.HtmlField "createdBy"}}
                 item.createdBy = item?.createdUser.userNickname
+                {{end}}
+                {{if eq $column.HtmlField "deptId"}}
+                item.deptId = item.deptInfo?.deptName
                 {{end}}
                 {{if eq $column.HtmlField "updatedBy"}}
                 item.updatedBy = item?.updatedUser.userNickname
@@ -470,7 +473,7 @@ export default defineComponent({
             {{end}}
             if(list.length > 0 &&  typeof list[0].id == "undefined"){
                 list.map((item:any)=>{
-                    item.id = item.categoryId
+                    item.id = item.{{.table.PkColumn.HtmlField}}
                 })
             }
             dataList.value = _.clone(res.data.list)
