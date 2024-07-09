@@ -38,11 +38,11 @@ func New() service.IWechat {
 		Log: miniProgram.Log{
 			Level: cfg.MustGet(ctx, "wechat.Log.Leave").String(),
 			File:  cfg.MustGet(ctx, "wechat.Log.File").String(),
-			Error:  cfg.MustGet(ctx, "wechat.Log.Error").String(),
+			Error: cfg.MustGet(ctx, "wechat.Log.Error").String(),
 		},
 		// 可选，不传默认走程序内存
-		Cache: kernel.NewRedisClient(&kernel.RedisOptions{
-			Addr:     cfg.MustGet(ctx, "wechat.Cache.Addr").String(),
+		Cache: kernel.NewRedisClient(&kernel.UniversalOptions{
+			Addrs:    []string{cfg.MustGet(ctx, "wechat.Cache.Addr").String()},
 			Password: cfg.MustGet(ctx, "wechat.Cache.Password").String(),
 			DB:       cfg.MustGet(ctx, "wechat.Cache.DB").Int(),
 		}),

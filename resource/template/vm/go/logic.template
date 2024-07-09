@@ -201,17 +201,17 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                     {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
                 {{$column.GoField}} : v.{{$column.GoField}},
                     {{end}}
-                    {{if eq $column.HtmlField "createdBy"}}
+                    {{if and $column.IsList (eq $column.HtmlField "createdBy")}}
                 CreatedUser:v.CreatedUser,
                     {{end}}
-                    {{if eq $column.HtmlField "deptId"}}
+                    {{if and $column.IsList (eq $column.HtmlField "deptId")}}
                     {{if $usedSystemModule}}
                 DeptInfo:systemService.SysDept().GetByDept(ctx, v.DeptId),
                     {{else}}
                 DeptInfo:service.SysDept().GetByDept(ctx, v.DeptId),
                     {{end}}
                     {{end}}
-                    {{if eq $column.HtmlField "UpdatedBy"}}
+                    {{if and $column.IsList (eq $column.HtmlField "UpdatedBy")}}
                 UpdatedUser:v.UpdatedUser,
                     {{end}}
                   {{end}}
@@ -234,17 +234,17 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                 {{.table.PkColumn.GoField}} : v.{{.table.PkColumn.GoField}},
                   {{end}}
                   {{range $index, $column := .table.ListColumns}}
-                  {{if eq $column.HtmlField "createdBy"}}
+                  {{if and $column.IsList (eq $column.HtmlField "createdBy")}}
                 CreatedUser:v.CreatedUser,
                   {{end}}
-                  {{if eq $column.HtmlField "deptId"}}
+                  {{if and $column.IsList (eq $column.HtmlField "deptId")}}
                       {{if $usedSystemModule}}
                 DeptInfo:systemService.SysDept().GetByDept(ctx, v.DeptId),
                       {{else}}
                 DeptInfo:service.SysDept().GetByDept(ctx, v.DeptId),
                       {{end}}
                   {{end}}
-                  {{if eq $column.HtmlField "UpdatedBy"}}
+                  {{if and $column.IsList (eq $column.HtmlField "UpdatedBy")}}
                 UpdatedUser:v.UpdatedUser,
                   {{end}}
                     {{if eq $column.HtmlType "images" "file" "files"}}
