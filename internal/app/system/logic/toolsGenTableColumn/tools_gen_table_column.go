@@ -192,7 +192,7 @@ func (s *sToolsGenTableColumn) InitColumnField(column *entity.ToolsGenTableColum
 	column.SortOrderList = column.SortOrderEdit
 	column.SortOrderDetail = column.SortOrderEdit
 	column.SortOrderQuery = column.SortOrderEdit
-	column.ColSpan = 12
+	column.ColSpan = 1
 	column.RowSpan = 1
 	column.IsRowStart = false
 	column.MinWidth = 150
