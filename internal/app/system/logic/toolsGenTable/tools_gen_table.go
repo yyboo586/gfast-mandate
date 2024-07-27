@@ -59,7 +59,7 @@ func (s *sToolsGenTable) List(ctx context.Context, req *system.ToolsGenTableSear
 			m = m.Where(dao.ToolsGenTable.Columns().TableName+" like ?", "%"+req.TableName+"%")
 		}
 		if req.TableComment != "" {
-			m = m.Where(dao.ToolsGenTable.Columns().TableComment+"like ?", "%"+req.TableComment+"%")
+			m = m.Where(dao.ToolsGenTable.Columns().TableComment+" like ?", "%"+req.TableComment+"%")
 		}
 		if len(req.DateRange) > 0 {
 			m = m.Where(dao.ToolsGenTable.Columns().CreateTime+" >=? AND "+dao.ToolsGenTable.Columns().CreateTime+" <=?", req.DateRange[0], req.DateRange[1])
