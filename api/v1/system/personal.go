@@ -53,7 +53,7 @@ type PersonalEditRes struct {
 
 type PersonalResetPwdReq struct {
 	g.Meta   `path:"/personal/resetPwd" tags:"系统后台/用户管理" method:"put" summary:"重置个人密码"`
-	Password string `p:"password" v:"required|password#密码不能为空|密码以字母开头，只能包含字母、数字和下划线，长度在6~18之间"`
+	Password string `p:"password" v:"required|password2#密码不能为空|密码必须包含大小写字母和数字，长度在6~18之间"`
 	commonApi.Author
 }
 

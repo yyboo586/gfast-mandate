@@ -67,7 +67,7 @@ type UserAddReq struct {
 	g.Meta `path:"/user/add" tags:"系统后台/用户管理" method:"post" summary:"添加用户"`
 	*SetUserReq
 	UserName string `p:"userName" v:"required#用户账号不能为空"`
-	Password string `p:"password" v:"required|password#密码不能为空|密码以字母开头，只能包含字母、数字和下划线，长度在6~18之间"`
+	Password string `p:"password" v:"required|password2#密码不能为空|密码必须包含大小写字母和数字，长度在6~18之间"`
 	UserSalt string
 }
 
@@ -100,7 +100,7 @@ type UserGetEditRes struct {
 type UserResetPwdReq struct {
 	g.Meta   `path:"/user/resetPwd" tags:"系统后台/用户管理" method:"put" summary:"重置用户密码"`
 	Id       uint64 `p:"userId" v:"required#用户id不能为空"`
-	Password string `p:"password" v:"required|password#密码不能为空|密码以字母开头，只能包含字母、数字和下划线，长度在6~18之间"`
+	Password string `p:"password" v:"required|password2#密码不能为空|密码必须包含大小写字母和数字，长度在6~18之间"`
 }
 
 type UserResetPwdRes struct {

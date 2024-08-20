@@ -22,10 +22,13 @@ func (s *Local) Upload(ctx context.Context, file *ghttp.UploadFile) (result syst
 		return
 	}
 	r := g.RequestFromCtx(ctx)
-	host := r.Host
-	forwardedHost := r.Header.Get("X-Forwarded-Host")
-	if forwardedHost != "" {
-		host = forwardedHost
+	host := r.Header.Get("X-Forwarded-Host")
+	scheme := r.Header.Get("X-Scheme")
+	if host == "" {
+		host = r.Host
+	}
+	if scheme == "" {
+		scheme = r.GetSchema()
 	}
 	uri := r.Header.Get("X-Original-URI")
 	if uri != "" {
@@ -34,7 +37,7 @@ func (s *Local) Upload(ctx context.Context, file *ghttp.UploadFile) (result syst
 			uri = gstr.SubStr(uri, 1, pos)
 		}
 	}
-	urlPerfix := fmt.Sprintf("//%s/%s", host, uri)
+	urlPerfix := fmt.Sprintf("%s://%s/%s", scheme, host, uri)
 	p := strings.Trim(consts.UploadPath, "/")
 	sp := s.getStaticPath(ctx)
 	if sp != "" {
