@@ -27,6 +27,7 @@ type UserSearchReq struct {
 	Mobile   string `p:"mobile"`
 	Status   string `p:"status"`
 	KeyWords string `p:"keyWords"`
+	UserInfo *model.ContextUser
 	commonApi.PageReq
 	commonApi.Author
 }

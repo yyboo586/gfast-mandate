@@ -314,7 +314,8 @@ func (s *sSysRole) RoleDeptTreeSelect(ctx context.Context) (res *system.RoleDept
 	res = new(system.RoleDeptTreeSelectRes)
 	err = g.Try(ctx, func(ctx context.Context) {
 		list, err := service.SysDept().GetList(ctx, &system.DeptSearchReq{
-			Status: "1",
+			Status:  "1",
+			ShowAll: true,
 		})
 		liberr.ErrIsNil(ctx, err)
 		dList := service.SysDept().GetListTree(0, list)

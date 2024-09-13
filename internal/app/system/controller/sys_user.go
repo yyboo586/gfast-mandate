@@ -40,6 +40,7 @@ func (c *userController) List(ctx context.Context, req *system.UserSearchReq) (r
 		userList []*entity.SysUser
 	)
 	res = new(system.UserSearchRes)
+	req.UserInfo = service.Context().GetLoginUser(ctx)
 	total, userList, err = service.SysUser().List(ctx, req)
 	if err != nil || total == 0 {
 		return

@@ -473,6 +473,15 @@ func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total i
 			m = m.As("a").LeftJoin("casbin_rule", "b", "b.v0 = CONCAT('u_',a.id )")
 			m = m.Where("v1 = ? and SUBSTR(v0,1,2) = 'u_'", req.RoleId)
 		}
+		//判断权限，普通管理只能按数据权限查看
+		if !s.AccessRule(ctx, req.UserInfo.Id, "api/v1/system/user/all") {
+			m = s.GetAuthDeptWhere(
+				ctx,
+				m,
+				req.UserInfo,
+				"sys_user", "dept_id", "id",
+			).WhereNotIn(dao.SysUser.Columns().Id, s.NotCheckAuthAdminIds(ctx).Slice())
+		}
 		if req.PageSize == 0 {
 			req.PageSize = consts.PageSize
 		}
@@ -605,12 +614,20 @@ func (s *sSysUser) filterRoleIds(ctx context.Context, roleIds []uint, userId uin
 		liberr.ErrIsNil(ctx, err)
 		roleList, err = service.SysRole().GetRoleList(ctx)
 		liberr.ErrIsNil(ctx, err)
+		//子角色也要能够被授权
+		sonIds := make([]uint, 0, 10)
+		for _, v := range accessRoleList {
+			sonIds = append(sonIds, service.SysRole().FindSonIdsByParentId(roleList, v)...)
+		}
+		accessRoleList = append(accessRoleList, sonIds...)
 		//自己创建的角色可以被授权
 		for _, v := range roleList {
 			if v.CreatedBy == userId {
 				accessRoleList = append(accessRoleList, v.Id)
 			}
 		}
+		//去重accessRoleList
+		accessRoleList = gconv.Uints(garray.NewArrayFrom(gconv.Interfaces(accessRoleList)).Unique().Slice())
 		for _, r := range roleIds {
 			for _, a := range accessRoleList {
 				if r == a {

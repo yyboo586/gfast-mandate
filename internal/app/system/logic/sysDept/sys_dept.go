@@ -40,6 +40,22 @@ func (s *sSysDept) GetList(ctx context.Context, req *system.DeptSearchReq) (list
 	if err != nil {
 		return
 	}
+	//判断是否有管理所有部门权限
+	if !req.ShowAll && !service.SysUser().AccessRule(ctx, req.UserId, "api/v1/system/dept/all") {
+		var userDept *entity.SysDept
+		userDept, err = s.GetByDeptId(ctx, req.UserDeptId)
+		if err != nil {
+			return
+		}
+		if userDept == nil {
+			err = errors.New("您没有被设置部门，无法获取信息")
+			return
+		}
+		newList := make([]*entity.SysDept, 0, 100)
+		newList = append(newList, userDept)
+		newList = append(newList, s.FindSonByParentId(list, req.UserDeptId)...)
+		list = newList
+	}
 	rList := make([]*entity.SysDept, 0, len(list))
 	if req.DeptName != "" || req.Status != "" {
 		for _, v := range list {

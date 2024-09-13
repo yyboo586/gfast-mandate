@@ -14,9 +14,12 @@ import (
 )
 
 type DeptSearchReq struct {
-	g.Meta   `path:"/dept/list" tags:"系统后台/部门管理" method:"get" summary:"部门列表"`
-	DeptName string `p:"deptName"`
-	Status   string `p:"status"`
+	g.Meta     `path:"/dept/list" tags:"系统后台/部门管理" method:"get" summary:"部门列表"`
+	DeptName   string `p:"deptName"`
+	Status     string `p:"status"`
+	ShowAll    bool
+	UserId     uint64
+	UserDeptId uint64
 }
 
 type DeptSearchRes struct {

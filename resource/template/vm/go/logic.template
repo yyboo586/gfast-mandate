@@ -440,15 +440,15 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
     err =g.Try(ctx, func(ctx context.Context){
         err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
         liberr.ErrIsNil(ctx,err,"获取信息失败")
-        if res!=nil{
         {{if $.table.HasDeptId}}
+        if res!=nil{
         {{if $usedSystemModule}}
             res.DeptInfo = systemService.SysDept().GetByDept(ctx, res.DeptId)
         {{else}}
             res.DeptInfo = service.SysDept().GetByDept(ctx, res.DeptId)
         {{end}}
-        {{end}}
         }
+        {{end}}
         {{range $index, $column := .table.Columns}}
         {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
         {{range $ti, $linkedTable := $.table.LinkedTables}}
