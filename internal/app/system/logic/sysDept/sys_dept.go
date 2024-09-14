@@ -10,6 +10,7 @@ package sysDept
 import (
 	"context"
 	"errors"
+	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -179,6 +180,24 @@ func (s *sSysDept) GetListTree(pid uint64, list []*entity.SysDept) (deptTree []*
 			deptTree = append(deptTree, t)
 		}
 	}
+	return
+}
+
+func (s *sSysDept) GetTopIds(list []*entity.SysDept) (ids []uint64) {
+	arr := garray.NewArray()
+	for _, v1 := range list {
+		tag := true
+		for _, v2 := range list {
+			if v1.ParentId == v2.DeptId {
+				tag = false
+				break
+			}
+		}
+		if tag {
+			arr.PushRight(v1.ParentId)
+		}
+	}
+	ids = gconv.Uint64s(arr.Unique().Slice())
 	return
 }
 

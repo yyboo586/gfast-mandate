@@ -65,7 +65,8 @@ type DeptDeleteRes struct {
 }
 
 type DeptTreeSelectReq struct {
-	g.Meta `path:"/dept/treeSelect" tags:"系统后台/部门管理" method:"get" summary:"获取部门树形菜单"`
+	g.Meta    `path:"/dept/treeSelect" tags:"系统后台/部门管理" method:"get" summary:"获取部门树形菜单"`
+	ShowOwner bool `p:"showOwner"`
 }
 
 type DeptTreeSelectRes struct {

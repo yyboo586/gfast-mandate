@@ -958,7 +958,7 @@ func (s *sSysUser) GetDataWhere(ctx context.Context, userInfo *model.ContextUser
 							deptIdArr.Add(gconv.Int64(userInfo.DeptId))
 							//获取正常状态部门数据
 							deptList := ([]*entity.SysDept)(nil)
-							deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1"})
+							deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1", ShowAll: true})
 							liberr.ErrIsNil(ctx, err)
 							var dList g.List
 							for _, d := range deptList {
@@ -1059,7 +1059,7 @@ func (s *sSysUser) GetAuthDataWhere(ctx context.Context, m *gdb.Model, userInfo 
 					deptIdArr.Add(gconv.Int64(userInfo.DeptId))
 					//获取正常状态部门数据
 					deptList := ([]*entity.SysDept)(nil)
-					deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1"})
+					deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1", ShowAll: true})
 					liberr.ErrIsNil(ctx, err)
 					var dList g.List
 					for _, d := range deptList {
@@ -1166,7 +1166,7 @@ func (s *sSysUser) GetAuthDeptDataWhere(ctx context.Context, m *gdb.Model, userI
 					deptIdArr.Add(gconv.Int64(userInfo.DeptId))
 					//获取正常状态部门数据
 					deptList := ([]*entity.SysDept)(nil)
-					deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1"})
+					deptList, err = service.SysDept().GetList(ctx, &system.DeptSearchReq{Status: "1", ShowAll: true})
 					liberr.ErrIsNil(ctx, err)
 					var dList g.List
 					for _, d := range deptList {
