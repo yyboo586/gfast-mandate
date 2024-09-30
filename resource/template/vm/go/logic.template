@@ -614,3 +614,19 @@ func (s *s{{$.table.ClassName}}) List{{$.table.ClassName}}{{$column.ClassName}}(
 {{end}}
 {{end}}
 {{end}}
+
+{{range $index,$column:= .table.Columns}}
+{{if eq $column.HtmlType "switch"}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
+func (s *s{{$.table.ClassName}}) Change{{$column.GoField}} (ctx context.Context,{{$.table.PkColumn.HtmlField}} {{$.table.PkColumn.GoType}},{{$column.HtmlField}} {{$column.GoType}})(err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        _, err = dao.{{$.table.ClassName}}.Ctx(ctx).WherePri({{$.table.PkColumn.HtmlField}}).
+            Update(do.{{$.table.ClassName}}{
+                {{$column.GoField}}:{{$column.HtmlField}},
+            })
+        liberr.ErrIsNil(ctx, err, "修改失败")
+    })
+    return
+}
+{{end}}
+{{end}}

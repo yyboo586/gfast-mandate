@@ -58,7 +58,7 @@ export function del{{.table.ClassName}}({{.table.PkColumn.HtmlField}}s:{{.table.
 {{/*去重处理*/}}
 {{$hasMethods:=newArray}}
 {{range $index,$column:= .table.Columns}}
-{{if and $column.IsStatus $column.IsList}}
+{{if eq $column.HtmlType "switch"}}
 // {{$.table.FunctionName}}{{$column.ColumnComment}}修改
 export function change{{$.table.ClassName}}{{$column.GoField}}({{$.table.PkColumn.HtmlField}}:{{$.table.PkColumn.TsType}},{{$column.HtmlField}}:{{$column.TsType}}) {
   const data = {

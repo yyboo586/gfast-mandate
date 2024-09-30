@@ -95,7 +95,11 @@
           />
         </el-form-item>
         {{end}}
-        {{else if eq $column.HtmlType "radio" }} {{/* else if eq $column.HtmlType "select" */}}
+        {{else if eq $column.HtmlType "switch"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-switch  v-model="formData.{{$column.HtmlField}}" class="ml-2" />
+        </el-form-item>
+        {{else if eq $column.HtmlType "radio" }}
         {{if ne $column.LinkTableName ""}}
           <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
             <el-radio-group v-model="formData.{{$column.HtmlField}}">
@@ -364,7 +368,7 @@ const state = reactive<{{.table.ClassName}}EditState>({
   isShowDialog: false,
   formData: {
     {{range $index, $column := .table.Columns}}
-    {{if eq $column.HtmlType "radio"}}
+    {{if eq $column.HtmlType "switch"}}
     {{$column.HtmlField}}: false ,
     {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
     {{$column.HtmlField}}: [] ,
@@ -415,6 +419,8 @@ const openDialog = (row?: {{.table.ClassName}}InfoData) => {
       {{else}}
       data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",")
       {{end}}
+      {{else if eq $column.HtmlType "switch"}}
+      data.{{$column.HtmlField}} = Boolean(data.{{$column.HtmlField}})
       {{else if and (eq $column.HtmlType "radio" "select") (ne $column.DictType "")}}
       {{if eq $column.TsType "boolean"}}
       data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?'1':'0'
@@ -501,8 +507,10 @@ const onSubmit = () => {
 const resetForm = ()=>{
   state.formData = {
     {{range $index, $column := .table.Columns}}
-    {{if eq $column.HtmlType "radio"}}
+    {{if eq $column.HtmlType "switch"}}
     {{$column.HtmlField}}: false ,
+    {{else if eq $column.HtmlType "radio"}}
+    {{$column.HtmlField}}: '' ,
     {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}
     {{$column.HtmlField}}: [] ,
     {{else if eq $column.HtmlType "keyValue"}}

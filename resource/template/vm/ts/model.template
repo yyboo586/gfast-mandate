@@ -40,7 +40,7 @@ export interface {{.table.ClassName}}TableColumns {
 ////
 export interface {{.table.ClassName}}InfoData {
     {{range $index, $column := .table.Columns}}
-    {{if $column.IsPk}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else if eq $column.HtmlType "keyValue"}}{key:string,value:any}[]{{else}}{{$column.TsType}}|undefined{{end}};        // {{$column.ColumnComment}} {{else}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "radio"}}boolean{{else if eq $column.HtmlType "keyValue"}}{key:string,value:any}[]{{else}}{{$column.TsType}}|undefined{{end}}; // {{$column.ColumnComment}} {{end}}
+    {{if $column.IsPk}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "switch"}}boolean{{else if eq $column.HtmlType "keyValue"}}{key:string,value:any}[]{{else}}{{$column.TsType}}|undefined{{end}};        // {{$column.ColumnComment}} {{else}}{{$column.HtmlField}}:{{if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects"}}any[]{{else if eq $column.HtmlType "switch"}}boolean{{else if eq $column.HtmlType "keyValue"}}{key:string,value:any}[]{{else}}{{$column.TsType}}|undefined{{end}}; // {{$column.ColumnComment}} {{end}}
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
     linked{{$column.GoField}}?:Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}[]{{end}}; // {{$column.ColumnComment}}

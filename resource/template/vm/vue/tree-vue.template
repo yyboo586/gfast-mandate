@@ -47,6 +47,12 @@
                   </el-form-item>
                 </el-col>
                   {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "switch"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <el-switch  v-model="tableData.param.{{$column.HtmlField}}" class="ml-2" />
+                    </el-form-item>
+                </el-col>
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.DictType "") }}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
@@ -283,6 +289,15 @@
                 fit="contain"></el-image>
             </template>
           </el-table-column>
+          {{else if eq $column.HtmlType "switch"}}
+          <el-table-column label="{{$column.ColumnComment}}" align="center" prop="{{$column.HtmlField}}"
+          {{if gt $column.MinWidth 0}}min-width="{{$column.MinWidth}}px"{{end}}
+          {{if $column.IsOverflowTooltip}}:show-overflow-tooltip="true"{{end}}
+          {{if $column.IsFixed}}fixed="left"{{end}}>
+              <template #default="scope">
+                  <el-switch  v-model="scope.row.{{$column.HtmlField}}" class="ml-2" @change="change{{$column.GoField}}(scope.row)"/>
+              </template>
+          </el-table-column>
           {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
           {{if ne $column.LinkTableName ""}}
           <el-table-column align="center" label="{{$column.ColumnComment}}" prop="linked{{$column.GoField}}"
@@ -427,7 +442,7 @@ import {
     add{{.table.ClassName}},
     update{{.table.ClassName}},
     {{range $index,$column:= .table.Columns}}
-    {{if and $column.IsStatus $column.IsList}}
+    {{if eq $column.HtmlType "switch"}}
     change{{$.table.ClassName}}{{$column.GoField}},
     {{end}}
     {{end}}
@@ -600,6 +615,16 @@ const {{$column.HtmlField}}Format = (row:{{$.table.ClassName}}TableColumns) => {
     return proxy.selectDictLabel({{$column.DictType}}.value, row.{{$column.HtmlField}});
 }
 {{end}}
+{{end}}
+{{if eq $column.HtmlType "switch"}}
+const change{{$column.GoField}} = (row:{{$.table.ClassName}}TableColumns) => {
+    change{{$.table.ClassName}}{{$column.GoField}}(row.{{$.table.PkColumn.HtmlField}},row.{{$column.HtmlField}})
+        .catch(()=>{
+            setTimeout(()=>{
+                row.{{$column.HtmlField}} = !row.{{$column.HtmlField}}
+            },300)
+        })
+}
 {{end}}
 {{end}}
 // 多选框选中数据

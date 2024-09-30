@@ -66,6 +66,15 @@
               {{"{{"}} formData.{{$column.HtmlField}} {{"}}"}}
             {{end}}
           </el-descriptions-item>
+        {{else if eq $column.HtmlType "switch"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            <el-switch  v-model="formData.{{$column.HtmlField}}" class="ml-2" disabled />
+          </el-descriptions-item>
         {{else if eq $column.HtmlType "date"}}
           <el-descriptions-item :span="{{$column.ColSpan}}">
             <template #label>

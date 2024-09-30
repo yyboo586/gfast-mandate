@@ -49,6 +49,12 @@
                   </el-form-item>
                 </el-col>
                   {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "switch"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <el-switch  v-model="tableData.param.{{$column.HtmlField}}" class="ml-2" />
+                    </el-form-item>
+                </el-col>
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.DictType "") }}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
@@ -311,7 +317,7 @@
 {{$hasImports:=newArray}}
 import {ItemOptions} from "/@/api/items";
 import {toRefs, reactive, onMounted, ref, defineComponent, computed,getCurrentInstance,toRaw,h,unref,FunctionalComponent} from 'vue';
-import {ElMessageBox, ElMessage, FormInstance,RowExpandHandler,ExpandedRowsChangeHandler,TableV2FixedDir, Column, ElLink, ElIcon, ElCheckbox, CheckboxValueType,ElImage,ElTag} from 'element-plus';
+import {ElMessageBox, ElMessage, FormInstance,RowExpandHandler,ExpandedRowsChangeHandler,TableV2FixedDir, Column, ElLink, ElIcon, ElCheckbox, CheckboxValueType,ElImage,ElTag,ElSwitch} from 'element-plus';
 import { EditPen,View,DeleteFilled } from '@element-plus/icons-vue'
 import {
     list{{.table.ClassName}},
@@ -320,7 +326,7 @@ import {
     add{{.table.ClassName}},
     update{{.table.ClassName}},
     {{range $index,$column:= .table.Columns}}
-    {{if and $column.IsStatus $column.IsList}}
+    {{if eq $column.HtmlType "switch"}}
     change{{$.table.ClassName}}{{$column.GoField}},
     {{end}}
     {{end}}
@@ -500,6 +506,16 @@ const {{$column.HtmlField}}Format = (row:{{$.table.ClassName}}TableColumns) => {
 }
 {{end}}
 {{end}}
+{{if eq $column.HtmlType "switch"}}
+const change{{$column.GoField}} = (row:{{$.table.ClassName}}TableColumns) => {
+    change{{$.table.ClassName}}{{$column.GoField}}(row.{{$.table.PkColumn.HtmlField}},row.{{$column.HtmlField}})
+        .catch(()=>{
+            setTimeout(()=>{
+                row.{{$column.HtmlField}} = !row.{{$column.HtmlField}}
+            },300)
+        })
+}
+{{end}}
 {{end}}
 // 多选框选中数据
 const handleSelectionChange = (selection:Array<{{.table.ClassName}}InfoData>) => {
@@ -646,6 +662,19 @@ const setVrData = (list:{{$.table.ClassName}}TableColumns[])=>{
                 children.push(h(ElImage,{fit:'contain',style:'width:50px;height:50px',src:proxy.getUpFileUrl({{$column.HtmlField}})}))
             }
             return ('div',children)
+        }
+    })
+    {{else if eq $column.HtmlType "switch"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ rowData:row,cellData:{{$column.HtmlField}} }) => {
+            return h(ElSwitch,{modelValue:{{$column.HtmlField}},
+            'onUpdate:modelValue': (value) => {
+                // 更新数据
+                row.{{$column.HtmlField}} = value;
+            },
+            onClick: () => { change{{$column.GoField}}(row)}});
         }
     })
     {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}

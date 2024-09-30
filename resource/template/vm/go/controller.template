@@ -19,6 +19,10 @@ package controller
 {{$hasSystemApi:=false}}
 {{$hasCommonService:=false}}
 {{$excel :=false}}
+{{$serviceVal := "service"}}
+{{if ne .table.ModuleName "system"}}
+    {{$serviceVal = "systemService"}}
+{{end}}
 {{if or .table.ExcelPort .table.ExcelImp}}
 {{$excel = true}}
 {{end}}
@@ -320,10 +324,6 @@ func(c *{{$structName}}Controller)Import(ctx context.Context,req *{{.table.Modul
 {{if gt (len .table.LinkedTables) 0}}
 // Linked{{$.table.ClassName}}DataSearch 相关连表查询数据
 func(c *{{$structName}}Controller) Linked{{$.table.ClassName}}DataSearch(ctx context.Context, req *{{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchReq) (res *{{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchRes, err error) {
-    {{$serviceVal := "service"}}
-    {{if ne $.table.ModuleName "system"}}
-        {{$serviceVal = "systemService"}}
-    {{end}}
     if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list") {
         err = errors.New("没有访问权限")
         return
@@ -363,3 +363,16 @@ func (c *{{$structName}}Controller) Delete(ctx context.Context, req *{{.table.Mo
 	return
 }
 
+{{range $index,$column:= .table.Columns}}
+{{if eq $column.HtmlType "switch"}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
+func(c *{{$structName}}Controller)Change{{$column.GoField}}(ctx context.Context, req *{{$.table.ModuleName}}.{{$column.GoField}}SwitchReq)(res *{{$.table.ModuleName}}.{{$column.GoField}}SwitchRes,err error){
+    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{$.apiVersion}}/{{$.modulePath}}/{{$.table.BusinessName | CaseCamelLower}}/edit") {
+        err = errors.New("没有修改权限")
+        return
+    }
+    err = service.{{$.table.ClassName}}().Change{{$column.GoField}}(ctx,req.{{$.table.PkColumn.GoField}},req.{{$column.GoField}})
+    return
+}
+{{end}}
+{{end}}
