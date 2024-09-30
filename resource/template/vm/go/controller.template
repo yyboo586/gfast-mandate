@@ -23,6 +23,7 @@ package controller
 {{if ne .table.ModuleName "system"}}
     {{$serviceVal = "systemService"}}
 {{end}}
+{{$impSystemService := false}}
 {{if or .table.ExcelPort .table.ExcelImp}}
 {{$excel = true}}
 {{end}}
@@ -53,7 +54,7 @@ import (
     {{if gt (len .table.LinkedTables) 0}}
     "errors"
     {{if ne $.table.ModuleName "system"}}
-    systemService "{{.goModName}}/internal/app/system/service"
+    {{$impSystemService = true}}
     {{else}}
     "{{.goModName}}/internal/app/system/service"
     {{end}}
@@ -81,6 +82,16 @@ import (
     {{if $excel}}
     "{{$.goModName}}/library/libUtils"
     "github.com/xuri/excelize/v2"
+    {{end}}
+    {{if not $impSystemService}}
+        {{range $index,$column:= .table.Columns}}
+            {{if eq $column.HtmlType "switch"}}
+                {{$impSystemService = true}}
+            {{end}}
+        {{end}}
+    {{end}}
+    {{if $impSystemService}}
+    systemService "{{.goModName}}/internal/app/system/service"
     {{end}}
 )
 ////
