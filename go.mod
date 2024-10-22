@@ -1,19 +1,19 @@
 module github.com/tiger1103/gfast/v3
 
-go 1.21
+go 1.23
 
-toolchain go1.23.0
+toolchain go1.23.2
 
 require (
-	github.com/ArtisanCloud/PowerWeChat/v3 v3.2.23
+	github.com/ArtisanCloud/PowerWeChat/v3 v3.2.45
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.8+incompatible
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/casbin/casbin/v2 v2.42.0
-	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.7.2
-	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.7.2
-	github.com/gogf/gf/contrib/nosql/redis/v2 v2.7.2
-	github.com/gogf/gf/v2 v2.7.2
+	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.7.4
+	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.7.4
+	github.com/gogf/gf/contrib/nosql/redis/v2 v2.7.4
+	github.com/gogf/gf/v2 v2.7.4
 	github.com/gorilla/websocket v1.5.3
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/mssola/user_agent v0.5.3
@@ -31,7 +31,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/ArtisanCloud/PowerLibs/v3 v3.2.3 // indirect
+	github.com/ArtisanCloud/PowerLibs/v3 v3.2.6 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -101,14 +101,14 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.26.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/image v0.16.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
-	golang.org/x/term v0.23.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/term v0.24.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect

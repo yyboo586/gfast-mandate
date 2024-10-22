@@ -377,7 +377,7 @@ func (c *{{$structName}}Controller) Delete(ctx context.Context, req *{{.table.Mo
 {{range $index,$column:= .table.Columns}}
 {{if eq $column.HtmlType "switch"}}
 // {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
-func(c *{{$structName}}Controller)Change{{$column.GoField}}(ctx context.Context, req *{{$.table.ModuleName}}.{{$column.GoField}}SwitchReq)(res *{{$.table.ModuleName}}.{{$column.GoField}}SwitchRes,err error){
+func(c *{{$structName}}Controller)Change{{$column.GoField}}(ctx context.Context, req *{{$.table.ModuleName}}.{{$.table.ClassName}}{{$column.GoField}}SwitchReq)(res *{{$.table.ModuleName}}.{{$.table.ClassName}}{{$column.GoField}}SwitchRes,err error){
     if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{$.apiVersion}}/{{$.modulePath}}/{{$.table.BusinessName | CaseCamelLower}}/edit") {
         err = errors.New("没有修改权限")
         return

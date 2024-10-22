@@ -110,6 +110,7 @@ type ToolsGenTableColumnsEditReq struct {
 	UseSnowId      string                        `p:"useSnowId"`
 	UseVirtual     string                        `p:"useVirtual"`
 	OverwriteInfo  []*entity.OverwriteInfo       `p:"overwriteInfo"`
+	MenuPid        uint                          `p:"menuPid"`
 }
 
 type ToolsGenTableColumnsEditRes struct {

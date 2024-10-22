@@ -477,6 +477,7 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 	} else {
 		table.Options = ""
 	}
+	table.MenuPid = req.MenuPid
 
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) (err error) {
 		err = g.Try(ctx, func(ctx context.Context) {

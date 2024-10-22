@@ -31,8 +31,9 @@ type ToolsGenTable struct {
 	SortType       interface{} // 排序方式 (asc顺序 desc倒序)
 	ShowDetail     interface{} // 是否有查看详情功能
 	ExcelPort      interface{} // 是否有导出excel功能
-	ExcelImp      interface{} // 是否有导入excel功能
+	ExcelImp       interface{} // 是否有导入excel功能
 	UseSnowId      interface{} //主键是否使用雪花ID
 	UseVirtual     interface{} //树表是否使用虚拟表
-	OverwriteInfo interface{} //覆盖文件信息
+	OverwriteInfo  interface{} //覆盖文件信息
+	MenuPid        interface{} //父级菜单ID
 }

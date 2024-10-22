@@ -57,6 +57,7 @@ type ToolsGenTableEx struct {
 	QueryColumns   []*ToolsGenTableColumnEx // 查询表单列信息
 	PkColumn       *ToolsGenTableColumnEx   // 主键列信息
 	LinkedTables   []*ToolsGenTableLinked   // 关联表信息
+	MenuPid        uint                     // 父级菜单ID
 }
 
 // ToolsGenTableLinked 关联表

@@ -138,14 +138,14 @@ type {{.table.ClassName}}DeleteRes struct {
 {{range $index,$column:= .table.Columns}}
 {{if eq $column.HtmlType "switch"}}
 // {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
-type {{$column.GoField}}SwitchReq struct {
+type {{$.table.ClassName}}{{$column.GoField}}SwitchReq struct {
     g.Meta   `path:"/change{{$column.GoField}}" tags:"{{$.table.FunctionName}}" method:"put" summary:"修改{{$column.ColumnComment}}"`
     commonApi.Author
     {{$.table.PkColumn.GoField}}    {{$.table.PkColumn.GoType}} `p:"{{$.table.PkColumn.HtmlField}}" v:"required#主键必须"` //通过主键修改
     {{$column.GoField}}    {{$column.GoType}} `p:"{{$column.HtmlField}}" v:"required#状态必须"` //通过主键获取
 }
 
-type {{$column.GoField}}SwitchRes struct {
+type {{$.table.ClassName}}{{$column.GoField}}SwitchRes struct {
     commonApi.EmptyRes
 }
 {{end}}

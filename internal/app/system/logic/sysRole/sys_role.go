@@ -68,7 +68,7 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 			model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id)  =  b.v0")
 		}
 		model = model.Group("a.id")
-		err = model.Order("id asc").Fields("a.*, count(u.id) user_cnt").Scan(&res.List)
+		err = model.Order("list_order asc,id asc").Fields("a.*, count(u.id) user_cnt").Scan(&res.List)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
 	})
 	return
