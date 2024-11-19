@@ -27,7 +27,7 @@
                   </el-form-item>
                 </el-col>
                 {{end}}
-                {{if eq $column.HtmlType "input" "textarea"}}
+                {{if eq $column.HtmlType "input" "textarea" "inputNumber"}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
                     <el-input
@@ -58,7 +58,7 @@
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.DictType "") }}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
+                    <el-select filterable v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
                         <el-option
                             v-for="dict in {{$column.DictType}}"
                             :key="dict.value"
@@ -135,7 +135,7 @@
                 {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.LinkTableName "")}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} style="width:200px;">
+                    <el-select filterable v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} style="width:200px;">
                       <el-option
                       {{if $column.IsCascade}}
                           v-for="item in {{$column.HtmlField}}QueryOptions"
@@ -172,10 +172,38 @@
                     </el-form-item>
                 </el-col>
                 {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "userSelectorSingle"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-user v-model="{{$column.HtmlField}}" :multiple="false"></select-user>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "userSelectorMultiple"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-user v-model="tableData.param.{{$column.HtmlField}}"></select-user>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "deptSelectorSingle"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-dept v-model="tableData.param.{{$column.HtmlField}}"></select-dept>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-dept v-model="tableData.param.{{$column.HtmlField}}" :multiple="true"></select-dept>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
                 {{else}}
                 <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
                   <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-                    <el-select v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
+                    <el-select filterable v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
                         <el-option label="请选择字典生成" value="" />
                     </el-select>
                   </el-form-item>
@@ -298,6 +326,8 @@
 {{$editImp := false }}
 {{$fileImp := false}}
 {{$getUserList:=false}}
+{{$selectorUserImp:=false}}
+{{$selectorDeptImp:=false}}
 
 {{range $index,$column:=.table.Columns}}
 {{if eq $column.HtmlType "richtext"}}
@@ -308,6 +338,10 @@
 {{$imgsImp = true}}
 {{else if eq $column.HtmlType "file" "files"}}
 {{$fileImp = true}}
+{{else if or (eq $column.HtmlType "userSelectorSingle") (eq $column.HtmlType "userSelectorMultiple")}}
+{{$selectorUserImp = true}}
+{{else if or (eq $column.HtmlType "deptSelectorSingle") (eq $column.HtmlType "deptSelectorMultiple")}}
+{{$selectorDeptImp = true}}
 {{end}}
 {{if eq $column.HtmlField "createdBy" "updatedBy"}}
 {{$getUserList = true}}
@@ -345,6 +379,12 @@ import {
 import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/edit.vue"
 import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/detail.vue"
 import _ from 'lodash'
+{{if $selectorUserImp}}
+import selectUser from "/@/components/selectUser/index.vue"
+{{end}}
+{{if $selectorDeptImp}}
+import selectDept from "/@/components/selectDept/index.vue"
+{{end}}
 defineOptions({ name: "{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List"})
 const {proxy} = <any>getCurrentInstance()
 const loading = ref(false)
@@ -407,6 +447,8 @@ const state = reactive<{{.table.ClassName}}TableDataState>({
             {{range $index, $column := .table.QueryColumns}}
             {{if eq $column.QueryType "BETWEEN"}}
             {{$column.HtmlField}}: [],
+            {{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+            {{$column.HtmlField}}: [],
             {{else}}
             {{$column.HtmlField}}: undefined,
             {{end}}{{end}}
@@ -415,6 +457,18 @@ const state = reactive<{{.table.ClassName}}TableDataState>({
     },
 });
 const { tableData } = toRefs(state);
+{{range $index, $column := .table.QueryColumns}}
+{{if eq $column.HtmlType "userSelectorSingle"}}
+const {{$column.HtmlField}} = computed({
+    get:()=>{
+        return state.tableData.param.{{$column.HtmlField}}?[state.tableData.param.{{$column.HtmlField}}]:[]
+    },
+    set:(val:number[])=>{
+        state.tableData.param.{{$column.HtmlField}} = val?val[0]:0
+    }
+})
+{{end}}
+{{end}}
 // 页面加载时
 onMounted(() => {
     initTableData();
@@ -675,6 +729,38 @@ const setVrData = (list:{{$.table.ClassName}}TableColumns[])=>{
                 row.{{$column.HtmlField}} = value;
             },
             onClick: () => { change{{$column.GoField}}(row)}});
+        }
+    })
+    {{else if eq $column.HtmlType "userSelectorSingle" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+            return h('span', linked{{$column.GoField}}?linked{{$column.GoField}}.userNickname:'');
+        }
+    })
+    {{else if eq $column.HtmlType "userSelectorMultiple" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+            cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+                return h('span', linked{{$column.GoField}}?linked{{$column.GoField}}.map((res:any)=>{return res.userNickname}).join('，'):'');
+        }
+    })
+    {{else if eq $column.HtmlType "deptSelectorSingle" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+      {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+            cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+                return h('span', linked{{$column.GoField}}?linked{{$column.GoField}}.deptName:'');
+        }
+    })
+    {{else if eq $column.HtmlType "deptSelectorMultiple" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+            return h('span',linked{{$column.GoField}}?linked{{$column.GoField}}.map((res:any)=>{return res.deptName}).join('，'):'');
         }
     })
     {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}

@@ -908,13 +908,13 @@ func (s *sSysUser) Delete(ctx context.Context, ids []int) (err error) {
 }
 
 // GetUsers 通过用户ids查询多个用户信息
-func (s *sSysUser) GetUsers(ctx context.Context, ids []int) (users []*model.SysUserSimpleRes, err error) {
+func (s *sSysUser) GetUsers(ctx context.Context, ids []interface{}) (users []*model.SysUserSimpleRes, err error) {
 	if len(ids) == 0 {
 		return
 	}
-	idsSet := gset.NewIntSetFrom(ids).Slice()
+	idsSet := gset.NewFrom(ids).Slice()
 	err = g.Try(ctx, func(ctx context.Context) {
-		err = dao.SysUser.Ctx(ctx).Where(dao.SysUser.Columns().Id+" in(?)", idsSet).
+		err = dao.SysUser.Ctx(ctx).Where(dao.SysUser.Columns().Id, idsSet).
 			Order(dao.SysUser.Columns().Id + " ASC").Scan(&users)
 	})
 	return
@@ -1182,7 +1182,7 @@ func (s *sSysUser) GetAuthDeptDataWhere(ctx context.Context, m *gdb.Model, userI
 						deptIdArr.Add(gconv.Int64(li["id"]))
 					}
 				case 5: //仅本人数据权限
-					whereJustMe = g.Map{deptField: userInfo.Id, createdUserField: userInfo.Id}
+					whereJustMe = g.Map{deptField: userInfo.DeptId, createdUserField: userInfo.Id}
 				}
 			}
 		}

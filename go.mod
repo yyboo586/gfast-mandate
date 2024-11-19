@@ -10,10 +10,10 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/casbin/casbin/v2 v2.42.0
-	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.7.4
-	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.7.4
-	github.com/gogf/gf/contrib/nosql/redis/v2 v2.7.4
-	github.com/gogf/gf/v2 v2.7.4
+	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.8.0
+	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.8.0
+	github.com/gogf/gf/contrib/nosql/redis/v2 v2.8.0
+	github.com/gogf/gf/v2 v2.8.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/mssola/user_agent v0.5.3
@@ -22,10 +22,11 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/sony/sonyflake v1.2.0
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.34
-	github.com/tiger1103/gfast-cache v1.0.7
-	github.com/tiger1103/gfast-token v1.0.7
+	github.com/tiger1103/gfast-cache v1.0.8
+	github.com/tiger1103/gfast-token v1.0.8
 	github.com/wenlng/go-captcha v1.2.5
 	github.com/xuri/excelize/v2 v2.7.1
+	golang.org/x/net v0.28.0
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
 )
 
@@ -104,7 +105,6 @@ require (
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/image v0.16.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/term v0.24.0 // indirect

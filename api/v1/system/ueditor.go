@@ -26,6 +26,8 @@ type UEditorReq struct {
 	Action   string            `p:"action"`
 	Callback string            `p:"callback"`
 	File     *ghttp.UploadFile `p:"upfile" type:"file"`
+	Start    int               `p:"start"`
+	Size     int               `p:"size"`
 }
 
 type UEditorRes struct {

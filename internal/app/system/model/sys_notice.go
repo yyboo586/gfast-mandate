@@ -62,6 +62,7 @@ type SysNoticeSearchReq struct {
 	Tag       string `p:"tag" v:"tag@integer#标签需为整数" dc:"标签"`                                     //标签
 	Status    string `p:"status" v:"status@integer#状态需为整数" dc:"状态"`                               //状态
 	CreatedAt string `p:"createdAt" v:"createdAt@datetime#创建时间需为YYYY-MM-DD hh:mm:ss格式" dc:"创建时间"` //创建时间
+	IsTrim    bool   `p:"isTrim"`
 }
 
 // SysNoticeSearchRes 列表返回结果

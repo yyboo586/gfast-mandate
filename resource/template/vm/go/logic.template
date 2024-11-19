@@ -18,12 +18,20 @@ package {{$structName}}
 {{$gstr:=false}}
 {{$hasLinkTable:=false}}
 {{$useCommonService:=false}}
+{{$hasDeptSelector:=false}}
+{{$usedSystemModel := false}}
 {{range $index, $column := .table.Columns}}
-{{if eq $column.HtmlType "images" "file" "files"}}
+{{if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
 {{$libUtils = true}}
 {{end}}
-{{if and (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy" "deptId") (ne $.table.ModuleName "system")}}
+{{if eq $column.HtmlType "deptSelectorMultiple" "deptSelectorSingle"}}
+{{$hasDeptSelector = true}}
+{{end}}
+{{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy" "deptId") (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
 {{$usedSystemModule = true}}
+{{end}}
+{{if and (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle") (ne $.table.ModuleName "system")}}
+{{$usedSystemModel = true}}
 {{end}}
 {{if eq $column.HtmlType "selects" "checkbox"}}
 {{range $ti, $linkedTable := $.table.LinkedTables}}
@@ -65,6 +73,9 @@ import (
     {{end}}
     {{if $usedSystemModule}}
     systemService "{{.goModName}}/internal/app/system/service"
+    {{end}}
+    {{if $usedSystemModel}}
+    systemModel "{{.goModName}}/internal/app/system/model"
     {{end}}
     {{if or (eq .table.TplCategory "tree") $libUtils}}
     "{{.goModName}}/library/libUtils"
@@ -125,7 +136,19 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
             m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" like ?", "%"+req.{{$column.GoField}}+"%")
         }
         {{else if eq $column.QueryType "EQ"}}
-          {{if eq $column.GoType "string"}}
+          {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+        if len(req.{{$column.GoField}}) > 0 {
+            if systemService.ToolsGenTable().IsMysql() {
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where("JSON_CONTAINS(`{{$column.ColumnName}}`,?)", gconv.String(v))
+                }
+            }else{
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where(`"{{$column.ColumnName}}" @> '[?]'::jsonb`, v)
+                }
+            }
+        }
+          {{else if eq $column.GoType "string"}}
         if req.{{$column.GoField}} != "" {
             m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
         }
@@ -183,6 +206,17 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
         listRes.List = make([]*model.{{.table.ClassName}}ListRes,len(res))
         for k,v:=range res{
             {{range $index, $column := .table.Columns}}
+            {{if eq $column.HtmlType "userSelectorMultiple"}}
+            var linked{{$column.GoField}} []*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.SysUserSimpleRes
+            linked{{$column.GoField}}, err = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysUser().GetUsers(ctx, gconv.Interfaces(v.{{$column.GoField}}))
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            {{if eq $column.HtmlType "deptSelectorMultiple"}}
+            linked{{$column.GoField}} := make([]*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.LinkDeptRes, len(v.{{$column.GoField}}))
+            for lk, lv := range v.{{$column.GoField}} {
+                linked{{$column.GoField}}[lk] = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, lv)
+            }
+            {{end}}
             {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
             {{range $ti, $linkedTable := $.table.LinkedTables}}
             {{if eq $column.LinkTableClass $linkedTable.ClassName}}
@@ -214,8 +248,6 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                     {{if and $column.IsList (eq $column.HtmlField "UpdatedBy")}}
                 UpdatedUser:v.UpdatedUser,
                     {{end}}
-                  {{end}}
-                  {{range $index, $column := .table.Columns}}
                     {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
                       {{if eq $column.HtmlType "images" "file" "files"}}
                 {{$column.GoField}} : v.{{$column.GoField}},
@@ -227,6 +259,18 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                             {{end}}
                         {{end}}
                       {{end}}
+                    {{end}}
+                    {{if eq $column.HtmlType "userSelectorSingle"}}
+                Linked{{$column.GoField}} : v.Linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "userSelectorMultiple"}}
+                Linked{{$column.GoField}} : linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorSingle"}}
+                Linked{{$column.GoField}}:  {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v.{{$column.GoField}}),
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+                Linked{{$column.GoField}}: linked{{$column.GoField}},
                     {{end}}
                   {{end}}
                 {{else}}
@@ -257,6 +301,18 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                         {{end}}
                     {{end}}
                     {{end}}
+                    {{if eq $column.HtmlType "userSelectorSingle"}}
+                Linked{{$column.GoField}} : v.Linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "userSelectorMultiple"}}
+                Linked{{$column.GoField}} : linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorSingle"}}
+                Linked{{$column.GoField}}:  {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v.{{$column.GoField}}),
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+                Linked{{$column.GoField}}: linked{{$column.GoField}},
+                    {{end}}
                   {{end}}
                 {{end}}
             }
@@ -276,7 +332,19 @@ func (s *s{{.table.ClassName}})GetExportData(ctx context.Context, req *model.{{.
             m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" like ?", "%"+req.{{$column.GoField}}+"%")
         }
         {{else if eq $column.QueryType "EQ"}}
-          {{if eq $column.GoType "string"}}
+          {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+        if len(req.{{$column.GoField}}) > 0 {
+            if systemService.ToolsGenTable().IsMysql() {
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where("JSON_CONTAINS(`{{$column.ColumnName}}`,?)", gconv.String(v))
+                }
+            }else{
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where(`"{{$column.ColumnName}}" @> '[?]'::jsonb`, v)
+                }
+            }
+        }
+          {{else if eq $column.GoType "string"}}
         if req.{{$column.GoField}} != "" {
             m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
         }
@@ -384,7 +452,7 @@ func(s *s{{.table.ClassName}})Import(ctx context.Context,file *ghttp.UploadFile)
                 {{$add = true}}
                 {{else if and $column.IsPk $.table.UseSnowId}}
                 {{$.table.PkColumn.GoField}}:{{$.table.PkColumn.HtmlField}},
-                {{else if and (ne $column.IsPk true) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+                {{else if and (ne $column.IsPk true) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files") (ne $column.HtmlType "imageSelector") (ne $column.HtmlType "fileSelector")}}
                 {{$add = true}}
                 {{if eq $column.GoType "int" "uint" "int64" "uint64" "bool" }}
                 {{$column.GoField}}:gconv.Int64(d[{{$i}}]),
@@ -440,12 +508,26 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
     err =g.Try(ctx, func(ctx context.Context){
         err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
         liberr.ErrIsNil(ctx,err,"获取信息失败")
-        {{if $.table.HasDeptId}}
+        {{if or $.table.HasDeptId $hasDeptSelector}}
         if res!=nil{
+        {{if $.table.HasDeptId}}
         {{if $usedSystemModule}}
             res.DeptInfo = systemService.SysDept().GetByDept(ctx, res.DeptId)
         {{else}}
             res.DeptInfo = service.SysDept().GetByDept(ctx, res.DeptId)
+        {{end}}
+        {{end}}
+        {{if $hasDeptSelector}}
+        {{range $index, $column := .table.Columns}}
+        {{if eq $column.HtmlType "deptSelectorSingle"}}
+            res.Linked{{$column.GoField}} = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, res.{{$column.GoField}})
+        {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+            res.Linked{{$column.GoField}} = make([]*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.LinkDeptRes, len(res.{{$column.GoField}}))
+            for k, v := range res.{{$column.GoField}} {
+                res.Linked{{$column.GoField}}[k] = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v)
+            }
+        {{end}}
+        {{end}}
         {{end}}
         }
         {{end}}
@@ -480,7 +562,7 @@ func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.Clas
         if !req.{{$column.GoField}}.IsEmpty(){
             {{$column.HtmlField}}=req.{{$column.GoField}}.Join(",")
         }
-        {{else if eq $column.HtmlType "images" "file" "files"}}
+        {{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
         for _,obj:=range req.{{$column.GoField}}{
             obj.Url,err = libUtils.GetFilesPath(ctx,obj.Url)
             liberr.ErrIsNil(ctx, err)
@@ -529,7 +611,7 @@ func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *model.{{.table.Cla
         if !req.{{$column.GoField}}.IsEmpty(){
             {{$column.HtmlField}}=req.{{$column.GoField}}.Join(",")
         }
-        {{else if eq $column.HtmlType "images" "file" "files"}}
+        {{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
         for _,obj:=range req.{{$column.GoField}}{
             obj.Url,err = libUtils.GetFilesPath(ctx,obj.Url)
             liberr.ErrIsNil(ctx, err)

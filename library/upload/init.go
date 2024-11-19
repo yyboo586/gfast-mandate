@@ -3,20 +3,23 @@ package upload
 import (
 	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/tiger1103/gfast/v3/api/v1/system"
+	"github.com/tiger1103/gfast/v3/internal/app/common/model"
+	"github.com/tiger1103/gfast/v3/internal/mounter"
 )
 
 const (
 	SourceLocal   UploaderType = iota //  上传到本地
 	SourceTencent                     //  上传至腾讯云
 	SourceQiniu                       //  上传到七牛云
-	SourceOss                       //  上传到oss
+	SourceOss                         //  上传到oss
 )
 
 type UploaderType int
 
 type IUpload interface {
-	Upload(ctx context.Context, file *ghttp.UploadFile) (result system.UploadResponse, err error)
+	Upload(ctx context.Context, file *ghttp.UploadFile) (result *model.UploadResponse, err error)
+	CheckMultipart(ctx context.Context, req *model.CheckMultipartReq) (res *model.CheckMultipartRes, err error)
+	UploadPart(ctx context.Context, req *model.UploadPartReq) (*model.UploadPartRes, error)
 }
 
 var uploadCollection map[UploaderType]IUpload
@@ -45,4 +48,9 @@ func Register() {
 	RegisterUploader(SourceTencent, &Tencent{})
 	RegisterUploader(SourceQiniu, &Qiniou{})
 	RegisterUploader(SourceOss, &OSS{})
+}
+func init() {
+	mounter.Mount(func(ctx context.Context, s *ghttp.Server) {
+		Register()
+	})
 }

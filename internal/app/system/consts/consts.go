@@ -17,4 +17,7 @@ const (
 	WebsocketTypeTokenUpdated = "tokenUpdated"
 	// WebsocketTypeNotice websocket通知类型-系统通知
 	WebsocketTypeNotice = "notice"
+
+	// UploadAppId 上传应用ID
+	UploadAppId = "system"
 )

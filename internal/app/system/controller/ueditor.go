@@ -15,8 +15,13 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
-	"github.com/tiger1103/gfast/v3/internal/app/common/consts"
-	"github.com/tiger1103/gfast/v3/internal/app/common/service"
+	commonConsts "github.com/tiger1103/gfast/v3/internal/app/common/consts"
+	"github.com/tiger1103/gfast/v3/internal/app/common/model"
+	commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
+	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
+	"github.com/tiger1103/gfast/v3/internal/app/system/service"
+	"github.com/tiger1103/gfast/v3/library/libUtils"
+	"math"
 )
 
 var UEditor = new(uEditorController)
@@ -49,13 +54,43 @@ func (c *uEditorController) action(ctx context.Context, req *system.UEditorReq) 
 	//上传视频  上传文件
 	case "uploadvideo", "uploadfile":
 		c.uEditorUpload(ctx, req.File, "file")
-	//列出图片  列出文件
-	case "listimage", "listfile":
+	//列出图片
+	case "listimage":
+		var (
+			list  g.List
+			total interface{} = 0
+		)
+		list, total, err = c.getFileList(ctx, req.Start, req.Size, "image")
+		if err != nil {
+			r.Response.WriteJson(g.Map{
+				"state": err.Error(),
+			})
+			r.Exit()
+		}
 		r.Response.WriteJson(g.Map{
 			"state": "SUCCESS",
-			"total": 0,
-			"start": 0,
-			"list":  g.Slice{},
+			"total": total,
+			"start": req.Start,
+			"list":  list,
+		})
+	//列出文件
+	case "listfile":
+		var (
+			list  g.List
+			total interface{} = 0
+		)
+		list, total, err = c.getFileList(ctx, req.Start, req.Size, "")
+		if err != nil {
+			r.Response.WriteJson(g.Map{
+				"state": err.Error(),
+			})
+			r.Exit()
+		}
+		r.Response.WriteJson(g.Map{
+			"state": "SUCCESS",
+			"total": total,
+			"start": req.Start,
+			"list":  list,
 		})
 	//抓取远端图片
 	case "catchimage":
@@ -67,6 +102,7 @@ func (c *uEditorController) action(ctx context.Context, req *system.UEditorReq) 
 			"state": "请求地址出错",
 		})
 	}
+	r.Exit()
 	return
 }
 
@@ -172,15 +208,15 @@ func (c *uEditorController) ueditorConfig(ctx context.Context, callback string) 
 // ueditor上传图片
 func (c *uEditorController) uEditorUpload(ctx context.Context, upFile *ghttp.UploadFile, fType string) {
 	var (
-		info system.UploadResponse
+		info *model.UploadResponse
 		err  error
 		r    = g.RequestFromCtx(ctx)
 	)
 	v, _ := g.Cfg().Get(ctx, "upload.default")
 	if fType == "image" {
-		info, err = service.Upload().UploadFile(ctx, upFile, consts.CheckFileTypeImg, v.Int())
+		info, err = commonService.Upload().UploadFile(ctx, upFile, commonConsts.CheckFileTypeImg, v.Int(), service.Context().Get(ctx).User.Id, consts.UploadAppId)
 	} else if fType == "file" {
-		info, err = service.Upload().UploadFile(ctx, upFile, consts.CheckFileTypeFile, v.Int())
+		info, err = commonService.Upload().UploadFile(ctx, upFile, commonConsts.CheckFileTypeFile, v.Int(), service.Context().Get(ctx).User.Id, consts.UploadAppId)
 	}
 
 	if err != nil {
@@ -196,4 +232,38 @@ func (c *uEditorController) uEditorUpload(ctx context.Context, upFile *ghttp.Upl
 		})
 	}
 	r.Exit()
+}
+
+func (c *uEditorController) getFileList(ctx context.Context, start int, size int, kind string) (list g.List, total interface{}, err error) {
+	var res *model.SysAttachmentSearchRes
+	pageNum := gconv.Int(math.Ceil(gconv.Float64(start)/gconv.Float64(size)) + 1)
+	res, err = commonService.SysAttachment().List(ctx, &model.SysAttachmentSearchReq{
+		PageReq: model.PageReq{
+			PageNum:  pageNum,
+			PageSize: size,
+		},
+		Kind:   kind,
+		Status: "true",
+	})
+	if err != nil {
+		return
+	}
+	if res != nil {
+		total = res.Total
+		list = make(g.List, len(res.List))
+		for k, v := range res.List {
+			path := ""
+			if v.Drive == commonConsts.UploadDriverLocal {
+				path = libUtils.GetDomain(ctx, true) + "/" + v.Path
+			} else {
+				path = v.Path
+			}
+			list[k] = g.Map{
+				"url":   path,
+				"mtime": v.UpdatedAt.Timestamp(),
+			}
+		}
+
+	}
+	return
 }

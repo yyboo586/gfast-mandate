@@ -176,7 +176,9 @@ func (s *sToolsGenTable) SelectDbTableListByNames(ctx context.Context, tableName
 			err := db.GetScan(ctx, &result, sqlStr)
 			liberr.ErrIsNil(ctx, err, "获取表格信息失败")
 		} else if s.IsPg() {
-			sqlStr = "select * from information_schema.tables WHERE table_schema = current_schema() " +
+			sqlStr = "select information_schema.tables.*,obj_description(pg_class.oid) AS table_comment " +
+				" from information_schema.tables JOIN pg_class ON pg_class.relname = table_name " +
+				" WHERE table_schema = current_schema() " +
 				"AND table_name NOT LIKE 'tools_gen_%' "
 			if len(tableNames) > 0 {
 				in := gstr.TrimRight(gstr.Repeat("?,", len(tableNames)), ",")

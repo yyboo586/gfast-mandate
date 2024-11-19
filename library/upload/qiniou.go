@@ -2,24 +2,24 @@ package upload
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/guid"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
-	"github.com/tiger1103/gfast/v3/api/v1/system"
+	"github.com/tiger1103/gfast/v3/internal/app/common/model"
 	"path"
 )
 
 type Qiniou struct{}
 
-func (s *Qiniou) Upload(ctx context.Context, file *ghttp.UploadFile) (result system.UploadResponse, err error) {
-
+func (s *Qiniou) Upload(ctx context.Context, file *ghttp.UploadFile) (result *model.UploadResponse, err error) {
 	url, err := s.toQiniou(ctx, file)
 	if err != nil {
 		return
 	}
-	result = system.UploadResponse{
+	result = &model.UploadResponse{
 		Size:     file.Size,
 		Path:     url,
 		FullPath: url,
@@ -72,4 +72,14 @@ func (s *Qiniou) toQiniou(ctx context.Context, f *ghttp.UploadFile) (url string,
 	url = ImgUrl + "/" + filename
 	return url, nil
 
+}
+
+func (s *Qiniou) CheckMultipart(ctx context.Context, req *model.CheckMultipartReq) (res *model.CheckMultipartRes, err error) {
+	err = gerror.New("当前驱动暂不支持分片上传！")
+	return
+}
+
+func (s *Qiniou) UploadPart(ctx context.Context, req *model.UploadPartReq) (res *model.UploadPartRes, err error) {
+	err = gerror.New("当前驱动暂不支持分片上传！")
+	return
 }

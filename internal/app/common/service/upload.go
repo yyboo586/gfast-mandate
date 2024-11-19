@@ -7,16 +7,18 @@ package service
 
 import (
 	"context"
-	"github.com/tiger1103/gfast/v3/api/v1/system"
+	"github.com/tiger1103/gfast/v3/internal/app/common/model"
 
 	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 type IUpload interface {
-	UploadFiles(ctx context.Context, files []*ghttp.UploadFile, checkFileType string, source int) (result system.UploadMultipleRes, err error)
-	UploadFile(ctx context.Context, file *ghttp.UploadFile, checkFileType string, source int) (result system.UploadResponse, err error)
-	CheckSize(ctx context.Context, checkFileType string, file *ghttp.UploadFile) (err error)
-	CheckType(ctx context.Context, checkFileType string, file *ghttp.UploadFile) (err error)
+	UploadFiles(ctx context.Context, files []*ghttp.UploadFile, checkFileType string, source int, userId uint64, appId string) (result []*model.UploadResponse, err error)
+	UploadFile(ctx context.Context, file *ghttp.UploadFile, checkFileType string, source int, userId uint64, appId string) (result *model.UploadResponse, err error)
+	CheckSize(ctx context.Context, checkFileType string, fileSize int64) (err error)
+	CheckType(ctx context.Context, checkFileType string, fileName string) (err error)
+	CheckMultipart(ctx context.Context, req *model.CheckMultipartReq) (res *model.CheckMultipartRes, err error)
+	UploadPart(ctx context.Context, req *model.UploadPartReq) (res *model.UploadPartRes, err error)
 }
 
 var localUpload IUpload

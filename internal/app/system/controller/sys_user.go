@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
@@ -136,6 +137,6 @@ func (c *userController) GetUserSelector(ctx context.Context, req *system.UserSe
 // GetByIds 根据id 获取用户信息
 func (c *userController) GetByIds(ctx context.Context, req *system.UserByIdsReq) (res *system.UserByIdsRes, err error) {
 	res = new(system.UserByIdsRes)
-	res.UserList, err = service.SysUser().GetUsers(ctx, req.Ids)
+	res.UserList, err = service.SysUser().GetUsers(ctx, gconv.Interfaces(req.Ids))
 	return
 }

@@ -51,14 +51,14 @@ type (
 		ResetUserPwd(ctx context.Context, req *system.UserResetPwdReq) (err error)
 		ChangeUserStatus(ctx context.Context, req *system.UserStatusReq) (err error)
 		Delete(ctx context.Context, ids []int) (err error)
-		GetUsers(ctx context.Context, ids []int) (users []*model.SysUserSimpleRes, err error)
+		GetUsers(ctx context.Context, ids []interface{}) (users []*model.SysUserSimpleRes, err error)
 		// Deprecated : 此方法已废弃，请使用更简单的GetAuthWhere方法或GetAuthDeptWhere方法
 		GetDataWhere(ctx context.Context, userInfo *model.ContextUser, entityData interface{}, menuId uint) (where g.Map, err error)
 		HasAccessByDataWhere(ctx context.Context, where g.Map, uid interface{}) bool
 		AccessRule(ctx context.Context, userId uint64, rule string) bool
 		GetUserSelector(ctx context.Context, req *system.UserSelectorReq) (total interface{}, userList []*model.SysUserSimpleRes, err error)
 		GetUsersByRoleId(ctx context.Context, roleId uint) (users []*model.SysUserRoleDeptRes, err error)
-		GetAuthWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, field ...string)  *gdb.Model
+		GetAuthWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, field ...string) *gdb.Model
 		GetAuthDeptWhere(ctx context.Context, m *gdb.Model, userInfo *model.ContextUser, field ...string) *gdb.Model
 	}
 )

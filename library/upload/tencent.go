@@ -2,6 +2,7 @@ package upload
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gfile"
@@ -9,7 +10,7 @@ import (
 	"github.com/gogf/gf/v2/util/grand"
 	"github.com/tencentyun/cos-go-sdk-v5"
 	"github.com/tencentyun/cos-go-sdk-v5/debug"
-	"github.com/tiger1103/gfast/v3/api/v1/system"
+	"github.com/tiger1103/gfast/v3/internal/app/common/model"
 	"io"
 	"net/http"
 	"net/url"
@@ -20,7 +21,7 @@ import (
 type Tencent struct {
 }
 
-func (s *Tencent) Upload(ctx context.Context, file *ghttp.UploadFile) (result system.UploadResponse, err error) {
+func (s *Tencent) Upload(ctx context.Context, file *ghttp.UploadFile) (result *model.UploadResponse, err error) {
 	v, err := g.Cfg().Get(ctx, "upload.tencentCOS")
 	if err != nil {
 		return
@@ -36,7 +37,7 @@ func (s *Tencent) Upload(ctx context.Context, file *ghttp.UploadFile) (result sy
 	name = strings.ToLower(strconv.FormatInt(gtime.TimestampNano(), 36) + grand.S(6))
 	name = name + gfile.Ext(file.Filename)
 
-	path := upPath + name
+	path := upPath + gtime.Date() + "/" + name
 
 	url, _ := url.Parse(rawUrl)
 	b := &cos.BaseURL{BucketURL: url}
@@ -64,12 +65,22 @@ func (s *Tencent) Upload(ctx context.Context, file *ghttp.UploadFile) (result sy
 	}
 	defer f.Close()
 	_, err = client.Object.Put(context.Background(), path, f, opt)
-	result = system.UploadResponse{
+	result = &model.UploadResponse{
 		Size:     file.Size,
 		Path:     rawUrl + path,
 		FullPath: rawUrl + path,
 		Name:     file.Filename,
 		Type:     file.Header.Get("Content-type"),
 	}
+	return
+}
+
+func (s *Tencent) CheckMultipart(ctx context.Context, req *model.CheckMultipartReq) (res *model.CheckMultipartRes, err error) {
+	err = gerror.New("当前驱动暂不支持分片上传！")
+	return
+}
+
+func (s *Tencent) UploadPart(ctx context.Context, req *model.UploadPartReq) (res *model.UploadPartRes, err error) {
+	err = gerror.New("当前驱动暂不支持分片上传！")
 	return
 }

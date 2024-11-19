@@ -10,12 +10,14 @@
 package logic
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
 	"github.com/tiger1103/gfast/v3/internal/app/system/dao"
@@ -25,6 +27,9 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 	"github.com/tiger1103/gfast/v3/library/libWebsocket"
 	"github.com/tiger1103/gfast/v3/library/liberr"
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
+	"strings"
 )
 
 func init() {
@@ -144,10 +149,79 @@ func (s *sSysNotice) ListShow(ctx context.Context, req *model.SysNoticeSearchReq
 		err = m.Page(req.PageNum, req.PageSize).Fields("" +
 			"n.*,nr.id IS NOT NULL as isRead").Order(order).Scan(&res)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
+		if req.IsTrim {
+			for k, v := range res {
+				v.Content = s.extractTextFromHTML(v.Content)
+				if gstr.LenRune(v.Content) > 90 {
+					res[k].Content = gstr.SubStrRune(v.Content, 0, 90) + "..."
+				}
+			}
+		}
 		listRes.List = res
 	})
 	return
 }
+
+// extractParagraphsFromHTML extracts text from all <p> tags in the HTML, ignoring <img> and other non-text nodes, and decodes HTML entities.
+func (s *sSysNotice) extractTextFromHTML(htmlStr string) string {
+	// Parse the HTML
+	doc, err := html.Parse(strings.NewReader(htmlStr))
+	if err != nil {
+		return htmlStr
+	}
+
+	// Create a slice to store the extracted paragraphs
+	var paragraphs []string
+
+	// Helper function to recursively traverse nodes and collect text content into a buffer
+	var collectText func(*html.Node, *bytes.Buffer)
+	collectText = func(n *html.Node, buf *bytes.Buffer) {
+		switch n.Type {
+		case html.TextNode:
+			// Append the text content to the buffer
+			buf.WriteString(n.Data)
+		case html.ElementNode:
+			// Recursively traverse child nodes, but ignore <img> and other non-text-producing elements
+			// Note: In a more sophisticated implementation, you might want to handle other elements like <br>, <strong>, etc.
+			if n.DataAtom != atom.Img && n.DataAtom != atom.Script && n.DataAtom != atom.Style {
+				for c := n.FirstChild; c != nil; c = c.NextSibling {
+					collectText(c, buf)
+				}
+			}
+		}
+	}
+
+	// Define a function to recursively traverse nodes and collect text from <p> tags
+	var traverseNodes func(*html.Node)
+	traverseNodes = func(n *html.Node) {
+		// Check the type of the node
+		switch n.Type {
+		case html.ElementNode:
+			// Check if the node is a <p> tag
+			if n.DataAtom == atom.P {
+				// Create a buffer to store the text content of the <p> tag
+				var textBuf bytes.Buffer
+				collectText(n, &textBuf)
+				// Decode HTML entities in the collected text and add it to the paragraphs slice
+				paragraphs = append(paragraphs, html.UnescapeString(strings.TrimSpace(textBuf.String())))
+			} else {
+				// For other tags, just recursively traverse their children
+				for c := n.FirstChild; c != nil; c = c.NextSibling {
+					traverseNodes(c)
+				}
+			}
+		}
+	}
+
+	for n := doc; n != nil; n = n.NextSibling {
+		if n.Type == html.DocumentNode {
+			traverseNodes(n.FirstChild) // Start traversal from the first child of the document node (which is usually the <html> tag)
+			break
+		}
+	}
+	return strings.Join(paragraphs, "")
+}
+
 func (s *sSysNotice) GetById(ctx context.Context, id int64) (res *model.SysNoticeInfoRes, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		err = dao.SysNotice.Ctx(ctx).WithAll().Where(dao.SysNotice.Columns().Id, id).Scan(&res)

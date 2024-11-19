@@ -11,10 +11,8 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/tiger1103/gfast/v3/internal/consts"
+	"github.com/tiger1103/gfast/v3/internal/mounter"
 	"github.com/tiger1103/gfast/v3/internal/router"
-	"github.com/tiger1103/gfast/v3/library/libValidate"
-	"github.com/tiger1103/gfast/v3/library/upload"
-	"github.com/tiger1103/gfast/v3/task"
 )
 
 var (
@@ -26,6 +24,8 @@ var (
 			g.Log().SetFlags(glog.F_ASYNC | glog.F_TIME_DATE | glog.F_TIME_TIME | glog.F_FILE_LONG)
 			g.Log().Info(ctx, gbase64.MustDecodeString(consts.Logo), "Version:", consts.Version)
 			s := g.Server()
+			//调用注册已挂载相关组件
+			mounter.DoMount(ctx, s)
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				router.R.BindController(ctx, group)
 			})
@@ -43,23 +43,11 @@ var (
 			}
 			//重新配置swaggerUI静态页面--end--
 			enhanceOpenAPIDoc(s)
-			//注册相关组件
-			register()
 			s.Run()
 			return nil
 		},
 	}
 )
-
-// 相关组件注册
-func register() {
-	//注册上传组件
-	upload.Register()
-	//注册自定义验证规则
-	libValidate.Register()
-	//执行计划任务
-	task.Run()
-}
 
 func enhanceOpenAPIDoc(s *ghttp.Server) {
 	openapi := s.GetOpenApi()

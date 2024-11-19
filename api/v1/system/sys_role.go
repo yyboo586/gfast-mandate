@@ -56,7 +56,7 @@ type RoleAddRes struct {
 type RoleGetReq struct {
 	g.Meta `path:"/role/get" tags:"系统后台/角色管理" method:"get" summary:"获取角色信息"`
 	commonApi.Author
-	Id uint `p:"id" v:"required#角色id不能为空""`
+	Id uint `p:"id" v:"required#角色id不能为空"`
 }
 
 type RoleGetRes struct {

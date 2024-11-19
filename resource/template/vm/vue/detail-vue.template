@@ -154,6 +154,69 @@
                        :href="proxy.getUpFileUrl(item.url)" target="_blank">{{"{{"}}item.name{{"}}"}}</el-link>
             </div>
           </el-descriptions-item>
+        {{else if eq $column.HtmlType "imageSelector"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            <div class="pic-block" v-for="(img,key) in formData.{{$column.HtmlField}}" :key="'{{$column.HtmlField}}-'+key">
+              <el-image
+                      style="width: 150px; height: 150px"
+                      v-if="!proxy.isEmpty(img.url)"
+                      :src="proxy.getUpFileUrl(img.url)"
+                      fit="contain"></el-image>
+            </div>
+          </el-descriptions-item>
+        {{else if eq $column.HtmlType "fileSelector"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            <div class="file-block" v-for="(item,key) in formData.{{$column.HtmlField}}" :key="'{{$column.HtmlField}}-'+key">
+              <el-link type="primary" :underline="false"
+                       :href="proxy.getUpFileUrl(item.url)" target="_blank">{{"{{"}}item.name{{"}}"}}</el-link>
+            </div>
+          </el-descriptions-item>
+        {{else if eq $column.HtmlType "userSelectorSingle"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            {{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.userNickname:'' {{"}}"}}
+          </el-descriptions-item>
+        {{else if eq $column.HtmlType "deptSelectorSingle"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            {{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.deptName:'' {{"}}"}}
+          </el-descriptions-item>
+        {{else if eq $column.HtmlType "userSelectorMultiple"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            {{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.map((res:any)=>{return res.userNickname}).join('，'):'' {{"}}"}}
+          </el-descriptions-item>
+        {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+          <el-descriptions-item :span="{{$column.ColSpan}}">
+            <template #label>
+              <div class="cell-item">
+                {{$column.ColumnComment}}
+              </div>
+            </template>
+            {{"{{"}} formData.linked{{$column.GoField}}?formData.linked{{$column.GoField}}.map((res:any)=>{return res.deptName}).join('，'):'' {{"}}"}}
+          </el-descriptions-item>
         {{else if eq $column.HtmlType "keyValue"}}
           <el-descriptions-item :span="{{$column.ColSpan}}">
             <template #label>
@@ -296,7 +359,7 @@
       {{range $index, $column := .table.Columns}}
       {{if eq $column.HtmlType "radio"}}
       {{$column.HtmlField}}: false ,
-      {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "keyValue"}}
+      {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "keyValue" "imageSelector" "fileSelector" "deptSelectorMultiple" "userSelectorMultiple"}}
       {{$column.HtmlField}}: [] ,
       {{else}}
       {{$column.HtmlField}}: undefined,
@@ -310,11 +373,16 @@
       {{end}}
       {{end}}
       {{end}}
+      {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+      linked{{$column.GoField}}:[],
+      {{else if eq $column.HtmlType "userSelectorSingle" "deptSelectorSingle"}}
+      linked{{$column.GoField}}:null,
+      {{end}}
       {{end}}
       {{range $ti, $linkedTable := .table.LinkedTables}}
       linked{{$.table.ClassName}}{{$linkedTable.ClassName}}: {
         {{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
-        {{$linkedColumn.HtmlField}}:{{if eq $linkedColumn.HtmlType "images" "file" "files"}}[]{{else}}undefined{{end}},    // {{$linkedColumn.ColumnComment}}
+        {{$linkedColumn.HtmlField}}:{{if eq $linkedColumn.HtmlType "images" "file" "files" "imageSelector" "fileSelector" "deptSelectorMultiple" "userSelectorMultiple"}}[]{{else}}undefined{{end}},    // {{$linkedColumn.ColumnComment}}
         {{end}}
       },
       {{end}}
@@ -345,8 +413,10 @@
         {{else if eq $column.HtmlType "imagefile"}}
         //单图地址赋值
         imageUrl{{$column.GoField}}.value = data.{{$column.HtmlField}} ? proxy.getUpFileUrl(data.{{$column.HtmlField}}) : ''
-        {{else if eq $column.HtmlType "images" "file" "files" "keyValue"}}
+        {{else if eq $column.HtmlType "images" "file" "files" "keyValue" "imageSelector" "fileSelector"}}
         data.{{$column.HtmlField}} =data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : []
+        {{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+        data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?data.{{$column.HtmlField}}:[]
         {{end}}
         {{if eq $column.HtmlField "createdBy"}}
         data.createdBy = data.createdUser?.userNickname
@@ -379,7 +449,7 @@
       {{range $index, $column := .table.Columns}}
       {{if eq $column.HtmlType "radio"}}
       {{$column.HtmlField}}: false ,
-      {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "keyValue"}}
+      {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "keyValue" "imageSelector" "fileSelector" "userSelectorMultiple" "deptSelectorMultiple"}}
       {{$column.HtmlField}}: [] ,
       {{else}}
       {{$column.HtmlField}}: undefined,
@@ -393,11 +463,16 @@
       {{end}}
       {{end}}
       {{end}}
+      {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+      linked{{$column.GoField}}:[],
+      {{else if eq $column.HtmlType "userSelectorSingle" "deptSelectorSingle"}}
+      linked{{$column.GoField}}:null,
+      {{end}}
       {{end}}
       {{range $ti, $linkedTable := .table.LinkedTables}}
       linked{{$.table.ClassName}}{{$linkedTable.ClassName}}: {
         {{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
-        {{$linkedColumn.HtmlField}}:{{if eq $linkedColumn.HtmlType "images" "file" "files"}}[]{{else}}undefined{{end}},    // {{$linkedColumn.ColumnComment}}
+        {{$linkedColumn.HtmlField}}:{{if eq $linkedColumn.HtmlType "images" "file" "files" "imageSelector" "fileSelector" "userSelectorMultiple" "deptSelectorMultiple"}}[]{{else}}undefined{{end}},    // {{$linkedColumn.ColumnComment}}
         {{end}}
       },
       {{end}}

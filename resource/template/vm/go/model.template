@@ -17,10 +17,10 @@ package model
 
 
 {{range $index,$column :=.table.Columns}}
-    {{if and (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (ne $.table.ModuleName "system")}}
+    {{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
         {{$hasUser = true}}
     {{end}}
-    {{if eq $column.HtmlType "imagefile" "images" "file" "files" }}
+    {{if eq $column.HtmlType "imagefile" "images" "file" "files" "imageSelector" "fileSelector"}}
         {{$hasUpFile = true}}
     {{end}}
     {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
@@ -28,7 +28,7 @@ package model
     {{end}}
 {{end}}
 {{range $index,$column :=.table.EditColumns}}
-    {{if and (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (ne $.table.ModuleName "system")}}
+    {{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (eq $column.HtmlType "userSelectorMultiple" "userSelectorSingle" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
         {{$hasUser = true}}
     {{end}}
     {{if eq $column.GoType "Time"}}
@@ -54,7 +54,7 @@ import (
 type {{.table.ClassName}}InfoRes struct {
     gmeta.Meta   `orm:"table:{{.table.TableName}}"`
     {{range $index, $column := .table.Columns}}
-    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}{{if $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`    // {{$column.ColumnComment}} {{end}}
+    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}{{if $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`    // {{$column.ColumnComment}} {{end}}
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
     Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}"`
@@ -69,6 +69,18 @@ type {{.table.ClassName}}InfoRes struct {
     {{if eq $column.HtmlField "updatedBy"}}
     UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
     {{end}}
+    {{if eq $column.HtmlType "userSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
     {{end}}
 }
 
@@ -76,7 +88,7 @@ type {{.table.ClassName}}InfoRes struct {
 type Linked{{$.table.ClassName}}{{$linkedTable.ClassName}} struct {
     gmeta.Meta   `orm:"table:{{$linkedTable.TableName}}"`
 	{{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
-    {{$linkedColumn.GoField}}    {{if eq $linkedColumn.GoType "Time"}}*gtime.Time{{else}}{{$linkedColumn.GoType}}{{end}}         `orm:"{{$linkedColumn.ColumnName}}" json:"{{$linkedColumn.HtmlField}}" dc:"{{$linkedColumn.ColumnComment}}"`    // {{$linkedColumn.ColumnComment}}
+    {{$linkedColumn.GoField}}    {{if eq $linkedColumn.GoType "Time"}}*gtime.Time{{else if eq $linkedColumn.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$linkedColumn.GoType}}{{end}}         `orm:"{{$linkedColumn.ColumnName}}" json:"{{$linkedColumn.HtmlField}}" dc:"{{$linkedColumn.ColumnComment}}"`    // {{$linkedColumn.ColumnComment}}
 	{{end}}
     {{if eq $linkedTable.TplCategory "tree"}}
     {{$linkedTable.OptionsStruct.ColumnAttr.GoField}} {{$linkedTable.OptionsStruct.ColumnAttr.GoType}} `orm:"{{$linkedTable.OptionsStruct.ColumnAttr.ColumnName}}" json:"{{$linkedTable.OptionsStruct.ColumnAttr.HtmlField}}"`
@@ -90,12 +102,12 @@ type {{.table.ClassName}}ListRes struct{
     {{if eq .table.TplCategory "tree"}}
     {{range $index, $column := .table.Columns}}
     {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
-    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}{{if and $column.IsPk $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}{{if and $column.IsPk $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{end}}
     {{range $index, $column := .table.Columns}}
     {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
-    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
     Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
@@ -110,6 +122,18 @@ type {{.table.ClassName}}ListRes struct{
     {{if eq $column.HtmlField "updatedBy"}}
     UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
     {{end}}
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}SysUserSimpleRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{end}}
     {{else}}
@@ -126,11 +150,23 @@ type {{.table.ClassName}}ListRes struct{
     {{if eq $column.HtmlField "updatedBy"}}
     UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedBy"`
     {{end}}
-    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}{{if and $column.IsPk $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}{{if and $column.IsPk $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`
     {{range $ti, $linkedTable := $.table.LinkedTables}}
     {{if eq $column.LinkTableClass $linkedTable.ClassName}}
     Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}SysUserSimpleRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{end}}
     {{end}}
@@ -143,7 +179,7 @@ type {{.table.ClassName}}SearchReq struct {
     comModel.PageReq
     {{end}}
     {{range $index, $column := .table.QueryColumns}}
-    {{$column.GoField}}  {{if eq $column.GoType "Time" "int" "int64" "uint" "uint64" "float" "float64" "bool"}}{{if eq $column.QueryType "BETWEEN"}}[]{{end}}string{{else}}{{if eq $column.QueryType "BETWEEN"}}[]{{end}}{{$column.GoType}}{{end}} `p:"{{$column.HtmlField}}"{{if ne $column.FieldValidation ""}} v:"{{$column.FieldValidation}}"{{end}} dc:"{{$column.ColumnComment}}"` //{{$column.ColumnComment}}
+    {{$column.GoField}}  {{if eq $column.GoType "Time" "int" "int64" "uint" "uint64" "float" "float64" "bool"}}{{if eq $column.QueryType "BETWEEN"}}[]{{end}}string{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{if eq $column.QueryType "BETWEEN"}}[]{{end}}{{$column.GoType}}{{end}} `p:"{{$column.HtmlField}}"{{if ne $column.FieldValidation ""}} v:"{{$column.FieldValidation}}"{{end}} dc:"{{$column.ColumnComment}}"` //{{$column.ColumnComment}}
     {{end}}
 }
 
@@ -172,7 +208,7 @@ type {{.table.ClassName}}AddReq struct {
     {{.table.PkColumn.GoField}}    {{.table.PkColumn.GoType}}  `p:"{{.table.PkColumn.HtmlField}}" v:"required#主键ID不能为空" dc:"{{.table.PkColumn.ColumnComment}}"`
     {{end}}
     {{range $index, $column := .table.EditColumns}}
-    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}garray.StrArray{{else}}{{$column.GoType}}{{end}}   `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}} dc:"{{$column.ColumnComment}}"`
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}garray.StrArray{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}} dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{if .table.HasCreatedBy}}
     CreatedBy       uint64
@@ -187,7 +223,7 @@ type {{.table.ClassName}}AddReq struct {
 type {{.table.ClassName}}EditReq struct {
     {{.table.PkColumn.GoField}}    {{.table.PkColumn.GoType}}  `p:"{{.table.PkColumn.HtmlField}}" v:"required#主键ID不能为空" dc:"{{.table.PkColumn.ColumnComment}}"`
     {{range $index, $column := .table.EditColumns}}
-    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}garray.StrArray{{else}}{{$column.GoType}}{{end}} `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}} dc:"{{$column.ColumnComment}}"`
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}garray.StrArray{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}} `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}} dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{if .table.HasUpdatedBy}}
     UpdatedBy       uint64

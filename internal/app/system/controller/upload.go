@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/tiger1103/gfast/v3/api/v1/system"
-	"github.com/tiger1103/gfast/v3/internal/app/common/consts"
-	"github.com/tiger1103/gfast/v3/internal/app/common/service"
+	commonConsts "github.com/tiger1103/gfast/v3/internal/app/common/consts"
+	commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
+	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
+	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 )
 
 var Upload = new(uploadController)
@@ -16,26 +18,28 @@ type uploadController struct{}
 func (c *uploadController) SingleImg(ctx context.Context, req *system.UploadSingleImgReq) (res *system.UploadSingleRes, err error) {
 	file := req.File
 	v, _ := g.Cfg().Get(ctx, "upload.default")
-	response, err := service.Upload().UploadFile(ctx, file, consts.CheckFileTypeImg, v.Int())
+	response, err := commonService.Upload().UploadFile(ctx, file, commonConsts.CheckFileTypeImg, v.Int(), service.Context().Get(ctx).User.Id, consts.UploadAppId)
 	if err != nil {
 		return
 	}
 	res = &system.UploadSingleRes{
 		UploadResponse: response,
 	}
-	// 上传第三方
 	return
 }
 
 // 上传多图
-func (c *uploadController) MultipleImg(ctx context.Context, req *system.UploadMultipleImgReq) (res *system.UploadMultipleRes, err error) {
+func (c *uploadController) MultipleImg(ctx context.Context, req *system.UploadMultipleImgReq) (res system.UploadMultipleRes, err error) {
 	files := req.File
-	v, _ := g.Cfg().Get(ctx, "upload.default")
-	mf, err := service.Upload().UploadFiles(ctx, files, consts.CheckFileTypeImg, v.Int())
+	res, err = commonService.Upload().UploadFiles(ctx,
+		files,
+		commonConsts.CheckFileTypeImg,
+		g.Cfg().MustGet(ctx, "upload.default").Int(),
+		service.Context().Get(ctx).User.Id,
+		consts.UploadAppId)
 	if err != nil {
 		return
 	}
-	res = &mf
 	return
 }
 
@@ -43,7 +47,7 @@ func (c *uploadController) MultipleImg(ctx context.Context, req *system.UploadMu
 func (c *uploadController) SingleFile(ctx context.Context, req *system.UploadSingleFileReq) (res *system.UploadSingleRes, err error) {
 	file := req.File
 	v, _ := g.Cfg().Get(ctx, "upload.default")
-	response, err := service.Upload().UploadFile(ctx, file, consts.CheckFileTypeFile, v.Int())
+	response, err := commonService.Upload().UploadFile(ctx, file, commonConsts.CheckFileTypeFile, v.Int(), service.Context().Get(ctx).User.Id, consts.UploadAppId)
 	if err != nil {
 		return
 	}
@@ -54,13 +58,36 @@ func (c *uploadController) SingleFile(ctx context.Context, req *system.UploadSin
 }
 
 // 上传多文件
-func (c *uploadController) MultipleFile(ctx context.Context, req *system.UploadMultipleFileReq) (res *system.UploadMultipleRes, err error) {
+func (c *uploadController) MultipleFile(ctx context.Context, req *system.UploadMultipleFileReq) (res system.UploadMultipleRes, err error) {
 	files := req.File
-	v, _ := g.Cfg().Get(ctx, "upload.default")
-	mf, err := service.Upload().UploadFiles(ctx, files, consts.CheckFileTypeFile, v.Int())
+	res, err = commonService.Upload().UploadFiles(ctx,
+		files,
+		commonConsts.CheckFileTypeFile,
+		g.Cfg().MustGet(ctx, "upload.default").Int(),
+		service.Context().Get(ctx).User.Id,
+		consts.UploadAppId)
 	if err != nil {
 		return
 	}
-	res = &mf
+	return
+}
+
+func (c *uploadController) CheckMultipart(ctx context.Context, req *system.CheckMultipartReq) (res *system.CheckMultipartRes, err error) {
+	req.DriverType = g.Cfg().MustGet(ctx, "upload.default").Int()
+	req.UploadType = commonConsts.CheckFileTypeFile
+	req.UserId = service.Context().Get(ctx).User.Id
+	req.AppId = consts.UploadAppId
+	res = new(system.CheckMultipartRes)
+	res.CheckMultipartRes, err = commonService.Upload().CheckMultipart(ctx, req.CheckMultipartReq)
+	return
+}
+
+func (c *uploadController) UploadPart(ctx context.Context, req *system.UploadPartReq) (res *system.UploadPartRes, err error) {
+	res = new(system.UploadPartRes)
+	req.DriverType = g.Cfg().MustGet(ctx, "upload.default").Int()
+	req.UploadType = commonConsts.CheckFileTypeFile
+	req.UserId = service.Context().Get(ctx).User.Id
+	req.AppId = consts.UploadAppId
+	res.UploadPartRes, err = commonService.Upload().UploadPart(ctx, req.UploadPartReq)
 	return
 }

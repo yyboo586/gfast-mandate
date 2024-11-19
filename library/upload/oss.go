@@ -10,12 +10,13 @@ package upload
 import (
 	"context"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/grand"
-	"github.com/tiger1103/gfast/v3/api/v1/system"
+	"github.com/tiger1103/gfast/v3/internal/app/common/model"
 	"github.com/tiger1103/gfast/v3/library/liberr"
 	"mime/multipart"
 	"strconv"
@@ -31,7 +32,7 @@ type OSS struct {
 	Path            string `json:"path"`
 }
 
-func (s *OSS) Upload(ctx context.Context, file *ghttp.UploadFile) (result system.UploadResponse, err error) {
+func (s *OSS) Upload(ctx context.Context, file *ghttp.UploadFile) (result *model.UploadResponse, err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
 		var (
 			client *oss.Client
@@ -57,7 +58,7 @@ func (s *OSS) Upload(ctx context.Context, file *ghttp.UploadFile) (result system
 			schema = "https"
 		}
 		url := schema + "://" + s.EndPoint + "/" + name
-		result = system.UploadResponse{
+		result = &model.UploadResponse{
 			Size:     file.Size,
 			Path:     url,
 			FullPath: url,
@@ -89,5 +90,15 @@ func (s *OSS) getClient() (client *oss.Client, err error) {
 		s.AccessKeyID,
 		s.AccessKeySecret,
 		conn, time, cname, userAgent, verifySsl, redirect, crc, logLevel)
+	return
+}
+
+func (s *OSS) CheckMultipart(ctx context.Context, req *model.CheckMultipartReq) (res *model.CheckMultipartRes, err error) {
+	err = gerror.New("当前驱动暂不支持分片上传！")
+	return
+}
+
+func (s *OSS) UploadPart(ctx context.Context, req *model.UploadPartReq) (res *model.UploadPartRes, err error) {
+	err = gerror.New("当前驱动暂不支持分片上传！")
 	return
 }

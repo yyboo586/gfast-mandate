@@ -30,7 +30,7 @@ type RuleAddReq struct {
 	g.Meta `path:"/menu/add" tags:"系统后台/菜单管理" method:"post" summary:"添加菜单"`
 	commonApi.Author
 	MenuType  uint   `p:"menuType"  v:"min:0|max:2#菜单类型最小值为:min|菜单类型最大值为:max"`
-	Pid       uint   `p:"parentId"  v:"min:0"`
+	Pid       uint   `p:"pid"  v:"min:0"`
 	Name      string `p:"name" v:"required#请填写规则名称"`
 	Title     string `p:"menuName" v:"required|length:1,100#请填写标题|标题长度在:min到:max位"`
 	Icon      string `p:"icon"`
@@ -80,7 +80,7 @@ type RuleUpdateReq struct {
 	commonApi.Author
 	Id        uint   `p:"id" v:"required#id必须"`
 	MenuType  uint   `p:"menuType"  v:"min:0|max:2#菜单类型最小值为:min|菜单类型最大值为:max"`
-	Pid       uint   `p:"parentId"  v:"min:0"`
+	Pid       uint   `p:"pid"  v:"min:0"`
 	Name      string `p:"name" v:"required#请填写规则名称"`
 	Title     string `p:"menuName" v:"required|length:1,100#请填写标题|标题长度在:min到:max位"`
 	Icon      string `p:"icon"`
