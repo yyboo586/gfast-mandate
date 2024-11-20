@@ -11,7 +11,7 @@
  Target Server Version : 50736 (5.7.36)
  File Encoding         : 65001
 
- Date: 19/11/2024 10:31:20
+ Date: 20/11/2024 09:08:37
 */
 
 SET NAMES utf8mb4;
@@ -4200,7 +4200,7 @@ CREATE TABLE `sys_dict_data`  (
   `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`dict_code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 112 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典数据表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 122 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典数据表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -4282,6 +4282,16 @@ INSERT INTO `sys_dict_data` VALUES (108, 0, '一般', '2', 'notice_tag', '', '',
 INSERT INTO `sys_dict_data` VALUES (109, 0, '次要', '3', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:52:44', '2023-12-28 15:52:44');
 INSERT INTO `sys_dict_data` VALUES (110, 0, '重要', '4', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:52:53', '2023-12-28 15:52:53');
 INSERT INTO `sys_dict_data` VALUES (111, 0, '紧急', '5', 'notice_tag', '', '', 0, 1, 31, 0, '', '2023-12-28 15:53:01', '2023-12-28 15:53:01');
+INSERT INTO `sys_dict_data` VALUES (112, 0, '本地上传', '0', 'sys_upload_drive', '', '', 0, 1, 31, 0, '', '2024-10-23 14:37:27', '2024-10-23 14:37:27');
+INSERT INTO `sys_dict_data` VALUES (113, 0, '腾讯云', '1', 'sys_upload_drive', '', '', 0, 1, 31, 31, '', '2024-10-23 14:37:38', '2024-10-23 14:38:05');
+INSERT INTO `sys_dict_data` VALUES (114, 0, '七牛云', '2', 'sys_upload_drive', '', '', 0, 1, 31, 31, '', '2024-10-23 14:37:52', '2024-10-23 14:38:43');
+INSERT INTO `sys_dict_data` VALUES (115, 0, '阿里云', '3', 'sys_upload_drive', '', '', 0, 1, 31, 31, '', '2024-10-23 14:38:11', '2024-10-23 14:38:49');
+INSERT INTO `sys_dict_data` VALUES (116, 0, '图片', 'image', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:54:18', '2024-10-23 14:54:18');
+INSERT INTO `sys_dict_data` VALUES (117, 0, '文档', 'doc', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:54:32', '2024-10-23 14:54:32');
+INSERT INTO `sys_dict_data` VALUES (118, 0, '音频', 'audio', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:54:55', '2024-10-23 14:54:55');
+INSERT INTO `sys_dict_data` VALUES (119, 0, '视频', 'video', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:55:09', '2024-10-23 14:55:09');
+INSERT INTO `sys_dict_data` VALUES (120, 0, '压缩包', 'zip', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:55:22', '2024-10-23 14:55:22');
+INSERT INTO `sys_dict_data` VALUES (121, 0, '其它', 'other', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:55:40', '2024-10-23 14:55:40');
 
 -- ----------------------------
 -- Table structure for sys_dict_type
@@ -4299,7 +4309,7 @@ CREATE TABLE `sys_dict_type`  (
   `updated_at` datetime NULL DEFAULT NULL COMMENT '修改日期',
   PRIMARY KEY (`dict_id`) USING BTREE,
   UNIQUE INDEX `dict_type`(`dict_type`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 52 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典类型表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典类型表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -4329,6 +4339,8 @@ INSERT INTO `sys_dict_type` VALUES (48, '插件商城折扣', 'plugin_store_disc
 INSERT INTO `sys_dict_type` VALUES (49, 'CMS栏目导航位置', 'cms_nav_position', 1, 22, 0, '', '2021-08-31 15:37:04', '2021-08-31 15:37:04');
 INSERT INTO `sys_dict_type` VALUES (50, '操作日志类型', 'sys_oper_log_type', 1, 31, 0, '', '2022-12-21 11:55:02', '2022-12-21 11:55:02');
 INSERT INTO `sys_dict_type` VALUES (51, '系统公告标签', 'notice_tag', 1, 31, 0, '', '2023-12-28 15:48:03', '2023-12-28 15:48:03');
+INSERT INTO `sys_dict_type` VALUES (52, '附件上传驱动', 'sys_upload_drive', 1, 31, 31, '', '2024-10-23 14:36:17', '2024-10-23 14:36:30');
+INSERT INTO `sys_dict_type` VALUES (53, '上传文件类型', 'sys_upload_file_type', 1, 31, 0, '', '2024-10-23 14:53:50', '2024-10-23 14:53:50');
 
 -- ----------------------------
 -- Table structure for sys_job
