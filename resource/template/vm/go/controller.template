@@ -20,14 +20,20 @@ package controller
 {{$hasCommonService:=false}}
 {{$excel :=false}}
 {{$serviceVal := "service"}}
+{{$modelVal := "model"}}
 {{if ne .table.ModuleName "system"}}
     {{$serviceVal = "systemService"}}
+    {{$modelVal = "systemModel"}}
 {{end}}
+{{$usedSystemModel := false}}
 {{$impSystemService := false}}
 {{if or .table.ExcelPort .table.ExcelImp}}
 {{$excel = true}}
 {{end}}
 {{if .table.ExcelPort}}
+{{if .table.UseSnowId}}
+    {{$hasGconv = true}}
+{{end}}
 {{range $index, $column := .table.Columns}}
     {{if ne $column.DictType ""}}
         {{$hasGmap = true}}
@@ -41,6 +47,11 @@ package controller
         {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
             {{$hasGstr = true}}
         {{end}}
+    {{end}}
+    {{if and (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle") (ne $.table.ModuleName "system")}}
+        {{$usedSystemModel = true}}
+        {{$hasGconv = true}}
+        {{$impSystemService = true}}
     {{end}}
 {{end}}
 {{end}}
@@ -73,6 +84,9 @@ import (
     {{end}}
     {{if and (ne $.table.ModuleName "system") $hasSystemApi}}
     systemApi "{{$.goModName}}/api/v1/system"
+    {{end}}
+    {{if $usedSystemModel}}
+    systemModel "{{.goModName}}/internal/app/system/model"
     {{end}}
     {{if $hasCommonService}}
     commonService "{{.goModName}}/internal/app/common/service"
@@ -229,6 +243,39 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
             if v.UpdatedUser!=nil{
                 {{$column.HtmlField}} = v.UpdatedUser.UserNickname
             }
+            {{else if eq $column.HtmlType "userSelectorSingle"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str := ""
+            if v.Linked{{$column.GoField}} != nil {
+                {{$column.HtmlField}}Str = v.Linked{{$column.GoField}}.UserNickname
+            }
+            {{else if eq $column.HtmlType "userSelectorMultiple"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str:=""
+            v.Linked{{$column.GoField}}, err = {{$serviceVal}}.SysUser().GetUsers(ctx, gconv.Interfaces(v.{{$column.GoField}}))
+            if err != nil {
+                return
+            }
+            for _, us := range v.Linked{{$column.GoField}} {
+                {{$column.HtmlField}}Str += us.UserNickname + ","
+            }
+            {{else if eq $column.HtmlType "deptSelectorSingle"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str := ""
+            {{$column.HtmlField}}Obj := systemService.SysDept().GetByDept(ctx, v.DepartId)
+            if {{$column.HtmlField}}Obj != nil {
+                {{$column.HtmlField}}Str = {{$column.HtmlField}}Obj.DeptName
+            }
+            {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str := ""
+            linked{{$column.GoField}} := make([]*{{$modelVal}}.LinkDeptRes, len(v.{{$column.GoField}}))
+            for lk, lv := range v.{{$column.GoField}} {
+                linked{{$column.GoField}}[lk] = {{$serviceVal}}.SysDept().GetByDept(ctx, lv)
+            }
+            for _, dv := range linked{{$column.GoField}} {
+                {{$column.HtmlField}}Str += dv.DeptName + ","
+            }
             {{end}}
             {{end}}
             {{end}}
@@ -259,6 +306,20 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
                 {{$column.HtmlField}},
                 {{else if eq $column.HtmlType "date" "datetime"}}
                 v.{{$column.GoField}}.Format("Y-m-d H:i:s"),
+                {{else if eq $column.HtmlType "userSelectorSingle"}}
+                //用户选择器-单选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if eq $column.HtmlType "userSelectorMultiple"}}
+                //用户选择器-多选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if eq $column.HtmlType "deptSelectorSingle"}}
+                //部门选择器-单选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+                //部门选择器-多选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if and $column.IsPk $.table.UseSnowId}}
+                gconv.String(v.{{$column.GoField}}),
                 {{else}}
                 v.{{$column.GoField}},
                 {{end}}

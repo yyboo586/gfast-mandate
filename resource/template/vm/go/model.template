@@ -73,7 +73,7 @@ type {{.table.ClassName}}InfoRes struct {
     Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{if eq $column.HtmlType "userSelectorMultiple"}}
-    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}SysUserSimpleRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
     {{end}}
     {{if eq $column.HtmlType "deptSelectorSingle"}}
     Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`

@@ -39,7 +39,7 @@
         {{else if eq $column.HtmlType "select" "selects"}}
           {{if ne $column.LinkTableName ""}}
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-          <el-select filterable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}} {{if $column.IsCascadeParent}}@change="form{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if eq $column.HtmlType "selects"}}multiple{{end}}>
+          <el-select filterable clearable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}} {{if $column.IsCascadeParent}}@change="form{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if eq $column.HtmlType "selects"}}multiple{{end}}>
               <el-option
               {{if $column.IsCascade}}
                   v-for="item in {{$column.HtmlField}}FormOptions"
@@ -54,7 +54,7 @@
         </el-form-item>
           {{else if ne $column.DictType ""}}
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-          <el-select filterable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}}>
+          <el-select filterable clearable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}}>
             <el-option
               v-for="dict in {{$column.HtmlField}}Options"
               :key="dict.value"
@@ -69,7 +69,7 @@
         </el-form-item>
           {{else}}
         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
-          <el-select filterable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}}>
+          <el-select filterable clearable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsPk}}v-bind:disabled="this.currentOp === 'edit'" {{end}}>
             <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>

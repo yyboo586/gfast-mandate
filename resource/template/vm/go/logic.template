@@ -301,7 +301,7 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
                         {{end}}
                     {{end}}
                     {{end}}
-                    {{if eq $column.HtmlType "userSelectorSingle"}}
+                        {{if eq $column.HtmlType "userSelectorSingle"}}
                 Linked{{$column.GoField}} : v.Linked{{$column.GoField}},
                     {{end}}
                     {{if eq $column.HtmlType "userSelectorMultiple"}}
@@ -519,7 +519,10 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
         {{end}}
         {{if $hasDeptSelector}}
         {{range $index, $column := .table.Columns}}
-        {{if eq $column.HtmlType "deptSelectorSingle"}}
+        {{if eq $column.HtmlType "userSelectorMultiple"}}
+            res.Linked{{$column.GoField}}, err = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysUser().GetUsers(ctx, gconv.Interfaces(res.{{$column.GoField}}))
+            liberr.ErrIsNil(ctx, err)
+        {{else if eq $column.HtmlType "deptSelectorSingle"}}
             res.Linked{{$column.GoField}} = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, res.{{$column.GoField}})
         {{else if eq $column.HtmlType "deptSelectorMultiple"}}
             res.Linked{{$column.GoField}} = make([]*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.LinkDeptRes, len(res.{{$column.GoField}}))
