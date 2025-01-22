@@ -262,7 +262,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
             {{else if eq $column.HtmlType "deptSelectorSingle"}}
             //{{$column.ColumnComment}}
             {{$column.HtmlField}}Str := ""
-            {{$column.HtmlField}}Obj := systemService.SysDept().GetByDept(ctx, v.DepartId)
+            {{$column.HtmlField}}Obj := systemService.SysDept().GetByDept(ctx, v.{{$column.GoField}})
             if {{$column.HtmlField}}Obj != nil {
                 {{$column.HtmlField}}Str = {{$column.HtmlField}}Obj.DeptName
             }

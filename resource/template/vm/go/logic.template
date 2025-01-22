@@ -19,6 +19,7 @@ package {{$structName}}
 {{$hasLinkTable:=false}}
 {{$useCommonService:=false}}
 {{$hasDeptSelector:=false}}
+{{$hasUserMultipleSelector:=false}}
 {{$usedSystemModel := false}}
 {{range $index, $column := .table.Columns}}
 {{if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
@@ -26,6 +27,9 @@ package {{$structName}}
 {{end}}
 {{if eq $column.HtmlType "deptSelectorMultiple" "deptSelectorSingle"}}
 {{$hasDeptSelector = true}}
+{{end}}
+{{if eq $column.HtmlType "userSelectorMultiple"}}
+    {{$hasUserMultipleSelector = true}}
 {{end}}
 {{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy" "deptId") (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
 {{$usedSystemModule = true}}
@@ -206,12 +210,12 @@ func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.Cla
         listRes.List = make([]*model.{{.table.ClassName}}ListRes,len(res))
         for k,v:=range res{
             {{range $index, $column := .table.Columns}}
-            {{if eq $column.HtmlType "userSelectorMultiple"}}
+            {{if and $column.IsList (eq $column.HtmlType "userSelectorMultiple")}}
             var linked{{$column.GoField}} []*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.SysUserSimpleRes
             linked{{$column.GoField}}, err = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysUser().GetUsers(ctx, gconv.Interfaces(v.{{$column.GoField}}))
             liberr.ErrIsNil(ctx, err)
             {{end}}
-            {{if eq $column.HtmlType "deptSelectorMultiple"}}
+            {{if and $column.IsList (eq $column.HtmlType "deptSelectorMultiple")}}
             linked{{$column.GoField}} := make([]*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.LinkDeptRes, len(v.{{$column.GoField}}))
             for lk, lv := range v.{{$column.GoField}} {
                 linked{{$column.GoField}}[lk] = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, lv)
@@ -508,7 +512,7 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
     err =g.Try(ctx, func(ctx context.Context){
         err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
         liberr.ErrIsNil(ctx,err,"获取信息失败")
-        {{if or $.table.HasDeptId $hasDeptSelector}}
+        {{if or $.table.HasDeptId $hasDeptSelector $hasUserMultipleSelector}}
         if res!=nil{
         {{if $.table.HasDeptId}}
         {{if $usedSystemModule}}
@@ -517,7 +521,6 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
             res.DeptInfo = service.SysDept().GetByDept(ctx, res.DeptId)
         {{end}}
         {{end}}
-        {{if $hasDeptSelector}}
         {{range $index, $column := .table.Columns}}
         {{if eq $column.HtmlType "userSelectorMultiple"}}
             res.Linked{{$column.GoField}}, err = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysUser().GetUsers(ctx, gconv.Interfaces(res.{{$column.GoField}}))
@@ -529,7 +532,6 @@ func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.tabl
             for k, v := range res.{{$column.GoField}} {
                 res.Linked{{$column.GoField}}[k] = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v)
             }
-        {{end}}
         {{end}}
         {{end}}
         }

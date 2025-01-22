@@ -8,6 +8,7 @@ import (
 	_ "github.com/tiger1103/gfast/v3/internal/app/boot"
 	_ "github.com/tiger1103/gfast/v3/internal/app/system/packed"
 	"github.com/tiger1103/gfast/v3/internal/cmd"
+	_ "github.com/tiger1103/gfast/v3/library/libValidate"
 	_ "github.com/tiger1103/gfast/v3/task"
 )
 

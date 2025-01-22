@@ -132,6 +132,7 @@
           <el-date-picker clearable  style="width: 200px"
             v-model="formData.{{$column.HtmlField}}"
             type="date"
+            value-format="YYYY-MM-DD"
             placeholder="选择{{$column.ColumnComment}}">
           </el-date-picker>
         </el-form-item>
@@ -140,6 +141,7 @@
           <el-date-picker clearable  style="width: 200px"
             v-model="formData.{{$column.HtmlField}}"
             type="datetime"
+            value-format="YYYY-MM-DD HH:mm:ss"
             placeholder="选择{{$column.ColumnComment}}">
           </el-date-picker>
         </el-form-item>
