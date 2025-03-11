@@ -60,15 +60,20 @@ func (s *sSysRole) GetRoleListSearch(ctx context.Context, req *system.RoleListRe
 			model = model.Where("a."+dao.SysRole.Columns().Id+" in(?) OR a.created_by = ?", roleIds, userId)
 		}
 		model = model.As("a")
+		fields := "a.*, count(u.id) user_cnt"
 		if service.ToolsGenTable().IsMysql() {
 			model = model.LeftJoin("casbin_rule", "b", "b.v1  = a.id ")
 			model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id) = b.v0 ")
+		} else if service.ToolsGenTable().IsDM() {
+			fields = "a.id,a.pid,a.status,a.list_order,a.name,a.remark, a.created_at,COUNT(u.id) AS user_cnt"
+			model = model.LeftJoin("casbin_rule", "b", "b.v1  = a.id ")
+			model = model.LeftJoin("sys_user", "u", "('u_' || u.id) = b.v0 ")
 		} else {
 			model = model.LeftJoin("casbin_rule", "b", "b.v1  = cast(a.id AS VARCHAR) ")
 			model = model.LeftJoin("sys_user", "u", "CONCAT('u_',u.id)  =  b.v0")
 		}
 		model = model.Group("a.id")
-		err = model.Order("list_order asc,id asc").Fields("a.*, count(u.id) user_cnt").Scan(&res.List)
+		err = model.Order("list_order asc,id asc").Fields(fields).Scan(&res.List)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
 	})
 	return
@@ -239,7 +244,7 @@ func (s *sSysRole) EditRole(ctx context.Context, req *system.RoleEditReq) (err e
 				ListOrder:     req.ListOrder,
 				Name:          req.Name,
 				Remark:        req.Remark,
-				EffectiveTime: req.EffectiveTimeInfo,
+				EffectiveTime: gconv.String(req.EffectiveTimeInfo),
 			}).Update()
 			liberr.ErrIsNil(ctx, e, "修改角色失败")
 			//过滤ruleIds 把没有权限的过滤掉

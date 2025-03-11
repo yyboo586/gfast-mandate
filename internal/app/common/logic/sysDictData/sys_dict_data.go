@@ -66,14 +66,14 @@ func (s *sSysDictData) GetDictWithDataByType(ctx context.Context, dictType, defa
 		if err != nil {
 			return
 		}
-	}
-	//设置给定的默认值
-	for _, v := range dict.Values {
-		if defaultValue != "" {
-			if gstr.Equal(defaultValue, v.DictValue) {
-				v.IsDefault = 1
-			} else {
-				v.IsDefault = 0
+		//设置给定的默认值
+		for _, v := range dict.Values {
+			if defaultValue != "" {
+				if gstr.Equal(defaultValue, v.DictValue) {
+					v.IsDefault = 1
+				} else {
+					v.IsDefault = 0
+				}
 			}
 		}
 	}

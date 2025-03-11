@@ -470,7 +470,7 @@ func (s *sSysUser) List(ctx context.Context, req *system.UserSearchReq) (total i
 		}
 
 		if req.RoleId > 0 {
-			m = m.As("a").LeftJoin("casbin_rule", "b", "b.v0 = CONCAT('u_',a.id )")
+			m = m.LeftJoin("casbin_rule", "b", "b.v0 = CONCAT('u_',sys_user.id )")
 			m = m.Where("v1 = ? and SUBSTR(v0,1,2) = 'u_'", req.RoleId)
 		}
 		//判断权限，普通管理只能按数据权限查看

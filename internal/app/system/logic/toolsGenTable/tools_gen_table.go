@@ -7,6 +7,7 @@
 
 package toolsGenTable
 
+import "C"
 import (
 	"bufio"
 	"context"
@@ -29,6 +30,7 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
 	"github.com/tiger1103/gfast/v3/internal/app/system/dao"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model"
+	"github.com/tiger1103/gfast/v3/internal/app/system/model/do"
 	"github.com/tiger1103/gfast/v3/internal/app/system/model/entity"
 	"github.com/tiger1103/gfast/v3/internal/app/system/service"
 	"github.com/tiger1103/gfast/v3/library/liberr"
@@ -85,8 +87,8 @@ func (s *sToolsGenTable) SelectDbTableList(ctx context.Context, req *system.Tool
 	res = new(system.ToolsGenTableSearchRes)
 	db := g.DB()
 	err = g.Try(ctx, func(ctx context.Context) {
-		if !s.IsMysql() && !s.IsPg() {
-			liberr.ErrIsNil(ctx, gerror.New("代码生成暂时只支持mysql及postgresql数据库"))
+		if !s.IsMysql() && !s.IsPg() && !s.IsDM() {
+			liberr.ErrIsNil(ctx, gerror.New("代码生成暂时只支持mysql、postgresql及达梦数据库"))
 		}
 		var sqlStr string
 		if s.IsMysql() {
@@ -152,6 +154,42 @@ func (s *sToolsGenTable) SelectDbTableList(ctx context.Context, req *system.Tool
 			sqlStr += " order by pg_stat_get_last_analyze_time(pg_class.oid) desc,table_name asc LIMIT  " + gconv.String(req.PageSize) + " OFFSET " + gconv.String(page)
 			err = db.GetScan(ctx, &res.List, "select "+sqlStr)
 			liberr.ErrIsNil(ctx, err, "读取数据失败")
+		} else if s.IsDM() {
+			dbName := gstr.ToUpper(g.DB().GetConfig().Name)
+			sqlStr = " FROM  ALL_TABLES T " +
+				"LEFT JOIN  ALL_TAB_COMMENTS C  ON T.OWNER = C.OWNER AND T.TABLE_NAME = C.TABLE_NAME " +
+				"LEFT JOIN  DBA_OBJECTS O ON T.OWNER = O.OWNER AND T.TABLE_NAME = O.OBJECT_NAME " +
+				" AND O.OBJECT_TYPE = 'TABLE' "
+			sqlStr += " WHERE T.OWNER = '" + dbName + "'"
+			sqlStr += " AND T.TABLE_NAME NOT LIKE 'TOOLS_GEN_%' " +
+				" AND T.TABLE_NAME NOT IN (SELECT TABLE_NAME FROM TOOLS_GEN_TABLE) "
+			if req != nil {
+				if req.TableName != "" {
+					sqlStr += gdb.FormatSqlWithArgs(" AND T.TABLE_NAME like ?", []interface{}{"%" + req.TableName + "%"})
+				}
+
+				if req.TableComment != "" {
+					sqlStr += gdb.FormatSqlWithArgs(" AND C.COMMENTS like ?", []interface{}{"%" + req.TableComment + "%"})
+				}
+				if len(req.DateRange) > 0 {
+					sqlStr += gdb.FormatSqlWithArgs(" AND O.CREATED >= date_format(?,'%y%m%d') ", []interface{}{req.DateRange[0]})
+					sqlStr += gdb.FormatSqlWithArgs(" AND O.CREATED <= date_format(?,'%y%m%d') ", []interface{}{req.DateRange[1]})
+				}
+			}
+			countSql := "select count(1) " + sqlStr
+			res.Total, err = db.GetCount(ctx, countSql)
+			liberr.ErrIsNil(ctx, err, "读取总表数失败")
+			sqlStr = `T.TABLE_NAME,C.COMMENTS AS TABLE_COMMENT, O.CREATED AS CREATE_TIME, O.LAST_DDL_TIME AS UPDATE_TIME ` + sqlStr
+			if req.PageNum == 0 {
+				req.PageNum = 1
+			}
+			if req.PageSize == 0 {
+				req.PageSize = consts.PageSize
+			}
+			page := (req.PageNum - 1) * req.PageSize
+			sqlStr += " ORDER BY O.CREATED desc,T.TABLE_NAME asc LIMIT  " + gconv.String(req.PageSize) + " OFFSET " + gconv.String(page)
+			err = db.GetScan(ctx, &res.List, "SELECT "+sqlStr)
+			liberr.ErrIsNil(ctx, err, "读取数据失败")
 		}
 	})
 	return
@@ -161,8 +199,8 @@ func (s *sToolsGenTable) SelectDbTableList(ctx context.Context, req *system.Tool
 func (s *sToolsGenTable) SelectDbTableListByNames(ctx context.Context, tableNames []string) ([]*entity.ToolsGenTable, error) {
 	var result []*entity.ToolsGenTable
 	err := g.Try(ctx, func(ctx context.Context) {
-		if !s.IsMysql() && !s.IsPg() {
-			liberr.ErrIsNil(ctx, gerror.New("代码生成暂时只支持mysql及postgresql数据库"))
+		if !s.IsMysql() && !s.IsPg() && !s.IsDM() {
+			liberr.ErrIsNil(ctx, gerror.New("代码生成暂时只支持mysql、postgresql及达梦数据库"))
 		}
 		db := g.DB()
 		var sqlStr string
@@ -186,6 +224,22 @@ func (s *sToolsGenTable) SelectDbTableListByNames(ctx context.Context, tableName
 			}
 			err := db.GetScan(ctx, &result, sqlStr)
 			liberr.ErrIsNil(ctx, err, "获取表格信息失败")
+		} else if s.IsDM() {
+			dbName := gstr.ToUpper(g.DB().GetConfig().Name)
+			sqlStr = "SELECT T.TABLE_NAME,C.COMMENTS AS TABLE_COMMENT," +
+				"O.CREATED AS CREATE_TIME," +
+				"O.LAST_DDL_TIME AS UPDATE_TIME " +
+				"FROM ALL_TABLES T LEFT JOIN ALL_TAB_COMMENTS C " +
+				"ON T.OWNER = C.OWNER AND T.TABLE_NAME = C.TABLE_NAME " +
+				"LEFT JOIN DBA_OBJECTS O " +
+				"ON T.OWNER = O.OWNER " +
+				"AND T.TABLE_NAME = O.OBJECT_NAME " +
+				"AND O.OBJECT_TYPE = 'TABLE' " +
+				gdb.FormatSqlWithArgs("WHERE T.OWNER = ? ", []interface{}{dbName}) +
+				gdb.FormatSqlWithArgs("AND T.TABLE_NAME in(?) ", gconv.SliceAny(tableNames)) +
+				"ORDER BY O.CREATED DESC,T.TABLE_NAME ASC"
+			err := db.GetScan(ctx, &result, sqlStr)
+			liberr.ErrIsNil(ctx, err, "获取表格信息失败")
 		}
 	})
 	return result, err
@@ -206,8 +260,33 @@ func (s *sToolsGenTable) ImportGenTable(ctx context.Context, tableList []*entity
 					}
 					err = s.InitTable(ctx, table, genTableColumns)
 					liberr.ErrIsNil(ctx, err)
-					result, err1 := tx.Model(dao.ToolsGenTable.Table()).FieldsEx("table_id").
-						Insert(table)
+					result, err1 := tx.Model(dao.ToolsGenTable.Table()).
+						Data(do.ToolsGenTable{
+							TableName:      table.TableName,
+							TableComment:   table.TableComment,
+							ClassName:      table.ClassName,
+							TplCategory:    table.TplCategory,
+							PackageName:    table.PackageName,
+							ModuleName:     table.ModuleName,
+							BusinessName:   table.BusinessName,
+							FunctionName:   table.FunctionName,
+							FunctionAuthor: table.FunctionAuthor,
+							Options:        table.Options,
+							CreateTime:     table.CreateTime,
+							UpdateTime:     table.UpdateTime,
+							Remark:         table.Remark,
+							Overwrite:      table.Overwrite,
+							SortColumn:     table.SortColumn,
+							SortType:       table.SortType,
+							ShowDetail:     table.ShowDetail,
+							ExcelPort:      table.ExcelPort,
+							ExcelImp:       table.ExcelImp,
+							UseSnowId:      table.UseSnowId,
+							UseVirtual:     table.UseVirtual,
+							OverwriteInfo:  table.OverwriteInfo,
+							MenuPid:        table.MenuPid,
+						}).
+						Insert()
 					liberr.ErrIsNil(ctx, err1)
 					tmpId, err2 := result.LastInsertId()
 					liberr.ErrIsNil(ctx, err2, "保存数据失败")
@@ -300,6 +379,10 @@ func (s *sToolsGenTable) IsPg() bool {
 
 func (s *sToolsGenTable) IsMysql() bool {
 	return s.getDbDriver() == "mysql"
+}
+
+func (s *sToolsGenTable) IsDM() bool {
+	return s.getDbDriver() == "dm"
 }
 
 // DeleteTable 删除表信息
@@ -485,7 +568,31 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 		err = g.Try(ctx, func(ctx context.Context) {
 			_, err = tx.Model(dao.ToolsGenTable.Table()).
 				WherePri(table.TableId).
-				Update(table)
+				Update(do.ToolsGenTable{
+					TableName:      table.TableName,
+					TableComment:   table.TableComment,
+					ClassName:      table.ClassName,
+					TplCategory:    table.TplCategory,
+					PackageName:    table.PackageName,
+					ModuleName:     table.ModuleName,
+					BusinessName:   table.BusinessName,
+					FunctionName:   table.FunctionName,
+					FunctionAuthor: table.FunctionAuthor,
+					Options:        table.Options,
+					CreateTime:     table.CreateTime,
+					UpdateTime:     table.UpdateTime,
+					Remark:         table.Remark,
+					Overwrite:      table.Overwrite,
+					SortColumn:     table.SortColumn,
+					SortType:       table.SortType,
+					ShowDetail:     table.ShowDetail,
+					ExcelPort:      table.ExcelPort,
+					ExcelImp:       table.ExcelImp,
+					UseSnowId:      table.UseSnowId,
+					UseVirtual:     table.UseVirtual,
+					OverwriteInfo:  gconv.String(table.OverwriteInfo),
+					MenuPid:        table.MenuPid,
+				})
 			liberr.ErrIsNil(ctx, err, "保存表数据失败")
 			//保存列数据
 			if req.Columns != nil {
@@ -549,6 +656,7 @@ func (s *sToolsGenTable) SaveEdit(ctx context.Context, req *system.ToolsGenTable
 							}
 							_, err = tx.Model(dao.ToolsGenTableColumn.Table()).
 								WherePri(dbColumn.ColumnId).
+								FieldsEx(dao.ToolsGenTableColumn.Columns().ColumnId).
 								Update(dbColumn)
 							liberr.ErrIsNil(ctx, err, "保存列:"+dbColumn.ColumnName+"，数据失败")
 						}
@@ -1419,7 +1527,9 @@ func (s *sToolsGenTable) SyncTable(ctx context.Context, tableId int64) (err erro
 				//字段不存在则添加
 				if !alreadyExists {
 					service.ToolsGenTableColumn().InitColumnField(column, table)
-					_, err = tx.Model(dao.ToolsGenTableColumn.Table()).Insert(column)
+					_, err = tx.Model(dao.ToolsGenTableColumn.Table()).
+						FieldsEx(dao.ToolsGenTableColumn.Columns().ColumnId).
+						Insert(column)
 					liberr.ErrIsNil(ctx, err, fmt.Sprintf("保存列`%s`数据失败", column.ColumnName))
 				}
 			}

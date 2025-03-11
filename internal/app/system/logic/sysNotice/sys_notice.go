@@ -87,7 +87,7 @@ func (s *sSysNotice) List(ctx context.Context, req *model.SysNoticeSearchReq) (l
 		var res []*model.SysNoticeListRes
 
 		err = m.Page(req.PageNum, req.PageSize).Fields("" +
-			"n.*," +
+			"n.id,n.title,n.type,n.tag,n.remark,n.sort,n.status,n.created_by,n.created_at," +
 			"SUM(nr.clicks) as clickNumber" +
 			//"(nr.user_id=" + strconv.FormatUint(currentUserId, 10) + ") as isRead" +
 			"").Order(order).Group("n.id").Scan(&res)
@@ -117,7 +117,9 @@ func (s *sSysNotice) ListShow(ctx context.Context, req *model.SysNoticeSearchReq
 			m = m.Where("n."+dao.SysNotice.Columns().Type+" = ?", gconv.Int64(req.Type))
 			if gconv.Int(req.Type) == consts.SysLetterType {
 				if service.ToolsGenTable().IsMysql() {
-					m = m.Where(fmt.Sprintf("JSON_CONTAINS(n.receiver,'%d')", currentUserId))
+					m = m.Where("JSON_CONTAINS(n.receiver,?)", currentUserId)
+				} else if service.ToolsGenTable().IsDM() {
+					m = m.Where("INSTR(n.receiver,?)>?", currentUserId, 0)
 				} else {
 					m = m.Where(fmt.Sprintf("receiver::jsonb @> '%d'::jsonb", currentUserId))
 				}
@@ -146,8 +148,7 @@ func (s *sSysNotice) ListShow(ctx context.Context, req *model.SysNoticeSearchReq
 			order = req.OrderBy
 		}
 		var res []*model.SysNoticeListRes
-		err = m.Page(req.PageNum, req.PageSize).Fields("" +
-			"n.*,nr.id IS NOT NULL as isRead").Order(order).Scan(&res)
+		err = m.Page(req.PageNum, req.PageSize).Fields("n.*,CASE WHEN nr.id IS NOT NULL THEN 1 ELSE 0 END AS isRead").Order(order).Scan(&res)
 		liberr.ErrIsNil(ctx, err, "获取数据失败")
 		if req.IsTrim {
 			for k, v := range res {
@@ -238,7 +239,7 @@ func (s *sSysNotice) Add(ctx context.Context, req *model.SysNoticeAddReq) (err e
 			Tag:       req.Tag,
 			Content:   req.Content,
 			Remark:    req.Remark,
-			Receiver:  req.Receiver,
+			Receiver:  gconv.String(req.Receiver),
 			Sort:      req.Sort,
 			Status:    req.Status,
 			CreatedBy: req.CreatedBy,
@@ -276,7 +277,7 @@ func (s *sSysNotice) Edit(ctx context.Context, req *model.SysNoticeEditReq) (err
 			Remark:    req.Remark,
 			Sort:      req.Sort,
 			Status:    req.Status,
-			Receiver:  req.Receiver,
+			Receiver:  gconv.String(req.Receiver),
 			UpdatedBy: req.UpdatedBy,
 		}
 		_, err = dao.SysNotice.Ctx(ctx).WherePri(req.Id).Update(data)
