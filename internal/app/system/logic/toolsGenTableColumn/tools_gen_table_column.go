@@ -7,7 +7,6 @@
 
 package toolsGenTableColumn
 
-import "C"
 import (
 	"context"
 	"fmt"

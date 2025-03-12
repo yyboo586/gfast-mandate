@@ -7,7 +7,6 @@
 
 package toolsGenTable
 
-import "C"
 import (
 	"bufio"
 	"context"
