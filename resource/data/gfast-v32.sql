@@ -13,6 +13,9 @@
 
  Date: 20/11/2024 09:08:37
 */
+DROP DATABASE IF EXISTS `gfast-v32mandate` ;
+CREATE DATABASE `gfast-v32mandate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `gfast-v32mandate`;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
