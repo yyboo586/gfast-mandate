@@ -9,6 +9,7 @@ package controller
 
 import (
 	"context"
+
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -103,6 +104,13 @@ func (c *loginController) Login(ctx context.Context, req *system.UserLoginReq) (
 	menuList, permissions, err = service.SysUser().GetAdminRules(ctx, user.Id)
 	if err != nil {
 		return
+	}
+	for index, v := range menuList {
+		if v.UserMenu.Name == "apiV1SystemTMeeting" {
+			menuList = append(menuList[:index], menuList[index+1:]...)
+			menuList = append([]*model.UserMenus{v}, menuList...)
+			break
+		}
 	}
 	res = &system.UserLoginRes{
 		UserInfo:    user,

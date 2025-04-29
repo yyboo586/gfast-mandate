@@ -16,6 +16,6 @@ type EmptyRes struct {
 
 // ListRes 列表公共返回
 type ListRes struct {
-	CurrentPage int         `json:"currentPage"`
-	Total       interface{} `json:"total"`
+	CurrentPage int         `json:"CurrentPage"`
+	Total       interface{} `json:"Total"`
 }

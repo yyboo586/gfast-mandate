@@ -9,11 +9,13 @@ package router
 
 import (
 	"context"
+
 	"github.com/gogf/gf/v2/net/ghttp"
 	commonRouter "github.com/tiger1103/gfast/v3/internal/app/common/router"
 	commonService "github.com/tiger1103/gfast/v3/internal/app/common/service"
-	mqueueRouter "github.com/tiger1103/gfast/v3/internal/app/mqueue/router"
+	meetingRouter "github.com/tiger1103/gfast/v3/internal/app/onlinemeeting/router"
 	systemRouter "github.com/tiger1103/gfast/v3/internal/app/system/router"
+
 	"github.com/tiger1103/gfast/v3/library/libRouter"
 )
 
@@ -30,8 +32,10 @@ func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGro
 		systemRouter.R.BindController(ctx, group)
 		// 绑定公共路由
 		commonRouter.R.BindController(ctx, group)
+		// 绑定会议模块路由
+		meetingRouter.R.BindController(ctx, group)
 		// 测试消息队列用，可以删除
-		mqueueRouter.R.BindController(ctx, group)
+		// mqueueRouter.R.BindController(ctx, group)
 		//自动绑定定义的模块
 		if err := libRouter.RouterAutoBind(ctx, router, group); err != nil {
 			panic(err)

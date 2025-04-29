@@ -10,6 +10,8 @@ package middleware
 import (
 	"context"
 	"errors"
+	"log"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gmap"
@@ -48,6 +50,7 @@ func (s *sMiddleware) Ctx(r *ghttp.Request) {
 		return
 	}
 	if data != nil {
+		log.Println(data)
 		context := new(model.Context)
 		err = gconv.Struct(data.Data, &context.User)
 		if err != nil {

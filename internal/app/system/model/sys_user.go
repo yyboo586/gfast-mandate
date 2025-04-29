@@ -14,7 +14,8 @@ import (
 
 // LoginUserRes 登录返回
 type LoginUserRes struct {
-	Id           uint64 `orm:"id,primary"       json:"id"`           //
+	Id           uint64 `orm:"id,primary"       json:"id"` //
+	UserID       string ``
 	UserName     string `orm:"user_name,unique" json:"userName"`     // 用户名
 	Mobile       string `orm:"mobile" json:"mobile"`                 //手机号
 	UserNickname string `orm:"user_nickname"    json:"userNickname"` // 用户昵称
