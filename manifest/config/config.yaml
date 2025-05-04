@@ -45,7 +45,7 @@ gfToken:
   maxRefresh: 5400
   multiLogin: true
   encryptKey: "49c54195e750b04e74a8429b17896586"
-  cacheModel: "memory" #缓存模式 memory OR redis OR dist
+  cacheModel: "redis" #缓存模式 memory OR redis OR dist
   distPath: "./resource/data/distTokenDb" #使用磁盘缓存时配置数据缓存的目录
   excludePaths:
     - "/api/v1/system/login"
@@ -69,7 +69,7 @@ system:
   notCheckAuthAdminIds: [1, 2, 31] #无需验证后台权限的用户id
   dataDir: "./resource/data"
   cache:
-    model: "memory" #缓存模式 memory OR redis OR dist
+    model: "redis" #缓存模式 memory OR redis OR dist
     distPath: "./resource/data/distCacheDb" #使用磁盘缓存时配置数据缓存的目录
     prefix: "gFastV3Cache:" #缓存前缀
   verifyStatus: 0 #0关闭验证码 1图形验证码 2交互验证码
