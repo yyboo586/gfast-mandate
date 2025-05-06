@@ -33,8 +33,7 @@ type SqMeetingsColumns struct {
 	Type             string // 会议类型
 	Status           string // 会议状态
 	Location         string // 会议地点
-	CreatorName      string // 创建人名字
-	ModeratorName    string // 主持人名字
+	CreatorID        string // 创建人标识
 	Description      string // 会议描述信息
 	RecordingEnabled string // 是否开启会议录制
 	CreateTime       string // 会议创建时间
@@ -51,8 +50,7 @@ var sqMeetingsColumns = SqMeetingsColumns{
 	Type:             "type",
 	Status:           "status",
 	Location:         "location",
-	CreatorName:      "creator_name",
-	ModeratorName:    "moderator_name",
+	CreatorID:        "creator_id",
 	Description:      "description",
 	RecordingEnabled: "recording_enabled",
 	CreateTime:       "create_time",

@@ -26,8 +26,10 @@ type SqMeetingsParticipantsDao struct {
 // SqMeetingsColumns defines and stores column names for table sq_meetings.
 type SqMeetingsParticipantsColumns struct {
 	ID         string // 主键ID
-	MID        string // 会议ID
-	UserName   string // 会议参与人名字
+	RoomNumber string // 会议ID
+	UserID     string // 会议参与人标识
+	UserName   string // 参会人名称
+	Role       string // 参会角色
 	Status     string // 参会状态
 	UpdateTime string // 接受会议的时间
 	JoinTime   string // 加入会议的时间
@@ -36,8 +38,10 @@ type SqMeetingsParticipantsColumns struct {
 
 var sqMeetingsParticipantsColumns = SqMeetingsParticipantsColumns{
 	ID:         "id",
-	MID:        "mid",
+	RoomNumber: "m_room_number",
+	UserID:     "user_id",
 	UserName:   "user_name",
+	Role:       "role",
 	Status:     "status",
 	UpdateTime: "update_time",
 	JoinTime:   "join_time",

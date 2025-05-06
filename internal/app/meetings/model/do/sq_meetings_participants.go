@@ -14,14 +14,16 @@ import (
 	"github.com/gogf/gf/v2/util/gmeta"
 )
 
-// SqMeetings is the golang structure for table sq_meetings.
+// SqMeetingsParticipants is the golang structure for table sq_meetings_participants.
 type SqMeetingsParticipants struct {
 	gmeta.Meta `orm:"table:sq_meetings_participants, do:true"`
-	Id         interface{} `orm:"id,primary" json:"id"`          // 主键ID
-	MID        interface{} `orm:"mid" json:"mid"`                // 会议ID
-	UserName   interface{} `orm:"user_name" json:"userName"`     // 参会人名字
-	Status     interface{} `orm:"status" json:"status"`          // 与会状态
-	UpdateTime *gtime.Time `orm:"update_time" json:"updateTime"` // 会议创建时间
-	JoinTime   *gtime.Time `orm:"join_time" json:"joinTime"`     // 会议开始时间
-	ExitTime   *gtime.Time `orm:"exit_time" json:"exitTime"`     // 会议结束时间
+	Id         interface{} `orm:"id,primary" json:"id"`            // 主键ID
+	RoomNumber interface{} `orm:"m_room_number" json:"roomNumber"` // 会议ID
+	UserId     interface{} `orm:"user_id" json:"userId"`           // 参会人标识
+	UserName   interface{} `orm:"user_name" json:"userName"`       // 参会人名称
+	Role       interface{} `orm:"role" json:"role"`                // 参会人角色
+	Status     interface{} `orm:"status" json:"status"`            // 邀请状态
+	UpdateTime *gtime.Time `orm:"update_time" json:"updateTime"`   // 更新时间
+	JoinTime   *gtime.Time `orm:"join_time" json:"joinTime"`       // 会议开始时间
+	ExitTime   *gtime.Time `orm:"exit_time" json:"exitTime"`       // 会议结束时间
 }

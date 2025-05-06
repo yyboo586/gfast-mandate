@@ -25,8 +25,7 @@ type SqMeetings struct {
 	Type             interface{} `orm:"type" json:"type"`                          // 会议类型
 	Status           interface{} `orm:"status" json:"status"`                      // 会议状态
 	Location         interface{} `orm:"location" json:"location"`                  // 会议地点
-	CreatorName      interface{} `orm:"creator_name" json:"creatorName"`           // 创建人名字
-	ModeratorName    interface{} `orm:"moderator_name" json:"moderatorName"`       // 主持人名字
+	CreatorId        interface{} `orm:"creator_id" json:"creatorId"`               // 创建人名字
 	Description      interface{} `orm:"description" json:"description"`            // 会议描述信息
 	RecordingEnabled interface{} `orm:"recording_enabled" json:"recordingEnabled"` // 是否开启会议录制
 	CreateTime       *gtime.Time `orm:"create_time" json:"createTime"`             // 会议创建时间

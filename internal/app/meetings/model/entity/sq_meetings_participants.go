@@ -17,11 +17,12 @@ import (
 // SqMeetings is the golang structure for table sq_meetings.
 type SqMeetingsParticipants struct {
 	gmeta.Meta `orm:"table:sq_meetings_participants"`
-	Id         int64       `orm:"id,primary" json:"id"`          // 主键ID
-	MID        string      `orm:"mid" json:"mid"`                // 会议ID
-	UserName   string      `orm:"user_name" json:"userName"`     // 参会人名字
-	Status     int         `orm:"status" json:"status"`          // 与会状态
-	UpdateTime *gtime.Time `orm:"update_time" json:"updateTime"` // 会议创建时间
-	JoinTime   *gtime.Time `orm:"join_time" json:"joinTime"`     // 会议开始时间
-	ExitTime   *gtime.Time `orm:"exit_time" json:"exitTime"`     // 会议结束时间
+	Id         int64       `orm:"id,primary" json:"id"`            // 主键ID
+	RoomNumber string      `orm:"m_room_number" json:"roomNumber"` // 会议ID
+	UserId     string      `orm:"user_id" json:"userId"`           // 参会人标识
+	UserName   string      `orm:"user_name" json:"userName"`       // 参会人名称
+	Status     int         `orm:"status" json:"status"`            // 与会状态
+	UpdateTime *gtime.Time `orm:"update_time" json:"updateTime"`   // 会议创建时间
+	JoinTime   *gtime.Time `orm:"join_time" json:"joinTime"`       // 会议开始时间
+	ExitTime   *gtime.Time `orm:"exit_time" json:"exitTime"`       // 会议结束时间
 }

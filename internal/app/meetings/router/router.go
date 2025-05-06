@@ -24,14 +24,14 @@ type Router struct{}
 func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGroup) {
 	group.Group("/meetings", func(group *ghttp.RouterGroup) {
 		//context拦截器
-		group.Middleware(service.Middleware().Ctx)
+		// group.Middleware(service.Middleware().Ctx)
 		//自动绑定定义的控制器
 		if err := libRouter.RouterAutoBindBefore(ctx, router, group); err != nil {
 			panic(err)
 		}
 		//登录验证拦截
-		service.GfToken().Middleware(group)
-		group.Middleware(service.Middleware().Auth)
+		// service.GfToken().Middleware(group)
+		// group.Middleware(service.Middleware().Auth)
 		//后台操作日志记录
 		group.Hook("/*", ghttp.HookAfterOutput, service.OperateLog().OperationLog)
 		//自动绑定定义的控制器
