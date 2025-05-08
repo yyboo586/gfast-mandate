@@ -14,7 +14,7 @@ CREATE TABLE `sq_meetings` (
     `location` varchar(100) NOT NULL COMMENT '会议地点',
     `creator_id` varchar(36) NOT NULL COMMENT '会议创建人ID',
     `description` varchar(100) NOT NULL COMMENT '会议描述信息',
-    `recording_enabled` tinyint DEFAULT 0 COMMENT '是否开启会议录制',
+    -- `recording_enabled` tinyint DEFAULT 0 COMMENT '是否开启会议录制',
     `create_time` datetime NOT NULL DEFAULT NOW() COMMENT '会议创建时间',
     `start_time` datetime NOT NULL COMMENT '会议开始时间', -- 预约会议最长3个月
     `end_time` datetime COMMENT '会议结束时间', -- 根据实际结束时间设置

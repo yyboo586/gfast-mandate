@@ -15,6 +15,8 @@ import (
 	"github.com/tiger1103/gfast/v3/api/v1/meetings"
 	"github.com/tiger1103/gfast/v3/internal/app/meetings/service"
 	systemController "github.com/tiger1103/gfast/v3/internal/app/system/controller"
+	systemService "github.com/tiger1103/gfast/v3/internal/app/system/service"
+	"github.com/tiger1103/gfast/v3/library/liberr"
 )
 
 type sqMeetingsController struct {
@@ -23,54 +25,62 @@ type sqMeetingsController struct {
 
 var SqMeetings = new(sqMeetingsController)
 
-func (c *sqMeetingsController) Login(ctx context.Context, req *meetings.LoginReq) (res *meetings.LoginRes, err error) {
-	res = new(meetings.LoginRes)
-	res.Token = "Bearer 12345678"
-	return
-}
-
-// Add 添加会议信息表
-func (c *sqMeetingsController) Add(ctx context.Context, req *meetings.SqMeetingsAddReq) (res *meetings.SqMeetingsAddRes, err error) {
-	err = service.SqMeetings().Add(ctx, req)
+// Create 添加会议信息表
+func (c *sqMeetingsController) Create(ctx context.Context, req *meetings.CreateReq) (res *meetings.CreateRes, err error) {
+	res, err = service.SqMeetings().Create(ctx, req)
 	return
 }
 
 // Get 获取会议详细信息
-func (c *sqMeetingsController) Get(ctx context.Context, req *meetings.SqMeetingsGetDetailsReq) (res *meetings.SqMeetingsGetDetailsRes, err error) {
-	res = new(meetings.SqMeetingsGetDetailsRes)
+func (c *sqMeetingsController) Get(ctx context.Context, req *meetings.GetDetailsReq) (res *meetings.GetDetailsRes, err error) {
+	res = new(meetings.GetDetailsRes)
 	res, err = service.SqMeetings().GetByRoomNumber(ctx, req.RoomNumber)
 	return
 }
 
-// Get 获取历史会议信息
-func (c *sqMeetingsController) GetHistory(ctx context.Context, req *meetings.SqMeetingsGetHistoryReq) (res *meetings.SqMeetingsGetHistoryRes, err error) {
-	res = new(meetings.SqMeetingsGetHistoryRes)
-	res, err = service.SqMeetings().GetHistoryByUserID(ctx, req.UserID)
+func (c *sqMeetingsController) GetHistoryByUserID(ctx context.Context, req *meetings.ListHistoryReq) (res *meetings.ListRes, err error) {
+	res = new(meetings.ListRes)
+	res, err = service.SqMeetings().GetByScope(ctx, req.UserID, "history")
 	return
 }
 
 // Get 获取历史会议信息
-func (c *sqMeetingsController) GetFuture(ctx context.Context, req *meetings.SqMeetingsGetFutureReq) (res *meetings.SqMeetingsGetFutureRes, err error) {
-	res = new(meetings.SqMeetingsGetFutureRes)
-	res, err = service.SqMeetings().GetFutureByUserID(ctx, req.UserID)
+func (c *sqMeetingsController) GetFuture(ctx context.Context, req *meetings.ListFutureReq) (res *meetings.ListRes, err error) {
+	res = new(meetings.ListRes)
+	res, err = service.SqMeetings().GetByScope(ctx, req.UserID, "future")
 	return
 }
 
-// Cancel 取消会议
-func (c *sqMeetingsController) Cancel(ctx context.Context, req *meetings.SqMeetingsCancelReq) (res *meetings.SqMeetingsCancelRes, err error) {
-	err = service.SqMeetings().CancelByRoomNumber(ctx, req.RoomNumber)
+// ListAll 列表
+func (c *sqMeetingsController) ListAll(ctx context.Context, req *meetings.ListAllReq) (res *meetings.ListRes, err error) {
+	res = new(meetings.ListRes)
+	res, err = service.SqMeetings().ListAll(ctx, req)
 	return
 }
 
 // Edit 修改会议信息表
-func (c *sqMeetingsController) Edit(ctx context.Context, req *meetings.SqMeetingsEditReq) (res *meetings.SqMeetingsEditRes, err error) {
+func (c *sqMeetingsController) Edit(ctx context.Context, req *meetings.EditReq) (res *meetings.EditRes, err error) {
 	err = service.SqMeetings().Edit(ctx, req)
 	return
 }
 
-// List 列表
-func (c *sqMeetingsController) List(ctx context.Context, req *meetings.SqMeetingsSearchReq) (res *meetings.SqMeetingsSearchRes, err error) {
-	res = new(meetings.SqMeetingsSearchRes)
-	res.SqMeetingsSearchRes, err = service.SqMeetings().List(ctx, req.SqMeetingsSearchReq)
+// Cancel 取消会议
+func (c *sqMeetingsController) Cancel(ctx context.Context, req *meetings.CancelReq) (res *meetings.CancelRes, err error) {
+	err = service.SqMeetings().CancelByRoomNumber(ctx, req.RoomNumber)
+	return
+}
+
+func (c *sqMeetingsController) RemoveParticipants(ctx context.Context, req *meetings.RemoveParticipantsReq) (res *meetings.RemoveParticipantsRes, err error) {
+	err = service.SqMeetings().RemoveParticipants(ctx, req)
+	return
+}
+
+func (c *sqMeetingsController) Login(ctx context.Context, req *meetings.LoginReq) (res *meetings.LoginRes, err error) {
+	key := "sdssssssssssssssssssssssssssssssssssssssssssstom"
+	data, err := systemService.GfToken().GenerateToken(ctx, key, req.UserID)
+	liberr.ErrIsNil(ctx, err, "生成token失败")
+
+	res = new(meetings.LoginRes)
+	res.Token = data
 	return
 }

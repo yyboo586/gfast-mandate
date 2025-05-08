@@ -13,17 +13,16 @@ import (
 	"context"
 
 	"github.com/tiger1103/gfast/v3/api/v1/meetings"
-	"github.com/tiger1103/gfast/v3/internal/app/meetings/model"
 )
 
 type ISqMeetings interface {
-	Add(ctx context.Context, req *meetings.SqMeetingsAddReq) (err error)
-	GetByRoomNumber(ctx context.Context, roomNumber string) (res *meetings.SqMeetingsGetDetailsRes, err error)
-	GetHistoryByUserID(ctx context.Context, userID string) (res *meetings.SqMeetingsGetHistoryRes, err error)
-	GetFutureByUserID(ctx context.Context, userID string) (res *meetings.SqMeetingsGetFutureRes, err error)
+	Create(ctx context.Context, req *meetings.CreateReq) (res *meetings.CreateRes, err error)
+	GetByRoomNumber(ctx context.Context, roomNumber string) (res *meetings.GetDetailsRes, err error)
+	GetByScope(ctx context.Context, userID, scope string) (res *meetings.ListRes, err error)
+	ListAll(ctx context.Context, req *meetings.ListAllReq) (res *meetings.ListRes, err error)
+	Edit(ctx context.Context, req *meetings.EditReq) (err error)
 	CancelByRoomNumber(ctx context.Context, roomNumber string) (err error)
-	Edit(ctx context.Context, req *meetings.SqMeetingsEditReq) (err error)
-	List(ctx context.Context, req *model.SqMeetingsSearchReq) (res *model.SqMeetingsSearchRes, err error)
+	RemoveParticipants(ctx context.Context, req *meetings.RemoveParticipantsReq) (err error)
 }
 
 var localSqMeetings ISqMeetings

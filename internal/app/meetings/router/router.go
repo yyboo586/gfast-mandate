@@ -30,7 +30,7 @@ func (router *Router) BindController(ctx context.Context, group *ghttp.RouterGro
 			panic(err)
 		}
 		//登录验证拦截
-		// service.GfToken().Middleware(group)
+		service.GfToken().Middleware(group)
 		// group.Middleware(service.Middleware().Auth)
 		//后台操作日志记录
 		group.Hook("/*", ghttp.HookAfterOutput, service.OperateLog().OperationLog)

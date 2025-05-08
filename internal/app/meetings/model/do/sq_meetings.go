@@ -16,19 +16,19 @@ import (
 
 // SqMeetings is the golang structure for table sq_meetings.
 type SqMeetings struct {
-	gmeta.Meta       `orm:"table:sq_meetings, do:true"`
-	Id               interface{} `orm:"id,primary" json:"id"`                      // 主键ID
-	RoomNumber       interface{} `orm:"room_number" json:"roomNumber"`             // 会议ID
-	Topic            interface{} `orm:"topic" json:"topic"`                        // 会议主题
-	Mode             interface{} `orm:"mode" json:"mode"`                          // 会议模式
-	Distance         interface{} `orm:"distance" json:"distance"`                  // 电子围栏半径
-	Type             interface{} `orm:"type" json:"type"`                          // 会议类型
-	Status           interface{} `orm:"status" json:"status"`                      // 会议状态
-	Location         interface{} `orm:"location" json:"location"`                  // 会议地点
-	CreatorId        interface{} `orm:"creator_id" json:"creatorId"`               // 创建人名字
-	Description      interface{} `orm:"description" json:"description"`            // 会议描述信息
-	RecordingEnabled interface{} `orm:"recording_enabled" json:"recordingEnabled"` // 是否开启会议录制
-	CreateTime       *gtime.Time `orm:"create_time" json:"createTime"`             // 会议创建时间
-	StartTime        *gtime.Time `orm:"start_time" json:"startTime"`               // 会议开始时间
-	EndTime          *gtime.Time `orm:"end_time" json:"endTime"`                   // 会议结束时间
+	gmeta.Meta  `orm:"table:sq_meetings, do:true"`
+	Id          interface{} `orm:"id,primary" json:"id"`           // 主键ID
+	RoomNumber  interface{} `orm:"room_number" json:"roomNumber"`  // 会议ID
+	Topic       interface{} `orm:"topic" json:"topic"`             // 会议主题
+	Mode        interface{} `orm:"mode" json:"mode"`               // 会议模式
+	Distance    interface{} `orm:"distance" json:"distance"`       // 电子围栏半径
+	Type        interface{} `orm:"type" json:"type"`               // 会议类型
+	Status      interface{} `orm:"status" json:"status"`           // 会议状态
+	Location    interface{} `orm:"location" json:"location"`       // 会议地点
+	CreatorId   interface{} `orm:"creator_id" json:"creatorId"`    // 创建人名字
+	Description interface{} `orm:"description" json:"description"` // 会议描述信息
+	// RecordingEnabled interface{} `orm:"recording_enabled" json:"recordingEnabled"` // 是否开启会议录制
+	CreateTime *gtime.Time `orm:"create_time" json:"createTime"` // 会议创建时间
+	StartTime  *gtime.Time `orm:"start_time" json:"startTime"`   // 会议开始时间
+	EndTime    *gtime.Time `orm:"end_time" json:"endTime"`       // 会议结束时间
 }

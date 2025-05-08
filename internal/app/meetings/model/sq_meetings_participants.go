@@ -14,15 +14,15 @@ import (
 )
 
 type SqMeetingsParticipants struct {
-	ID         int64       `json:"-"`
-	RoomNumber string      `json:"room_number"`
-	UserID     string      `json:"user_id"`
-	UserName   string      `json:"user_name"`
-	Role       []string    `json:"role"`
-	Status     string      `json:"status"`
-	UpdateTime *gtime.Time `json:"update_time"`
-	JoinTime   *gtime.Time `json:"join_time"`
-	ExitTime   *gtime.Time `json:"exit_time"`
+	ID         int64 `json:"-"`
+	RoomNumber string
+	UserID     string
+	UserName   string
+	Role       []string
+	Status     string
+	UpdateTime *gtime.Time
+	JoinTime   *gtime.Time
+	ExitTime   *gtime.Time
 }
 
 type SqMeetingsParticipantsDB struct {
