@@ -31,7 +31,7 @@ database:
     Path: "resource/log/sql"
 
   default:
-    link: "mysql:root:12345678@tcp(localhost:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:12345678@tcp(47.109.79.103:3306)/sx?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -83,7 +83,7 @@ casbin:
 gfcli:
   gen:
     dao:
-      - link: "mysql:root:12345678@tcp(localhost:3306)/gfast-v32mandate"
+      - link: "mysql:root:12345678@tcp(47.109.79.103:3306)/sx"
         tables: "tools_gen_table,tools_gen_table_column"
         removePrefix: "gf_"
         descriptionTag: true
