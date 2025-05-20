@@ -9,7 +9,7 @@ import (
 type IFile interface {
 	Upload(ctx context.Context, req *meeting.FileUploadReq) (res *meeting.FileUploadRes, err error)
 	ListByRoom(ctx context.Context, req *meeting.FileListReq) (res *meeting.FileListRes, err error)
-	Delete(ctx context.Context, id int64, deletorID, deletorName string) (err error)
+	Delete(ctx context.Context, id int64) (err error)
 	Download(ctx context.Context, id int64) (res *meeting.FileDownloadRes, err error)
 }
 
