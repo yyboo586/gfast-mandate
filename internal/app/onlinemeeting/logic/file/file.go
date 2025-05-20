@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -14,6 +15,7 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/onlinemeeting/dao"
 	"github.com/tiger1103/gfast/v3/internal/app/onlinemeeting/model/do"
 	"github.com/tiger1103/gfast/v3/internal/app/onlinemeeting/service"
+	sysService "github.com/tiger1103/gfast/v3/internal/app/system/service"
 	"github.com/tiger1103/gfast/v3/internal/consts"
 )
 
@@ -42,8 +44,8 @@ func (f *File) Upload(ctx context.Context, req *meeting.FileUploadReq) (res *mee
 	if req.File == nil {
 		return nil, gerror.New("文件不能为空")
 	}
-	storagePath := fmt.Sprintf("static/%s/", req.RoomNumber)
-	saveName, err := req.File.Save(storagePath, true)
+	storagePath := fmt.Sprintf("/file/static/%s", req.RoomNumber)
+	saveName, err := req.File.Save("/home/www"+storagePath, true)
 	if err != nil {
 		deleteFile(storagePath + saveName)
 		return nil, err
@@ -56,7 +58,7 @@ func (f *File) Upload(ctx context.Context, req *meeting.FileUploadReq) (res *mee
 		SaveName:     saveName,
 		FileSize:     req.File.Size, // 字节
 		FileType:     1,
-		StoragePath:  "static/" + req.RoomNumber,
+		StoragePath:  storagePath,
 		Status:       1,
 		UploaderId:   req.UploaderID,
 		UploaderName: req.UploaderName,
@@ -95,7 +97,7 @@ func (f *File) Download(ctx context.Context, fileId int64) (res *meeting.FileDow
 	// 2. 构造文件访问路径（本地示例）
 	storagePath := fileInfo["storage_path"].String()
 	saveName := fileInfo["save_name"].String()
-	filePath := fmt.Sprintf("/%s/%s", storagePath, saveName) // 假设前端可通过此路径访问
+	filePath := fmt.Sprintf("%s/%s", storagePath, saveName) // 假设前端可通过此路径访问
 
 	res = &meeting.FileDownloadRes{
 		FilePath: filePath,
@@ -103,7 +105,9 @@ func (f *File) Download(ctx context.Context, fileId int64) (res *meeting.FileDow
 
 	return res, nil
 }
-func (f *File) Delete(ctx context.Context, fileId int64, deletorId, deletorName string) (err error) {
+func (f *File) Delete(ctx context.Context, fileId int64) (err error) {
+	operatorInfo := sysService.Context().GetLoginUser(ctx)
+
 	// 1. 查询文件信息
 	fileInfo, err := dao.TFile.Ctx(ctx).Where("id", fileId).One()
 	if err != nil {
@@ -117,8 +121,8 @@ func (f *File) Delete(ctx context.Context, fileId int64, deletorId, deletorName 
 	// 2. 更新数据库记录（软删除）
 	_, err = dao.TFile.Ctx(ctx).Where("id", fileId).Update(do.TFile{
 		Status:      2, // 已删除
-		DeletorId:   deletorId,
-		DeletorName: deletorName,
+		DeletorId:   operatorInfo.UserID,
+		DeletorName: operatorInfo.UserName,
 		DeleteTime:  gtime.Now(),
 	})
 
@@ -160,11 +164,20 @@ func (f *File) ListByRoom(ctx context.Context, req *meeting.FileListReq) (res *m
 	}
 	list := make([]*meeting.FileEntity, 0)
 	for _, v := range fileList.List() {
+		log.Println(v["upload_time"])
 		list = append(list, &meeting.FileEntity{
-			ID:       fmt.Sprintf("%d", v["id"].(int64)),
-			FileName: v["file_name"].(string),
+			ID:           fmt.Sprintf("%d", v["id"].(int64)),
+			FileName:     v["file_name"].(string),
+			FileSize:     v["file_size"].(uint32),
+			UploaderID:   v["uploader_id"].(string),
+			UploaderName: v["uploader_name"].(string),
+			UploadTime:   v["upload_time"].(*gtime.Time),
 		})
 	}
+
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].FileSize > list[j].FileSize
+	})
 
 	res = &meeting.FileListRes{
 		List: list,

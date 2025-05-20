@@ -34,7 +34,7 @@ var (
 			s.SetIndexFolder(true)
 
 			// 获取静态文件根目录
-			basePath := gfile.RealPath("./static")
+			basePath := gfile.RealPath("/home/www/file/static")
 			if !gfile.Exists(basePath) {
 				g.Log().Fatalf(ctx, "静态文件目录不存在: %s", basePath)
 			}

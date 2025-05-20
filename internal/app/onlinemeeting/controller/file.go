@@ -29,7 +29,7 @@ func (c *fileController) Upload(ctx context.Context, req *meeting.FileUploadReq)
 
 func (c *fileController) Delete(ctx context.Context, req *meeting.FileDeleteReq) (res *meeting.FileDeleteRes, err error) {
 	res = new(meeting.FileDeleteRes)
-	err = service.File().Delete(ctx, req.ID, req.DeletorID, req.DeletorName)
+	err = service.File().Delete(ctx, req.ID)
 	return
 }
 

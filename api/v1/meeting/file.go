@@ -3,6 +3,7 @@ package meeting
 import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/tiger1103/gfast/v3/api/v1/common"
 )
 
@@ -32,9 +33,9 @@ type FileDownloadRes struct {
 type FileDeleteReq struct {
 	g.Meta `path:"/file_delete" method:"delete" tags:"会议管理" summary:"删除文件"`
 	common.Author
-	ID          int64  `p:"id" v:"required#文件ID必须" dc:"文件ID"`
-	DeletorID   string `v:"required#删除者ID必须" dc:"删除者ID"`
-	DeletorName string `v:"required#删除者名称必须" dc:"删除者名称"`
+	ID int64 `p:"id" v:"required#文件ID必须" dc:"文件ID"`
+	// DeletorID   string `v:"required#删除者ID必须" dc:"删除者ID"`
+	// DeletorName string `v:"required#删除者名称必须" dc:"删除者名称"`
 }
 
 type FileDeleteRes struct {
@@ -49,8 +50,12 @@ type FileListReq struct {
 }
 
 type FileEntity struct {
-	ID       string
-	FileName string
+	ID           string
+	FileName     string
+	FileSize     uint32
+	UploaderID   string
+	UploaderName string
+	UploadTime   *gtime.Time
 }
 
 type FileListRes struct {
