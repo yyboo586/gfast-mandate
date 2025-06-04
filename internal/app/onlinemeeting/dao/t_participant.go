@@ -28,11 +28,7 @@ var (
 // Add your custom methods and functionality below.
 func (t *tMeetingParticipantDao) GetByRoomNumber(ctx context.Context, roomNumber string) (res []*entity.MeetingParticipantDB, err error) {
 	res = make([]*entity.MeetingParticipantDB, 0)
-	if err = t.Ctx(ctx).Where(TMeetingParticipant.Columns().MRoomNumber, roomNumber).Scan(&res); err != nil {
-		err = gerror.New(fmt.Sprintf("tMeetingParticipantDao.GetByRoomNumber: %v", err.Error()))
-		return
-	}
-
+	err = t.Ctx(ctx).Where(TMeetingParticipant.Columns().MRoomNumber, roomNumber).Scan(&res)
 	return
 }
 

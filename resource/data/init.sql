@@ -19,6 +19,77 @@ CREATE DATABASE OnlineMeeting DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8
 USE OnlineMeeting;
 
 --
+-- Table structure for table `t_meeting`
+--
+
+DROP TABLE IF EXISTS `t_meeting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `t_meeting` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `room_number` char(9) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID',
+  `topic` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mode` tinyint(1) NOT NULL,
+  `distance` int NOT NULL,
+  `type` tinyint(1) NOT NULL,
+  `status` tinyint(1) NOT NULL,
+  `location` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `creator_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID',
+  `description` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_time` datetime NOT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_room_number` (`room_number`),
+  KEY `idx_topic` (`topic`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `t_meeting`
+--
+
+LOCK TABLES `t_meeting` WRITE;
+/*!40000 ALTER TABLE `t_meeting` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_meeting` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `t_meeting_participant`
+--
+
+DROP TABLE IF EXISTS `t_meeting_participant`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `t_meeting_participant` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `m_room_number` char(9) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID, t_meetingroom_number',
+  `user_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID',
+  `user_name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` int unsigned NOT NULL COMMENT ', 1:, 2:, 3:',
+  `status` tinyint(1) NOT NULL COMMENT ', 1:, 2:, 3:',
+  `update_time` datetime DEFAULT NULL COMMENT '/',
+  `join_time` datetime DEFAULT NULL,
+  `exit_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_room_number_user_id` (`m_room_number`,`user_id`),
+  KEY `idx_user_id` (`user_id`),
+  CONSTRAINT `t_meeting_participant_ibfk_1` FOREIGN KEY (`m_room_number`) REFERENCES `t_meeting` (`room_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `t_meeting_participant`
+--
+
+LOCK TABLES `t_meeting_participant` WRITE;
+/*!40000 ALTER TABLE `t_meeting_participant` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_meeting_participant` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+--
 -- Table structure for table `casbin_rule`
 --
 
@@ -722,75 +793,6 @@ LOCK TABLES `t_file` WRITE;
 /*!40000 ALTER TABLE `t_file` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `t_meeting`
---
-
-DROP TABLE IF EXISTS `t_meeting`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_meeting` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `room_number` char(9) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID',
-  `topic` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mode` tinyint(1) NOT NULL,
-  `distance` int NOT NULL,
-  `type` tinyint(1) NOT NULL,
-  `status` tinyint(1) NOT NULL,
-  `location` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `creator_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID',
-  `description` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `create_time` datetime NOT NULL,
-  `start_time` datetime NOT NULL,
-  `end_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_room_number` (`room_number`),
-  KEY `idx_topic` (`topic`),
-  KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `t_meeting`
---
-
-LOCK TABLES `t_meeting` WRITE;
-/*!40000 ALTER TABLE `t_meeting` DISABLE KEYS */;
-/*!40000 ALTER TABLE `t_meeting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `t_meeting_participant`
---
-
-DROP TABLE IF EXISTS `t_meeting_participant`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_meeting_participant` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `m_room_number` char(9) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID, t_meetingroom_number',
-  `user_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ID',
-  `user_name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` int unsigned NOT NULL COMMENT ', 1:, 2:, 3:',
-  `status` tinyint(1) NOT NULL COMMENT ', 1:, 2:, 3:',
-  `update_time` datetime DEFAULT NULL COMMENT '/',
-  `join_time` datetime DEFAULT NULL,
-  `exit_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_room_number_user_id` (`m_room_number`,`user_id`),
-  KEY `idx_user_id` (`user_id`),
-  CONSTRAINT `t_meeting_participant_ibfk_1` FOREIGN KEY (`m_room_number`) REFERENCES `t_meeting` (`room_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `t_meeting_participant`
---
-
-LOCK TABLES `t_meeting_participant` WRITE;
-/*!40000 ALTER TABLE `t_meeting_participant` DISABLE KEYS */;
-/*!40000 ALTER TABLE `t_meeting_participant` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `tools_gen_table`

@@ -26,6 +26,20 @@ var (
 )
 
 // Add your custom methods and functionality below.
+func (t tMeetingDao) CheckExistsByRoomNumber(ctx context.Context, roomNumber string) (exists bool, err error) {
+	exists, err = t.Ctx(ctx).Where(TMeeting.Columns().RoomNumber, roomNumber).Exist()
+	return
+}
+
+func (t tMeetingDao) GetByRoomNumber(ctx context.Context, roomNumber string) (res *entity.MeetingDB, err error) {
+	res = &entity.MeetingDB{}
+	if err = t.Ctx(ctx).Where(TMeeting.Columns().RoomNumber, roomNumber).Scan(&res); err != nil {
+		return
+	}
+	res.Members, err = TMeetingParticipant.GetByRoomNumber(ctx, roomNumber)
+	return
+}
+
 func (t tMeetingDao) GetFieldsByRoomID(ctx context.Context, roomNumber string, fields []interface{}) (res *entity.MeetingDB, err error) {
 	m := t.Ctx(ctx).Where(TMeeting.Columns().RoomNumber, roomNumber)
 	count, err := m.Count()
@@ -41,19 +55,6 @@ func (t tMeetingDao) GetFieldsByRoomID(ctx context.Context, roomNumber string, f
 	if err != nil {
 		return nil, gerror.New(fmt.Sprintf("dao.GetFieldsByRoomID: %v", err.Error()))
 	}
-	return
-}
-
-func (t tMeetingDao) GetByRoomID(ctx context.Context, roomNumber string, fields []interface{}) (res *entity.MeetingDB, err error) {
-	res = &entity.MeetingDB{}
-
-	err = t.Ctx(ctx).Where(TMeeting.Columns().RoomNumber, roomNumber).Scan(&res)
-	if err != nil {
-		err = gerror.New(fmt.Sprintf("tMeetingDao.GetByRoomID: %v", err.Error()))
-		return
-	}
-	res.Members, err = TMeetingParticipant.GetByRoomNumber(ctx, roomNumber)
-
 	return
 }
 

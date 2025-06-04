@@ -44,10 +44,10 @@ func (f *File) Upload(ctx context.Context, req *meeting.FileUploadReq) (res *mee
 	if req.File == nil {
 		return nil, gerror.New("文件不能为空")
 	}
-	storagePath := fmt.Sprintf("/file/static/%s", req.RoomNumber)
-	saveName, err := req.File.Save("/home/www"+storagePath, true)
+	storagePath := fmt.Sprintf("/home/www/file/static/%s", req.RoomNumber)
+	saveName, err := req.File.Save(storagePath, true)
 	if err != nil {
-		deleteFile(storagePath + saveName)
+		// deleteFile(storagePath + saveName)
 		return nil, err
 	}
 	id := f.node.Generate()
@@ -164,11 +164,11 @@ func (f *File) ListByRoom(ctx context.Context, req *meeting.FileListReq) (res *m
 	}
 	list := make([]*meeting.FileEntity, 0)
 	for _, v := range fileList.List() {
-		log.Println(v["upload_time"])
 		list = append(list, &meeting.FileEntity{
 			ID:           fmt.Sprintf("%d", v["id"].(int64)),
 			FileName:     v["file_name"].(string),
 			FileSize:     v["file_size"].(uint32),
+			FilePath:     v["storage_path"].(string) + "/" + v["save_name"].(string),
 			UploaderID:   v["uploader_id"].(string),
 			UploaderName: v["uploader_name"].(string),
 			UploadTime:   v["upload_time"].(*gtime.Time),

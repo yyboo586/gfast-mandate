@@ -19,7 +19,7 @@ func (c *meetingController) Create(ctx context.Context, req *meeting.CreateReq) 
 	return
 }
 
-func (c *meetingController) Get(ctx context.Context, req *meeting.GetDetailsReq) (res *meeting.GetDetailsRes, err error) {
+func (c *meetingController) GetByRoomNumber(ctx context.Context, req *meeting.GetDetailsReq) (res *meeting.GetDetailsRes, err error) {
 	res = new(meeting.GetDetailsRes)
 	res, err = service.Meeting().GetByRoomNumber(ctx, req.RoomNumber)
 	return
@@ -27,13 +27,13 @@ func (c *meetingController) Get(ctx context.Context, req *meeting.GetDetailsReq)
 
 func (c *meetingController) GetHistory(ctx context.Context, req *meeting.ListHistoryReq) (res *meeting.ListRes, err error) {
 	res = new(meeting.ListRes)
-	res, err = service.Meeting().GetByScope(ctx, &req.ListReq, "history")
+	res, err = service.Meeting().ListByScope(ctx, &req.ListReq, model.MeetingScopeHistory)
 	return
 }
 
 func (c *meetingController) GetFuture(ctx context.Context, req *meeting.ListFutureReq) (res *meeting.ListRes, err error) {
 	res = new(meeting.ListRes)
-	res, err = service.Meeting().GetByScope(ctx, &req.ListReq, "future")
+	res, err = service.Meeting().ListByScope(ctx, &req.ListReq, model.MeetingScopeFuture)
 	return
 }
 
@@ -74,8 +74,8 @@ func (c *meetingController) InviteParticipants(ctx context.Context, req *meeting
 	userInfos := make([]*model.UserInfo, 0)
 	for _, v := range req.UserInfos {
 		userInfos = append(userInfos, &model.UserInfo{
-			ID:   v.UserID,
-			Name: v.UserName,
+			UserID:   v.UserID,
+			UserName: v.UserName,
 		})
 	}
 	err = service.Meeting().InviteParticipants(ctx, req.RoomNumber, userInfos)
@@ -91,6 +91,7 @@ func (c *meetingController) RemoveParticipants(ctx context.Context, req *meeting
 	return
 }
 
+// 处理会议邀请
 func (c *meetingController) UpdateParticipantStatus(ctx context.Context, req *meeting.UpdateParticipantStatusReq) (res *meeting.UpdateParticipantStatusRes, err error) {
 	res = new(meeting.UpdateParticipantStatusRes)
 	valid := service.Meeting().CheckParticipantStatusValid(req.Status)
@@ -102,7 +103,7 @@ func (c *meetingController) UpdateParticipantStatus(ctx context.Context, req *me
 	actionInfo := &model.HandleUserAction{
 		RoomNumber: req.RoomNumber,
 		UserID:     req.UserID,
-		Action:     model.ActionInvite,
+		Action:     model.ActionMeetingInvite,
 		Status:     req.Status,
 	}
 	err = service.Meeting().HandleUserAction(ctx, actionInfo)

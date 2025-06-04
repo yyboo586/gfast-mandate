@@ -53,6 +53,7 @@ type FileEntity struct {
 	ID           string
 	FileName     string
 	FileSize     uint32
+	FilePath     string
 	UploaderID   string
 	UploaderName string
 	UploadTime   *gtime.Time

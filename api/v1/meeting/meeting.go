@@ -30,6 +30,7 @@ type CreateReq struct {
 	CreatorName   string      `v:"required#会议创建人名字不能为空" dc:"创建人名字"`
 	Description   string      `dc:"会议描述信息"`
 	StartTime     *gtime.Time `v:"required#会议开始时间不能为空" dc:"会议开始时间"`
+	EndTime       *gtime.Time `v:"required#会议结束时间不能为空" dc:"会议结束时间"`
 	MemberInfos   []*UserInfo `v:"required#参会人员信息不能为空"  dc:"邀请参会人员信息集合"`
 }
 
@@ -44,12 +45,13 @@ type CreateRes struct {
 	ModeratorName string
 	Description   string
 	StartTime     *gtime.Time
+	EndTime       *gtime.Time
 }
 
 type GetDetailsReq struct {
 	g.Meta `path:"/get_details" tags:"会议管理" method:"get" summary:"获取会议详情"`
 	common.Author
-	RoomNumber string `v:"required#会议ID必须"`
+	RoomNumber string `dc:"会议室ID" v:"required#会议ID必须"`
 }
 
 type GetDetailsRes struct {
@@ -102,7 +104,7 @@ type ListRes struct {
 type EditReq struct {
 	g.Meta `path:"/edit" tags:"会议管理" method:"put" summary:"修改会议信息"`
 	common.Author
-	RoomNumber  string      `v:"required#会议ID不能为空" dc:"会议ID"`
+	RoomNumber  string      `dc:"会议ID" v:"required#会议ID不能为空"`
 	Topic       string      `dc:"会议主题"`
 	Type        string      `dc:"会议类型(即时会议/预约会议)"`
 	Mode        string      `dc:"会议模式(漫游模式/会议室模式/虚拟人模式)"`

@@ -13,7 +13,7 @@ type IMeeting interface {
 	// 获取会议详情
 	GetByRoomNumber(ctx context.Context, roomNumber string) (res *meeting.GetDetailsRes, err error)
 	// 根据scope获取会议列表
-	GetByScope(ctx context.Context, req *meeting.ListReq, scope string) (res *meeting.ListRes, err error)
+	ListByScope(ctx context.Context, req *meeting.ListReq, scope string) (res *meeting.ListRes, err error)
 	// 获取所有会议
 	ListAll(ctx context.Context, req *meeting.ListAllReq) (res *meeting.ListRes, err error)
 	// 编辑会议基本信息
